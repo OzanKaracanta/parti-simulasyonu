@@ -175,9 +175,55 @@
 
 .topbar-resources {
   display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  min-width: 0;
+}
+
+.topbar-resources-kicker {
+  font-size: 8px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ps-text-faint);
+  line-height: 1;
+}
+
+.topbar-resources-chips {
+  display: flex;
   align-items: center;
   gap: 6px;
-  min-width: 0;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.party-reputation {
+  margin: 4px 0 0;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--ps-text-dim);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.party-reputation-icon {
+  color: var(--ps-caution, #c9a227);
+  font-size: 10px;
+}
+
+.resource-bar-section-label {
+  margin: 0 0 6px;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ps-text-faint);
+}
+
+.resource-bar-section-label--spaced {
+  margin-top: 12px;
 }
 
 .resource-chip {
@@ -195,6 +241,37 @@
 
 .resource-chip:hover {
   border-color: var(--ps-border-strong);
+}
+
+.resource-chip--energy .resource-pending {
+  display: block;
+  font-size: 8px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--ps-crisis);
+  letter-spacing: 0.02em;
+}
+
+.end-week-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
+  line-height: 1.2;
+  flex-shrink: 0;
+  min-width: 7.5rem;
+}
+
+.end-week-btn-label {
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+.end-week-btn-energy {
+  font-size: 9px;
+  font-weight: 600;
+  opacity: 0.9;
+  letter-spacing: 0.02em;
 }
 
 .resource-icon {
@@ -221,10 +298,6 @@
   font-weight: 700;
   color: var(--ps-text);
   font-variant-numeric: tabular-nums;
-}
-
-.end-week-btn {
-  flex-shrink: 0;
 }
 
 /* ── Body Layout ── */

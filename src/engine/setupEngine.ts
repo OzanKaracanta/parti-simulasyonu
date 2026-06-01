@@ -2,9 +2,10 @@
 
 import { CAMPAIGN_MAX_WEEKS } from '../data/campaignConfig';
 import { campaignActions } from '../data/campaignActions';
-import { createInitialOrganizationToolLevelsByRegion } from '../systems/regionOrganization';
+import { buildCampaignStartFootprint } from './campaignStartEngine';
 import { createInitialNationalOrganizationToolLevels } from '../data/nationalOrganizationTools';
-import { getRegionById, regionDefinitions } from '../data/regions';
+import { regionDefinitions } from '../data/regions';
+import { createInitialOrganizationToolLevelsByRegion } from '../systems/regionOrganization';
 import {
   colorOptions,
   getIdeologyById,
@@ -13,10 +14,12 @@ import {
 } from '../data/setupOptions';
 import { calculateNationalSupport, clamp } from './gameEngine';
 import { createEmptyPoliticalState, initializeFirstWeekAgenda } from './agendaEngine';
-import { createInitialSegmentSupport, syncRegionsWithSegments } from './segmentEngine';
+import { buildPlayerStartMetrics } from './playerStartEngine';
 import {
-  createInitialPoliticalSegmentSupport,
-} from './politicalSegmentEngine';
+  createCampaignStartSegmentSupport,
+  syncRegionsWithSegments,
+} from './segmentEngine';
+import { createCampaignStartPoliticalSegmentSupport } from './politicalSegmentEngine';
 import { createInitialPartyStances } from '../data/politicalIdentity';
 import type {
   GameState,
@@ -59,25 +62,6 @@ function applyEffects(
   }
 }
 
-function mapRegionMetricsToGameMetrics(regionMetrics: RegionStartingMetrics): Record<MetricKey, number> {
-  return {
-    mediaPower: regionMetrics.mediaPower,
-    campaignVisibility: Math.round(
-      (regionMetrics.nationalRecognition + regionMetrics.campaignVisibility) / 2,
-    ),
-    youthReach: regionMetrics.youthReach,
-    localOrganization: regionMetrics.localOrganization,
-    crisisManagement: regionMetrics.crisisManagement,
-    leaderTrust: regionMetrics.leaderTrust,
-    policyCredibility: regionMetrics.partyTrust,
-    socialGroupReach: Math.round(
-      (regionMetrics.youthReach + regionMetrics.localCandidateTrust) / 2,
-    ),
-    financialSustainability: regionMetrics.economyTrust,
-    regionalInfluence: regionMetrics.localCandidateTrust,
-  };
-}
-
 function calculateRegionalSupport(metrics: RegionStartingMetrics, isHomeRegion: boolean): number {
   const nationalImpact =
     metrics.nationalRecognition * 0.2 +
@@ -116,7 +100,6 @@ function buildRegions(homeRegionId: RegionId): RegionState[] {
 }
 
 export function buildGameStateFromSetup(choices: SetupChoices): GameState {
-  const region = getRegionById(choices.regionId);
   const ideology = getIdeologyById(choices.ideologyId);
   const leadership = getLeadershipById(choices.leadershipStyleId);
   const color = colorOptions.find((item) => item.id === choices.colorId);
@@ -126,7 +109,7 @@ export function buildGameStateFromSetup(choices: SetupChoices): GameState {
     throw new Error('Geçersiz renk veya sembol seçimi');
   }
 
-  const metrics = mapRegionMetricsToGameMetrics(region.metrics);
+  const metrics = buildPlayerStartMetrics(choices.regionId);
   const resources = { ...BASE_RESOURCES };
 
   applyEffects(metrics, resources, color.effects);
@@ -135,16 +118,13 @@ export function buildGameStateFromSetup(choices: SetupChoices): GameState {
   applyEffects(metrics, resources, leadership.effects);
 
   const regions = buildRegions(choices.regionId);
-  const segmentSupport = createInitialSegmentSupport(metrics, choices.ideologyId);
-  const politicalSegmentSupport = createInitialPoliticalSegmentSupport(choices.ideologyId);
+  const segmentSupport = createCampaignStartSegmentSupport(metrics, choices.ideologyId);
+  const politicalSegmentSupport = createCampaignStartPoliticalSegmentSupport(choices.ideologyId);
   const partyStances = createInitialPartyStances(choices.ideologyId);
   const political = createEmptyPoliticalState();
 
-  const organizationToolLevelsByRegion = createInitialOrganizationToolLevelsByRegion();
-  organizationToolLevelsByRegion[choices.regionId] = {
-    ...organizationToolLevelsByRegion[choices.regionId],
-    volunteer_network: 1,
-  };
+  const campaignStart = buildCampaignStartFootprint(choices.regionId);
+  const { organizationToolLevelsByRegion, nationalOrganizationToolLevels } = campaignStart;
 
   const syncedRegions = syncRegionsWithSegments(regions, segmentSupport, choices.regionId);
   const firstWeek = initializeFirstWeekAgenda(
@@ -156,6 +136,7 @@ export function buildGameStateFromSetup(choices: SetupChoices): GameState {
       recentRegionIds: [],
     },
     political.rivalParties,
+    choices.ideologyId,
   );
 
   const draftState: GameState = {
@@ -178,7 +159,7 @@ export function buildGameStateFromSetup(choices: SetupChoices): GameState {
     selectedActionIds: [],
     selectedActionTargets: {},
     organizationToolLevelsByRegion,
-    nationalOrganizationToolLevels: createInitialNationalOrganizationToolLevels(),
+    nationalOrganizationToolLevels,
     organizationRevertStack: [],
     currentWeeklyEvent: firstWeek.currentWeeklyEvent,
     selectedEventResponseId: null,
@@ -202,6 +183,7 @@ export function buildGameStateFromSetup(choices: SetupChoices): GameState {
     storyFlags: political.storyFlags,
     pendingWeekBacklash: null,
     activeWeekBacklash: null,
+    activeAdvisorBriefing: null,
     lastBacklashWeek: 0,
     backlashStoryFlags: {},
     history: [],
@@ -217,9 +199,9 @@ export function buildGameStateFromSetup(choices: SetupChoices): GameState {
 }
 
 export function createSetupState(): GameState {
-  const metrics = mapRegionMetricsToGameMetrics(getRegionById('ege').metrics);
-  const segmentSupport = createInitialSegmentSupport(metrics, 'centrist-reform');
-  const politicalSegmentSupport = createInitialPoliticalSegmentSupport('centrist-reform');
+  const metrics = buildPlayerStartMetrics('ege');
+  const segmentSupport = createCampaignStartSegmentSupport(metrics, 'centrist-reform');
+  const politicalSegmentSupport = createCampaignStartPoliticalSegmentSupport('centrist-reform');
   const partyStances = createInitialPartyStances('centrist-reform');
   const political = createEmptyPoliticalState();
 
@@ -267,6 +249,7 @@ export function createSetupState(): GameState {
     storyFlags: {},
     pendingWeekBacklash: null,
     activeWeekBacklash: null,
+    activeAdvisorBriefing: null,
     lastBacklashWeek: 0,
     backlashStoryFlags: {},
     history: [],

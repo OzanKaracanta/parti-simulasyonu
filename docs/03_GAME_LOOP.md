@@ -18,12 +18,12 @@ Yeni Hafta Başlar
 
 - Toplam süre: 52 hafta
 - **Sabit aksiyon limiti yok** — haftalık operasyon sayısı kaynak bütçesiyle sınırlanır
-- Başlangıçta tipik bir hafta: **3–4 operasyon** (para + enerji + gönüllü + örgüt yükü birlikte dolar)
+- Başlangıçta tipik bir hafta: **3–4 operasyon** (para + enerji + gönüllü + koordinasyon kotası birlikte dolar)
 - Örgüt araçları, finansman altyapısı ve saha yatırımları ilerledikçe aynı haftada daha fazla operasyon mümkün olur
 - Bazı aksiyonlar para tüketir
 - Bazı aksiyonlar enerji tüketir (haftalık sınırlı yenilenir)
 - Bazı aksiyonlar gönüllü gücü tüketir (saha ekibi; haftalık kısmi toparlanma)
-- Bazı aksiyonlar örgüt kapasitesi yükü tahsis eder (hafta bitince yük serbest kalır)
+- Bazı aksiyonlar koordinasyon yükü tahsis eder (hafta bitince yük serbest kalır)
 - Bazı aksiyonlar itibar riski yaratır
 
 ## Operasyonel bütçe (yumuşak limit)
@@ -35,7 +35,7 @@ Oyuncunun aynı haftada yapabileceği operasyon sayısı, dört kaynak tavanın�
 | **Para** | Nakit akışı; saha ve medya maliyetleri | 3–4 orta operasyon sonrası bağış/finansman baskısı |
 | **Enerji** | Lider ve merkez ekibinin haftalık iş gücü | 3–4 operasyon sonrası tükenmeye yakın |
 | **Gönüllü** | Saha temas kapasitesi | Yoğun yerel/toplu grup operasyonlarında sınır |
-| **Örgüt yükü** | Koordinasyon tavanı (`organizationLoad`) | Ağır operasyonlar slot doldurur |
+| **Koordinasyon** | Haftalık plan kotası (`organizationLoad`) | Ağır operasyonlar slot doldurur |
 
 **İlerleme döngüsü:** Finansman operasyonları para kazandırır → örgüt araçları yük tavanını ve yeni aksiyonları açar → gönüllü eğitimi saha kapasitesini büyütür → oyuncu haftalık operasyon setini genişletir.
 

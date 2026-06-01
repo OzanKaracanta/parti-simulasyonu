@@ -13,7 +13,10 @@ import type {
 
 const POLITICAL_SUPPORT_MIN = 8;
 const POLITICAL_SUPPORT_MAX = 72;
+/** Haftalık recovery / eksik state için orta kampanya tabanı */
 const POLITICAL_BASE = 28;
+const POLITICAL_CAMPAIGN_START_BASE = 22;
+const POLITICAL_CAMPAIGN_IDEOLOGY_BONUS_SCALE = 0.65;
 
 /** Ana gündem politik etki çarpanı (doküman: ×0.7) */
 export const MAIN_EVENT_POLITICAL_SCALE = 0.7;
@@ -46,6 +49,20 @@ export function createInitialPoliticalSegmentSupport(
 
   for (const segmentId of ALL_POLITICAL_SEGMENT_IDS) {
     support[segmentId] = clampPoliticalSupport(POLITICAL_BASE + (bonus[segmentId] ?? 0));
+  }
+
+  return support;
+}
+
+export function createCampaignStartPoliticalSegmentSupport(
+  ideologyId: IdeologyId,
+): Record<PoliticalSegmentId, number> {
+  const bonus = IDEOLOGY_POLITICAL_BONUS[ideologyId] ?? {};
+  const support = {} as Record<PoliticalSegmentId, number>;
+
+  for (const segmentId of ALL_POLITICAL_SEGMENT_IDS) {
+    const scaledBonus = Math.round((bonus[segmentId] ?? 0) * POLITICAL_CAMPAIGN_IDEOLOGY_BONUS_SCALE);
+    support[segmentId] = clampPoliticalSupport(POLITICAL_CAMPAIGN_START_BASE + scaledBonus);
   }
 
   return support;
@@ -151,6 +168,6 @@ export function calculatePoliticalSupportModifier(
   }
 
   const baseline = 36;
-  const modifier = (weighted - baseline) * 0.18;
-  return Math.max(-4, Math.min(4, Math.round(modifier * 10) / 10));
+  const modifier = (weighted - baseline) * 0.21;
+  return Math.max(-5, Math.min(5, Math.round(modifier * 10) / 10));
 }

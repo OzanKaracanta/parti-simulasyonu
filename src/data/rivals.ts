@@ -2,6 +2,13 @@
 
 import type { IdeologyId, RivalPartyState } from '../types/game';
 
+/** Kampanya başı sabit ulusal oy payları (oyuncu ~%10–13 bandında başlar) */
+export const RIVAL_START_NATIONAL_SUPPORT = {
+  ruling: 40,
+  oppositionMain: 25,
+  oppositionSecondary: 21,
+} as const;
+
 export interface RivalDefinition {
   id: string;
   name: string;
@@ -21,7 +28,7 @@ export const rivalDefinitions: RivalDefinition[] = [
     leaderName: 'Ayşe Korkmaz',
     ideologyId: 'nationalist-security',
     colorHex: '#dc2626',
-    baseSupport: 22,
+    baseSupport: RIVAL_START_NATIONAL_SUPPORT.ruling,
     isRulingParty: true,
   },
   {
@@ -31,7 +38,7 @@ export const rivalDefinitions: RivalDefinition[] = [
     leaderName: 'Mehmet Arslan',
     ideologyId: 'populist-social',
     colorHex: '#ea580c',
-    baseSupport: 18,
+    baseSupport: RIVAL_START_NATIONAL_SUPPORT.oppositionMain,
   },
   {
     id: 'rival-progress',
@@ -40,7 +47,7 @@ export const rivalDefinitions: RivalDefinition[] = [
     leaderName: 'Deniz Aydın',
     ideologyId: 'liberal-economist',
     colorHex: '#2563eb',
-    baseSupport: 16,
+    baseSupport: RIVAL_START_NATIONAL_SUPPORT.oppositionSecondary,
   },
 ];
 

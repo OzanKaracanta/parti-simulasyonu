@@ -1,4 +1,6 @@
 import { metricLabels, resourceLabels, segmentLabels } from '../../../data/labels';
+import { getScaledMainEventEnergyCost } from '../../../engine/energyCostUtils';
+import { politicalSegmentLabels } from '../../../data/politicalSegments';
 import type {
   AgendaEffectLine,
   AgendaPressure,
@@ -9,6 +11,7 @@ import type {
 import type {
   EventResponseOption,
   MetricKey,
+  PoliticalSegmentEffect,
   ResourceKey,
   ResponseTone,
   SegmentId,
@@ -111,6 +114,17 @@ function buildMetricAndResourceEffects(option: EventResponseOption): AgendaEffec
   if (resources) {
     for (const [key, value] of Object.entries(resources) as [ResourceKey, number][]) {
       if (!value) continue;
+      if (key === 'energy' && value < 0) {
+        const scaledCost = getScaledMainEventEnergyCost(value);
+        if (scaledCost > 0) {
+          lines.push({
+            label: resourceLabels[key],
+            value: -scaledCost,
+            type: 'negative',
+          });
+        }
+        continue;
+      }
       if (value < 0) {
         lines.push({
           label: resourceLabels[key],
@@ -140,22 +154,46 @@ function buildSegmentEffects(option: EventResponseOption): AgendaEffectLine[] {
     }));
 }
 
-export function toAgendaResponseDisplay(option: EventResponseOption): AgendaResponseDisplay {
+function buildPoliticalSegmentEffectLines(
+  effects: PoliticalSegmentEffect[],
+): AgendaEffectLine[] {
+  return effects
+    .filter((effect) => effect.delta !== 0)
+    .map((effect) => ({
+      label: politicalSegmentLabels[effect.segmentId],
+      value: effect.delta,
+      type: effectTypeFromValue(effect.delta),
+    }));
+}
+
+export function toAgendaResponseDisplay(
+  option: EventResponseOption,
+  politicalPreview?: PoliticalSegmentEffect[],
+): AgendaResponseDisplay {
   const stance = toneToStance(option.tone);
   const metricLines = buildMetricAndResourceEffects(option);
+  const politicalLines = buildPoliticalSegmentEffectLines(
+    option.politicalSegmentEffects ?? politicalPreview ?? [],
+  );
   const segmentLines = buildSegmentEffects(option);
 
   const cost: AgendaResponseDisplay['cost'] = {};
   const energy = option.effects?.resources?.energy;
   const money = option.effects?.resources?.money;
-  if (energy && energy < 0) cost.energy = Math.abs(energy);
+  const scaledEnergy = getScaledMainEventEnergyCost(energy);
+  if (scaledEnergy > 0) cost.energy = scaledEnergy;
   if (money && money < 0) cost.money = Math.abs(money);
 
-  const effects = [...segmentLines, ...metricLines.filter((line) => !line.label.includes('Enerji') && !line.label.includes('Para'))];
+  const effects = [
+    ...politicalLines,
+    ...segmentLines,
+    ...metricLines.filter((line) => !line.label.includes('Enerji') && !line.label.includes('Para')),
+  ];
 
   if (option.tone === 'measured' && !effects.some((line) => line.type === 'neutral' && line.label === 'Düşük maliyet')) {
     const hasLowResourceCost =
-      (energy !== undefined && energy >= -4) || (energy === undefined && option.responseLevel === 'partial');
+      scaledEnergy <= 2 ||
+      (energy === undefined && option.responseLevel === 'partial');
     if (hasLowResourceCost) {
       effects.push({ label: 'Düşük maliyet', type: 'neutral' });
     }

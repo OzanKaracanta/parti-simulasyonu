@@ -11,6 +11,8 @@ interface SidebarNavProps {
   active: DashboardView;
   onChange: (view: DashboardView) => void;
   pendingAgendaCount?: number;
+  /** Öğretici spotlight — ilgili alt menüyü açık tut */
+  tutorialHighlightView?: DashboardView | null;
 }
 
 type NavItem = {
@@ -23,7 +25,7 @@ type NavItem = {
 type NavGroupId = 'agendas' | 'campaign' | 'organization';
 
 const topNavItems: NavItem[] = [
-  { id: 'overview', label: 'Genel Bakış', icon: '◈', hint: 'Harita ve komuta özeti' },
+  { id: 'overview', label: 'Karargâh', icon: '◈', hint: 'Harita ve komuta özeti' },
 ];
 
 const agendaSubItems: NavItem[] = [
@@ -53,9 +55,9 @@ const organizationSubItems: NavItem[] = [
 ];
 
 const bottomNavItems: NavItem[] = [
-  { id: 'regions', label: 'Bölgeler', icon: '⊞', hint: 'Bölgesel tablo' },
-  { id: 'statistics', label: 'İstatistikler', icon: '◫', hint: 'Metrik ve kaynak takibi' },
-  { id: 'reports', label: 'Raporlar', icon: '▤', hint: 'Haftalık özet' },
+  { id: 'regions', label: 'Seçim Haritası', icon: '⊞', hint: 'Bölgesel tablo' },
+  { id: 'statistics', label: 'Analiz Odası', icon: '◫', hint: 'Metrik ve kaynak takibi' },
+  { id: 'reports', label: 'Haftalık Raporlar', icon: '▤', hint: 'Haftalık özet' },
 ];
 
 function getGroupForView(view: DashboardView): NavGroupId | null {
@@ -89,6 +91,7 @@ function NavButton({
       onClick={onClick}
       aria-current={isActive ? 'page' : undefined}
       title={item.hint}
+      data-tutorial-nav={item.id}
     >
       <span className="sidebar-nav-icon" aria-hidden>
         {item.icon}
@@ -189,13 +192,21 @@ function NavGroup({
   );
 }
 
-export function SidebarNav({ active, onChange, pendingAgendaCount = 0 }: SidebarNavProps) {
-  const [expandedGroup, setExpandedGroup] = useState<NavGroupId | null>(() => getGroupForView(active));
+export function SidebarNav({
+  active,
+  onChange,
+  pendingAgendaCount = 0,
+  tutorialHighlightView = null,
+}: SidebarNavProps) {
+  const [expandedGroup, setExpandedGroup] = useState<NavGroupId | null>(() =>
+    getGroupForView(active) ?? getGroupForView(tutorialHighlightView ?? active),
+  );
 
   useEffect(() => {
-    const group = getGroupForView(active);
-    setExpandedGroup(group);
-  }, [active]);
+    const group =
+      getGroupForView(active) ?? getGroupForView(tutorialHighlightView ?? active);
+    if (group) setExpandedGroup(group);
+  }, [active, tutorialHighlightView]);
 
   const toggleGroup = (groupId: NavGroupId) => {
     setExpandedGroup((current) => (current === groupId ? null : groupId));
@@ -215,13 +226,16 @@ export function SidebarNav({ active, onChange, pendingAgendaCount = 0 }: Sidebar
       ))}
 
       <NavGroup
-        label="Gündemler"
+        label="Gündem Masası"
         icon="◉"
         hint="Ulusal, bölgesel ve alt gündemler"
         submenuId="sidebar-agenda-submenu"
         submenuLabel="Gündem alt menüsü"
         hasActiveChild={isAgendaView(active)}
-        expanded={expandedGroup === 'agendas'}
+        expanded={
+          expandedGroup === 'agendas' ||
+          (tutorialHighlightView !== null && isAgendaView(tutorialHighlightView))
+        }
         onToggle={() => toggleGroup('agendas')}
         badgeCount={pendingAgendaCount}
         subItems={agendaSubItems}
@@ -230,13 +244,16 @@ export function SidebarNav({ active, onChange, pendingAgendaCount = 0 }: Sidebar
       />
 
       <NavGroup
-        label="Kampanya"
+        label="Saha Operasyonları"
         icon="⚡"
         hint="Ulusal ve bölgesel operasyonlar"
         submenuId="sidebar-campaign-submenu"
         submenuLabel="Kampanya alt menüsü"
         hasActiveChild={isCampaignView(active)}
-        expanded={expandedGroup === 'campaign'}
+        expanded={
+          expandedGroup === 'campaign' ||
+          (tutorialHighlightView !== null && isCampaignView(tutorialHighlightView))
+        }
         onToggle={() => toggleGroup('campaign')}
         subItems={campaignSubItems}
         active={active}
@@ -244,13 +261,16 @@ export function SidebarNav({ active, onChange, pendingAgendaCount = 0 }: Sidebar
       />
 
       <NavGroup
-        label="Örgüt Araçları"
+        label="Teşkilat"
         icon="⬡"
         hint="Ulusal ve bölgesel teşkilat yatırımları"
         submenuId="sidebar-organization-submenu"
         submenuLabel="Örgüt araçları alt menüsü"
         hasActiveChild={isOrganizationView(active)}
-        expanded={expandedGroup === 'organization'}
+        expanded={
+          expandedGroup === 'organization' ||
+          (tutorialHighlightView !== null && isOrganizationView(tutorialHighlightView))
+        }
         onToggle={() => toggleGroup('organization')}
         subItems={organizationSubItems}
         active={active}

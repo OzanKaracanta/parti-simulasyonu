@@ -11,7 +11,6 @@ import type { PoliticalSegmentId } from '../types/politicalSegments';
 import type {
   GameState,
   MetricKey,
-  ResourceKey,
   SegmentId,
   SubAgendaWeekOutcome,
 } from '../types/game';
@@ -32,15 +31,20 @@ import {
   applyPoliticalSegmentEffects,
   buildPoliticalSegmentReactions,
   computePoliticalSegmentDiff,
-  SUB_AGENDA_POLITICAL_SCALE,
   scalePoliticalEffects,
 } from './politicalSegmentEngine';
-import { buildPoliticalReactionText } from './politicalReactionText';
-
-function clampResource(value: number, key: ResourceKey): number {
-  const max = key === 'money' ? 999 : 100;
-  return Math.max(0, Math.min(max, value));
-}
+import {
+  buildPoliticalEffectsForTone,
+  buildPoliticalReactionText,
+  mergePoliticalSegmentEffects,
+} from './politicalReactionText';
+import {
+  filterSocioSegmentEffectsByAxis,
+  getPoliticalAgendaScale,
+  resolveEffectiveReactionAxis,
+} from './reactionAxisEngine';
+import { modulatePoliticalEffectsForPlayerIdeology } from './playerIdeologyPoliticalEngine';
+import type { ResolvedEventSegments } from './resolveEventSegments';
 
 function clampMetric(value: number): number {
   return Math.max(0, Math.min(100, value));
@@ -118,7 +122,23 @@ export function evaluateAndApplySubAgendaResponses(state: GameState): {
     if (!resolved) continue;
 
     const { agenda, response } = resolved;
-    let segmentEffects = { ...response.segmentEffects };
+    const segmentContext: Pick<
+      ResolvedEventSegments,
+      'primarySegments' | 'tensionSegments'
+    > = {
+      primarySegments: agenda.primarySegments,
+      tensionSegments: agenda.tensionSegments,
+    };
+    let segmentEffects = filterSocioSegmentEffectsByAxis(
+      resolveEffectiveReactionAxis({
+        reactionAxis: agenda.reactionAxis,
+        policyTopic: agenda.policyTopic,
+        primaryPoliticalSegments: agenda.primaryPoliticalSegments,
+        attacksRival: false,
+      }),
+      { ...response.segmentEffects },
+      segmentContext,
+    );
 
     let crossRuleNote: string | undefined;
 
@@ -145,9 +165,29 @@ export function evaluateAndApplySubAgendaResponses(state: GameState): {
     const segmentChanges = computeSegmentDiff(nextState.segmentSupport, segmentAfter);
     const segmentReactions = buildSegmentReactions(segmentChanges, segmentLabels);
 
+    const agendaAxis = resolveEffectiveReactionAxis({
+      reactionAxis: agenda.reactionAxis,
+      policyTopic: agenda.policyTopic,
+      primaryPoliticalSegments: agenda.primaryPoliticalSegments,
+      attacksRival: false,
+    });
+    const tonePolitical = buildPoliticalEffectsForTone(
+      {
+        primaryPoliticalSegments: agenda.primaryPoliticalSegments,
+        tensionPoliticalSegments: agenda.tensionPoliticalSegments,
+      },
+      response.tone,
+    );
+    const mergedPolitical = response.politicalSegmentEffects?.length
+      ? mergePoliticalSegmentEffects(tonePolitical, response.politicalSegmentEffects)
+      : tonePolitical;
+    const rawPolitical = modulatePoliticalEffectsForPlayerIdeology(
+      mergedPolitical,
+      nextState.party.ideologyId,
+    );
     const scaledPoliticalEffects = scalePoliticalEffects(
-      response.politicalSegmentEffects ?? [],
-      SUB_AGENDA_POLITICAL_SCALE,
+      rawPolitical,
+      getPoliticalAgendaScale(agendaAxis, 'sub'),
     );
     const politicalAfter = applyPoliticalSegmentEffects(
       nextState.politicalSegmentSupport,
@@ -170,13 +210,6 @@ export function evaluateAndApplySubAgendaResponses(state: GameState): {
       ...nextState,
       segmentSupport: segmentAfter,
       politicalSegmentSupport: politicalAfter,
-      resources: {
-        ...nextState.resources,
-        energy: clampResource(
-          nextState.resources.energy - response.energyCost,
-          'energy',
-        ),
-      },
     };
 
     const consistencyUpdate = applySubAgendaConsistencyUpdate(nextState, agenda, response);

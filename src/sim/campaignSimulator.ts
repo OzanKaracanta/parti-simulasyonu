@@ -5,12 +5,17 @@ import { buildGameStateFromSetup } from '../engine/setupEngine';
 import type { GameState, SetupChoices } from '../types/game';
 import type { BalanceScenario } from './balanceScenarios';
 import { playBotWeek, type BotStrategyId } from './campaignBot';
+import { computePoliticalSimMetrics } from './politicalSimMetrics';
 import { createSeededRng } from './seededRandom';
 
 export const SUPPORT_BAND_MIN = 15;
 export const SUPPORT_BAND_MAX = 55;
-export const BACKLASH_TARGET_MIN = 12;
+/** Segment revizyonu (Faz 3–5) sonrası pasif botlarda 11 backlash kabul edilebilir */
+export const BACKLASH_TARGET_MIN = 11;
 export const BACKLASH_TARGET_MAX = 16;
+
+/** Faz 6 — politik yankının en az bu kadar haftada görünmesi beklenir (52 haftalık kampanya) */
+export const POLITICAL_ACTIVITY_WEEKS_MIN = 24;
 
 export interface CampaignSimResult {
   scenarioId: string;
@@ -31,6 +36,10 @@ export interface CampaignSimResult {
   weeksPlayed: number;
   outsideBandWeeks: number;
   weeklySupport: number[];
+  weeksWithPoliticalActivity: number;
+  avgWeeklyPoliticalAbsDelta: number;
+  netPlayerBasePoliticalDelta: number;
+  finalPlayerBasePoliticalSupport: number;
 }
 
 function buildSetupFromScenario(scenario: BalanceScenario): SetupChoices {
@@ -84,6 +93,12 @@ export function runCampaignSimulation(scenario: BalanceScenario): CampaignSimRes
   const maxWeeklyAbsDelta =
     weeklyDeltas.length > 0 ? Math.round(Math.max(...weeklyDeltas) * 10) / 10 : 0;
 
+  const political = computePoliticalSimMetrics(
+    state.history,
+    state.politicalSegmentSupport,
+    scenario.ideologyId,
+  );
+
   return {
     scenarioId: scenario.id,
     label: scenario.label,
@@ -103,6 +118,10 @@ export function runCampaignSimulation(scenario: BalanceScenario): CampaignSimRes
     weeksPlayed: state.history.length,
     outsideBandWeeks,
     weeklySupport: weeklySupport.map((value) => Math.round(value * 10) / 10),
+    weeksWithPoliticalActivity: political.weeksWithPoliticalActivity,
+    avgWeeklyPoliticalAbsDelta: political.avgWeeklyPoliticalAbsDelta,
+    netPlayerBasePoliticalDelta: political.netPlayerBasePoliticalDelta,
+    finalPlayerBasePoliticalSupport: political.finalPlayerBasePoliticalSupport,
   };
 }
 
@@ -117,6 +136,9 @@ export interface BalanceAggregate {
   maxWeeklyAbsDelta: number;
   supportBandViolations: number;
   backlashBandViolations: number;
+  politicalActivityViolations: number;
+  avgWeeksWithPoliticalActivity: number;
+  avgPlayerBasePoliticalSupport: number;
 }
 
 export function aggregateBalanceResults(results: CampaignSimResult[]): BalanceAggregate {
@@ -134,6 +156,9 @@ export function aggregateBalanceResults(results: CampaignSimResult[]): BalanceAg
       maxWeeklyAbsDelta: 0,
       supportBandViolations: 0,
       backlashBandViolations: 0,
+      politicalActivityViolations: 0,
+      avgWeeksWithPoliticalActivity: 0,
+      avgPlayerBasePoliticalSupport: 0,
     };
   }
 
@@ -156,5 +181,16 @@ export function aggregateBalanceResults(results: CampaignSimResult[]): BalanceAg
     backlashBandViolations: results.filter(
       (item) => item.backlashCount < BACKLASH_TARGET_MIN || item.backlashCount > BACKLASH_TARGET_MAX,
     ).length,
+    politicalActivityViolations: results.filter(
+      (item) => item.weeksWithPoliticalActivity < POLITICAL_ACTIVITY_WEEKS_MIN,
+    ).length,
+    avgWeeksWithPoliticalActivity:
+      Math.round(
+        (sum(results.map((item) => item.weeksWithPoliticalActivity)) / count) * 10,
+      ) / 10,
+    avgPlayerBasePoliticalSupport:
+      Math.round(
+        (sum(results.map((item) => item.finalPlayerBasePoliticalSupport)) / count) * 10,
+      ) / 10,
   };
 }

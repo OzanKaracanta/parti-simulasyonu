@@ -1,5 +1,6 @@
 /** Haftalık olay seçimi ve aksiyon modifikasyonları */
 
+import { scaleActionEnergyCost } from '../data/campaignConfig';
 import { weeklyEvents } from '../data/weeklyEvents';
 import { categoryLabels } from '../data/labels';
 import type { CampaignAction, GameState, MetricKey, ResourceKey, WeeklyEvent } from '../types/game';
@@ -38,6 +39,13 @@ export function getActionEventLabels(
   return labels;
 }
 
+function withScaledEnergyCost(
+  cost: Partial<Record<ResourceKey, number>>,
+): Partial<Record<ResourceKey, number>> {
+  if (!cost.energy) return cost;
+  return { ...cost, energy: scaleActionEnergyCost(cost.energy) };
+}
+
 function adjustActionCost(
   cost: Partial<Record<ResourceKey, number>>,
   multiplier: number,
@@ -47,7 +55,8 @@ function adjustActionCost(
   for (const [key, value] of Object.entries(cost)) {
     if (!value) continue;
     if (key === 'organizationCapacity') continue;
-    adjusted[key as ResourceKey] = Math.max(1, Math.round(value * multiplier));
+    const base = key === 'energy' ? scaleActionEnergyCost(value) : value;
+    adjusted[key as ResourceKey] = Math.max(1, Math.round(base * multiplier));
   }
 
   return adjusted;
@@ -85,7 +94,10 @@ export function resolveActionWithWeeklyEvent(
   const labels = getActionEventLabels(event, action);
 
   if (!event || labels.length === 0) {
-    return { resolved: action, labels };
+    return {
+      resolved: { ...action, cost: withScaledEnergyCost(action.cost) },
+      labels,
+    };
   }
 
   let costMultiplier = 1;

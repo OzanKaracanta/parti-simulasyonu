@@ -92,7 +92,7 @@ Alt Şerit: Canlı olay akışı (EventFeed)
 
 ## Bileşenler
 
-- `GameShell`, `TopBar`, `SidebarNav`
+- `GameShell`, `TopBar` (haftalık bütçe: ₺ / ⚡ / 👥; itibar parti bilgisinde), `CoordinationMeter` (kampanya ekranı), `SidebarNav`
 - `AgendaHubPanel`, `WeeklyEventPanel`
 - `ActionList`, `OperationCard`, `SelectedActionsPanel`
 - `CommandCenterPanel`, `WeekFlowPanel`, `StrategicBriefPanel`

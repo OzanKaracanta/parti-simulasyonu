@@ -36,7 +36,7 @@ export function SubAgendaPanel({
   const selectionFor = (agendaId: string) =>
     selectedSubAgendaSelections.find((item) => item.agendaId === agendaId);
 
-  const introText = `Bu hafta en fazla ${maxSlots} alt gündeme mesaj verebilirsin (temel ${SUB_AGENDA_MAX_SLOTS}${bonusSubAgendaSlots > 0 ? ` + ${bonusSubAgendaSlots} radar bonusu` : ''}). İki veya daha fazla sert mesaj medyada gürültü yaratır; aynı hassas kesime ikinci sert mesajda gerilim artar. Boş bırakılan kartlarda rakipler konuşabilir.`;
+  const introText = `Bu hafta en fazla ${maxSlots} alt gündeme mesaj verebilirsin (temel ${SUB_AGENDA_MAX_SLOTS}${bonusSubAgendaSlots > 0 ? ` + ${bonusSubAgendaSlots} radar bonusu` : ''}). Her mesaj seçildiğinde enerji hemen düşer; tüm gündem tepkileri haftalık enerji tavanıyla sınırlıdır. İki veya daha fazla sert mesaj medyada gürültü yaratır. Boş bırakılan kartlarda rakipler konuşabilir.`;
 
   const content = (
     <div className={`sub-agenda-panel-body ${layout === 'page' ? 'sub-agenda-panel-body--page' : ''}`}>
@@ -64,6 +64,7 @@ export function SubAgendaPanel({
           return (
             <SubAgendaCard
               key={agenda.id}
+              state={state}
               agenda={agenda}
               selection={selection}
               cardLocked={cardLocked}

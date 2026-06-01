@@ -29,6 +29,7 @@ import { applySegmentEffects } from './segmentEngine';
 import { evaluateAndApplyEventResponse } from './eventEvaluation';
 import { getEventResponseById } from '../data/eventResponseFactory';
 import { buildPoliticalReactionTextFromEvent } from './politicalReactionText';
+import { enrichResolvedForPlayerContext } from './reactionAxisEngine';
 import { resolveEventSegmentsForWeek } from './resolveEventSegments';
 import { evaluateAndApplySubAgendaResponses, getSubAgendaResponse } from './subAgendaEvaluation';
 import { evaluateAndApplyRegionalAgendaResponses } from './regionalAgendaEvaluation';
@@ -36,6 +37,7 @@ import { applyRegionalStoryScheduling } from './regionalStoryEngine';
 import { getRegionalAgendaMaxSlots } from '../data/regionalAgendaConfig';
 import { canRespondToRegionalAgenda, getRegionalAgendaAccessReason } from './regionalAgendaAccess';
 import { getEffectiveSubAgendaMaxSlots } from './subAgendaSlots';
+import { buildAdvisorBriefing } from './advisorEngine';
 import { buildWeeklyHistoryItem } from './weeklyReport';
 import {
   buildWeekBacklashContext,
@@ -64,6 +66,12 @@ import {
   advanceWeekWithPolitics,
   resolveWeeklyPoliticsAfterResponse,
 } from './politicalWeekEngine';
+import {
+  applyEnergyDelta,
+  canAffordEnergyDelta,
+  getMainEventResponseEnergyCost,
+} from './agendaEnergyEngine';
+import { getRegionalAgendaResponse } from './regionalAgendaEvaluation';
 
 export function clamp(value: number, min = 0, max = 100): number {
   return Math.max(min, Math.min(max, value));
@@ -90,7 +98,8 @@ export function adjustResourcesByActionCost(
   for (const [key, value] of Object.entries(cost)) {
     const resourceKey = key as ResourceKey;
     if (resourceKey === 'organizationCapacity') continue;
-    next[resourceKey] = clampResource(next[resourceKey] + sign * (value ?? 0), resourceKey);
+    const amount = value ?? 0;
+    next[resourceKey] = clampResource(next[resourceKey] + sign * amount, resourceKey);
   }
 
   return next;
@@ -169,7 +178,7 @@ export function getActionDisabledReason(
   if (load > 0 && !canAffordOrganizationLoad(state, action)) {
     const used = getSelectedOrganizationLoad(state);
     const capacity = state.resources.organizationCapacity;
-    return `Örgüt kapasitesi dolu (${used + load}/${capacity} yük)`;
+    return `Koordinasyon kotası dolu (${used + load}/${capacity} yük)`;
   }
 
   return null;
@@ -283,9 +292,23 @@ export function selectEventResponse(state: GameState, responseId: string): GameS
   );
   if (!isValid) return null;
 
+  if (state.selectedEventResponseId === responseId) return state;
+
+  const oldCost = state.selectedEventResponseId
+    ? getMainEventResponseEnergyCost(state, state.selectedEventResponseId)
+    : 0;
+  const newCost = getMainEventResponseEnergyCost(state, responseId);
+  const delta = newCost - oldCost;
+  if (!canAffordEnergyDelta(state, delta)) return null;
+
+  let resources = state.resources;
+  if (oldCost > 0) resources = applyEnergyDelta(resources, oldCost);
+  if (newCost > 0) resources = applyEnergyDelta(resources, -newCost);
+
   return {
     ...state,
     selectedEventResponseId: responseId,
+    resources,
   };
 }
 
@@ -304,34 +327,72 @@ export function selectSubAgendaResponse(
   const existingIndex = selections.findIndex((item) => item.agendaId === agendaId);
 
   if (existingIndex >= 0) {
-    if (selections[existingIndex].responseId === responseId) {
+    const previousId = selections[existingIndex].responseId;
+    if (previousId === responseId) {
+      const refund = getSubAgendaResponse(state, agendaId, previousId)?.response.energyCost ?? 0;
       selections.splice(existingIndex, 1);
-    } else {
-      selections[existingIndex] = { agendaId, responseId };
+      return {
+        ...state,
+        selectedSubAgendaSelections: selections,
+        resources: refund > 0 ? applyEnergyDelta(state.resources, refund) : state.resources,
+      };
     }
-    return { ...state, selectedSubAgendaSelections: selections };
+
+    const oldCost =
+      getSubAgendaResponse(state, agendaId, previousId)?.response.energyCost ?? 0;
+    const newCost =
+      getSubAgendaResponse(state, agendaId, responseId)?.response.energyCost ?? 0;
+    const delta = newCost - oldCost;
+    if (!canAffordEnergyDelta(state, delta)) return null;
+
+    let resources = state.resources;
+    if (oldCost > 0) resources = applyEnergyDelta(resources, oldCost);
+    if (newCost > 0) resources = applyEnergyDelta(resources, -newCost);
+
+    selections[existingIndex] = { agendaId, responseId };
+    return { ...state, selectedSubAgendaSelections: selections, resources };
   }
 
   if (selections.length >= getEffectiveSubAgendaMaxSlots(state)) {
     return null;
   }
 
+  const newCost =
+    getSubAgendaResponse(state, agendaId, responseId)?.response.energyCost ?? 0;
+  if (!canAffordEnergyDelta(state, newCost)) return null;
+
   return {
     ...state,
     selectedSubAgendaSelections: [...selections, { agendaId, responseId }],
+    resources:
+      newCost > 0 ? applyEnergyDelta(state.resources, -newCost) : state.resources,
   };
 }
 
 export function clearSubAgendaResponse(state: GameState, agendaId?: string): GameState {
   if (!agendaId) {
-    return { ...state, selectedSubAgendaSelections: [] };
+    let resources = state.resources;
+    for (const selection of state.selectedSubAgendaSelections) {
+      const cost =
+        getSubAgendaResponse(state, selection.agendaId, selection.responseId)?.response
+          .energyCost ?? 0;
+      if (cost > 0) resources = applyEnergyDelta(resources, cost);
+    }
+    return { ...state, selectedSubAgendaSelections: [], resources };
   }
+
+  const selection = state.selectedSubAgendaSelections.find((item) => item.agendaId === agendaId);
+  const refund = selection
+    ? getSubAgendaResponse(state, selection.agendaId, selection.responseId)?.response.energyCost ??
+      0
+    : 0;
 
   return {
     ...state,
     selectedSubAgendaSelections: state.selectedSubAgendaSelections.filter(
       (item) => item.agendaId !== agendaId,
     ),
+    resources: refund > 0 ? applyEnergyDelta(state.resources, refund) : state.resources,
   };
 }
 
@@ -352,34 +413,75 @@ export function selectRegionalAgendaResponse(
   const existingIndex = selections.findIndex((item) => item.agendaId === agendaId);
 
   if (existingIndex >= 0) {
-    if (selections[existingIndex].responseId === responseId) {
+    const previousId = selections[existingIndex].responseId;
+    if (previousId === responseId) {
+      const refund =
+        getRegionalAgendaResponse(state, agendaId, previousId)?.response.energyCost ?? 0;
       selections.splice(existingIndex, 1);
-    } else {
-      selections[existingIndex] = { agendaId, responseId };
+      return {
+        ...state,
+        selectedRegionalAgendaSelections: selections,
+        resources: refund > 0 ? applyEnergyDelta(state.resources, refund) : state.resources,
+      };
     }
-    return { ...state, selectedRegionalAgendaSelections: selections };
+
+    const oldCost =
+      getRegionalAgendaResponse(state, agendaId, previousId)?.response.energyCost ?? 0;
+    const newCost =
+      getRegionalAgendaResponse(state, agendaId, responseId)?.response.energyCost ?? 0;
+    const delta = newCost - oldCost;
+    if (!canAffordEnergyDelta(state, delta)) return null;
+
+    let resources = state.resources;
+    if (oldCost > 0) resources = applyEnergyDelta(resources, oldCost);
+    if (newCost > 0) resources = applyEnergyDelta(resources, -newCost);
+
+    selections[existingIndex] = { agendaId, responseId };
+    return { ...state, selectedRegionalAgendaSelections: selections, resources };
   }
 
   if (selections.length >= getRegionalAgendaMaxSlots(state.campaignWeek)) {
     return null;
   }
 
+  const newCost =
+    getRegionalAgendaResponse(state, agendaId, responseId)?.response.energyCost ?? 0;
+  if (!canAffordEnergyDelta(state, newCost)) return null;
+
   return {
     ...state,
     selectedRegionalAgendaSelections: [...selections, { agendaId, responseId }],
+    resources:
+      newCost > 0 ? applyEnergyDelta(state.resources, -newCost) : state.resources,
   };
 }
 
 export function clearRegionalAgendaResponse(state: GameState, agendaId?: string): GameState {
   if (!agendaId) {
-    return { ...state, selectedRegionalAgendaSelections: [] };
+    let resources = state.resources;
+    for (const selection of state.selectedRegionalAgendaSelections) {
+      const cost =
+        getRegionalAgendaResponse(state, selection.agendaId, selection.responseId)?.response
+          .energyCost ?? 0;
+      if (cost > 0) resources = applyEnergyDelta(resources, cost);
+    }
+    return { ...state, selectedRegionalAgendaSelections: [], resources };
   }
+
+  const selection = state.selectedRegionalAgendaSelections.find(
+    (item) => item.agendaId === agendaId,
+  );
+  const refund = selection
+    ? getRegionalAgendaResponse(state, selection.agendaId, selection.responseId)?.response
+        .energyCost ?? 0
+    : 0;
 
   return {
     ...state,
     selectedRegionalAgendaSelections: state.selectedRegionalAgendaSelections.filter(
       (item) => item.agendaId !== agendaId,
     ),
+    resources: refund > 0 ? applyEnergyDelta(state.resources, refund) : state.resources,
   };
 }
 
@@ -442,8 +544,8 @@ export function applyActionEffects(
 
 export function finishWeek(state: GameState): GameState {
   const weekState = ensurePoliticalSegmentSupport(
-    state.activeWeekBacklash !== null
-      ? { ...state, activeWeekBacklash: null }
+    state.activeWeekBacklash !== null || state.activeAdvisorBriefing !== null
+      ? { ...state, activeWeekBacklash: null, activeAdvisorBriefing: null }
       : state,
   );
 
@@ -588,7 +690,14 @@ export function finishWeek(state: GameState): GameState {
   const mainEventPoliticalReactionText =
     mainEvent && mainEventResponse
       ? buildPoliticalReactionTextFromEvent(
-          resolveEventSegmentsForWeek(mainEvent, weekState.rivalParties),
+          enrichResolvedForPlayerContext(
+            mainEvent,
+            {
+              playerIdeologyId: weekState.party.ideologyId,
+              rivalParties: weekState.rivalParties,
+            },
+            resolveEventSegmentsForWeek(mainEvent, weekState.rivalParties),
+          ),
           mainEventResponse.tone,
         )
       : undefined;
@@ -633,13 +742,20 @@ export function finishWeek(state: GameState): GameState {
     history: [...weekState.history, weeklyReport],
   };
 
+  const advisorBriefing = buildAdvisorBriefing(weeklyReport, nextState, { isFinalWeek });
+
   if (isFinalWeek) {
     return {
       ...nextState,
-      status: 'finished',
+      activeAdvisorBriefing: advisorBriefing,
+      activeWeekBacklash: null,
       finalResult: calculateFinalResult(nextState),
     };
   }
 
-  return nextState;
+  return {
+    ...nextState,
+    activeAdvisorBriefing: advisorBriefing,
+    activeWeekBacklash: null,
+  };
 }

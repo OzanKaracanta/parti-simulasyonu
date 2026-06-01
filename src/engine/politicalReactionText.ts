@@ -15,6 +15,23 @@ function formatSegmentList(ids: PoliticalSegmentId[]): string {
   return `${rest.join(', ')} ve ${politicalSegmentLabels[last]}`;
 }
 
+/** Elle yazılmış etkiler ton şablonunu segment bazında geçersiz kılar */
+export function mergePoliticalSegmentEffects(
+  fromTone: PoliticalSegmentEffect[],
+  explicit: PoliticalSegmentEffect[],
+): PoliticalSegmentEffect[] {
+  const map = new Map(fromTone.map((effect) => [effect.segmentId, effect.delta]));
+
+  for (const effect of explicit) {
+    map.set(effect.segmentId, effect.delta);
+  }
+
+  return [...map.entries()].map(([segmentId, delta]) => ({
+    segmentId: segmentId as PoliticalSegmentEffect['segmentId'],
+    delta,
+  }));
+}
+
 export function buildPoliticalEffectsForTone(
   resolved: Pick<
     ResolvedEventSegments,

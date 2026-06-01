@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "simulate": "npx tsx scripts/simulateCampaigns.ts"
+    "simulate": "npx tsx scripts/simulateCampaigns.ts",
+    "verify:campaign-start": "npx tsx scripts/verifyCampaignStart.ts"
   },
   "dependencies": {
     "react": "^19.2.6",

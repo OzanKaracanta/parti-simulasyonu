@@ -60,7 +60,10 @@ export function simulateWeekEndMoney(state: GameState): number {
   const selectedActions = state.availableActions.filter((action) =>
     state.selectedActionIds.includes(action.id),
   );
-  const sympathizerDonation = calculateSympathizerDonation(state.metrics.leaderTrust);
+  const sympathizerDonation = calculateSympathizerDonation(
+    state.metrics.leaderTrust,
+    state.campaignWeek,
+  );
 
   let simulated = applyActionEffects(state, selectedActions).state;
   simulated = evaluateAndApplyEventResponse(simulated).state;
@@ -80,7 +83,7 @@ export function computeWeeklyCashFlowPreview(state: GameState): WeeklyCashFlowPr
   const alreadySpentOnActions = sumSelectedActionMoneyCosts(state);
   const weekStartMoney = state.resources.money + alreadySpentOnActions;
   const leaderTrust = state.metrics.leaderTrust;
-  const sympathizerDonation = calculateSympathizerDonation(leaderTrust);
+  const sympathizerDonation = calculateSympathizerDonation(leaderTrust, state.campaignWeek);
 
   let simulated = applyActionEffects(
     state,

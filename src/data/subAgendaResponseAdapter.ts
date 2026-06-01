@@ -1,6 +1,8 @@
 /** Alt gündem tepkileri — ana gündem özel tepkilerinden veya jenerik şablondan üretim */
 
+import { getScaledMainEventEnergyCost } from '../engine/energyCostUtils';
 import { buildPoliticalEffectsForTone } from '../engine/politicalReactionText';
+import { SUB_AGENDA_TONE_ENERGY } from './subAgendaConfig';
 import type { ResolvedEventSegments } from '../engine/resolveEventSegments';
 import type {
   EventResponseOption,
@@ -51,14 +53,11 @@ function energyFromResponse(
   tone: EventResponseOption['tone'],
   resourceEnergy?: number,
 ): { energyCost: number; energyCostLabel: SubAgendaEnergyCostLabel } {
+  const toneFallback = SUB_AGENDA_TONE_ENERGY[tone];
   const cost =
     resourceEnergy !== undefined && resourceEnergy !== 0
-      ? Math.min(8, Math.max(1, Math.abs(resourceEnergy)))
-      : tone === 'bold'
-        ? 5
-        : tone === 'measured'
-          ? 3
-          : 1;
+      ? getScaledMainEventEnergyCost(resourceEnergy) || toneFallback
+      : toneFallback;
 
   const energyCostLabel: SubAgendaEnergyCostLabel =
     cost >= 5 ? 'yüksek' : cost >= 3 ? 'orta' : 'düşük';
@@ -120,7 +119,7 @@ function createGenericSubAgendaResponses(
         tensionSegments.length > 0
           ? 'Mesajın hedef tabanda güçlü karşılık buldu; diğer kesimlerde gerilim oluştu.'
           : 'Mesajın hedef tabanda güçlü karşılık buldu.',
-      energyCost: 5,
+      energyCost: SUB_AGENDA_TONE_ENERGY.bold,
       energyCostLabel: 'yüksek',
       segmentEffects: {
         ...segmentBoost(primarySegments, 4),
@@ -139,7 +138,7 @@ function createGenericSubAgendaResponses(
       stanceValue: 0,
       outcomeTitle: 'Dengeli çizgi',
       outcomeDescription: 'Hedef kitlede sınırlı kazanç; gerilim daha kontrollü kaldı.',
-      energyCost: 3,
+      energyCost: SUB_AGENDA_TONE_ENERGY.measured,
       energyCostLabel: 'orta',
       segmentEffects: {
         ...segmentBoost(primarySegments, 2),
@@ -158,7 +157,7 @@ function createGenericSubAgendaResponses(
       stanceValue: -1,
       outcomeTitle: 'Sessiz kalındı',
       outcomeDescription: 'Bu konuda konuşmadın; hedef kitlede hayal kırıklığı oluştu.',
-      energyCost: 1,
+      energyCost: SUB_AGENDA_TONE_ENERGY.passive,
       energyCostLabel: 'düşük',
       segmentEffects: segmentPenalty(primarySegments, 2),
       politicalSegmentEffects: buildPoliticalEffectsForTone(

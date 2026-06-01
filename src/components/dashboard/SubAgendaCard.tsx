@@ -2,13 +2,19 @@ import {
   policyTopicLabels,
   weeklyEventTypeLabels,
 } from '../../data/labels';
-import type { SubAgendaItem, SubAgendaSelection } from '../../types/game';
+import {
+  canSelectSubAgendaResponse,
+  getAgendaEnergyDisabledReason,
+  getProjectedAgendaEnergySpend,
+} from '../../engine/agendaEnergyEngine';
+import type { GameState, SubAgendaItem, SubAgendaSelection } from '../../types/game';
 import { AgendaSegmentImpact } from './agenda/AgendaSegmentImpact';
 import { ReactionAxisBadge } from './agenda/ReactionAxisBadge';
 import { SubAgendaResponseOption } from './SubAgendaResponseOption';
 import './SubAgendaPanel.css';
 
 interface SubAgendaCardProps {
+  state: GameState;
   agenda: SubAgendaItem;
   selection: SubAgendaSelection | undefined;
   cardLocked: boolean;
@@ -17,6 +23,7 @@ interface SubAgendaCardProps {
 }
 
 export function SubAgendaCard({
+  state,
   agenda,
   selection,
   cardLocked,
@@ -72,12 +79,30 @@ export function SubAgendaCard({
         >
           {agenda.responseOptions.map((option) => {
             const isSelected = selection?.responseId === option.id;
+            const canAfford = isSelected || canSelectSubAgendaResponse(state, agenda.id, option.id);
+            const existingCost = selection
+              ? agenda.responseOptions.find((item) => item.id === selection.responseId)?.energyCost ?? 0
+              : 0;
+            const projected = getProjectedAgendaEnergySpend(
+              state,
+              existingCost,
+              option.energyCost,
+            );
+            const disabledReason = canAfford
+              ? null
+              : getAgendaEnergyDisabledReason(
+                  state,
+                  option.energyCost - existingCost,
+                  projected,
+                );
 
             return (
               <SubAgendaResponseOption
                 key={option.id}
                 option={option}
                 selected={isSelected}
+                disabled={!canAfford}
+                disabledReason={disabledReason}
                 onSelect={() => {
                   if (isSelected) {
                     onClearResponse();

@@ -87,3 +87,44 @@
 .week-flow-step.active .week-flow-detail {
   color: var(--ps-agenda);
 }
+
+.week-flow-tutorial-theme {
+  margin: 0 0 10px;
+  font-size: 11px;
+  color: var(--ps-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.week-flow-tutorial-badge {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--ps-agenda-dim);
+  color: var(--ps-agenda);
+}
+
+.week-flow-step.tutorial-required {
+  border-color: var(--ps-agenda-border);
+}
+
+.week-flow-go-btn {
+  flex-shrink: 0;
+  align-self: center;
+  padding: 4px 8px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--ps-agenda);
+  background: var(--ps-agenda-dim);
+  border: 1px solid var(--ps-agenda-border);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.week-flow-step {
+  align-items: center;
+}

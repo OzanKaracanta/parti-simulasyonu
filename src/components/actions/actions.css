@@ -1,5 +1,12 @@
 /* Operasyon kartları — Seviye 2 */
 
+.action-list-header-extra {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
 .action-list-panel .fm-panel-body,
 .operations-deck-panel .fm-panel-body {
   padding: 0;

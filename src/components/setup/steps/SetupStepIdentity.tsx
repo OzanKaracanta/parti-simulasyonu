@@ -1,4 +1,5 @@
 import { getRegionById, regionDefinitions } from '../../../data/regions';
+import { getCampaignStartPreviewSummary } from '../../../engine/campaignStartEngine';
 import { colorOptions, partyNameOptions } from '../../../data/setupOptions';
 import type { SetupChoices } from '../../../types/game';
 import { SetupRegionMap } from '../SetupRegionMap';
@@ -11,6 +12,7 @@ interface SetupStepIdentityProps {
 
 export function SetupStepIdentity({ form, onChange }: SetupStepIdentityProps) {
   const selectedRegion = getRegionById(form.regionId);
+  const founding = getCampaignStartPreviewSummary(form.regionId);
   const accentColor = colorOptions.find((item) => item.id === form.colorId)?.hex;
 
   return (
@@ -47,7 +49,10 @@ export function SetupStepIdentity({ form, onChange }: SetupStepIdentityProps) {
       <section className="setup-panel setup-panel--full">
         <h2>Başlangıç bölgesi</h2>
         <p className="setup-panel__lead">
-          Bölge, başlangıç metriklerini ve yerel rekabet zorluğunu belirler.
+          Merkez bölgenizde Genel Merkez ve İl Bürosu kurulu başlarsınız; iki komşu bölgede de İl
+          Bürosu vardır. Küçük
+          parlamenter grup olarak {founding.playerSupportLabel} ulusal destekle başlarsın; iktidar (
+          {founding.rulingPartyName}) yaklaşık %{founding.rulingPartySupport} bandında.
         </p>
 
         <div className="setup-region-picker">
@@ -96,6 +101,11 @@ export function SetupStepIdentity({ form, onChange }: SetupStepIdentityProps) {
               </p>
               <p className="region-detail-panel__risk">
                 <span className="region-card__label">Risk</span> {selectedRegion.risk}
+              </p>
+              <p className="region-detail-panel__founding">
+                <span className="region-card__label">Kuruluş</span> {founding.homeRegionName}:
+                Genel Merkez + İl Bürosu · {founding.neighborIlOfficeRegionNames.join(', ')}: İl
+                Bürosu
               </p>
             </div>
           </div>

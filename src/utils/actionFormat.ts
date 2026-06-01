@@ -36,9 +36,22 @@ export function getActionCostLines(action: CampaignAction): string[] {
   const lines = costResourceLines(action.cost);
   const load = action.organizationLoad ?? 0;
   if (load > 0) {
-    lines.push(`${load} ${resourceLabels.organizationCapacity} yükü`);
+    lines.push(`${load} koordinasyon yükü`);
   }
   return lines;
+}
+
+/** Öğretici — maliyet sütunu üstü ipucu */
+export function getActionCostBreakdownHint(action: CampaignAction): string {
+  const lines = getActionCostLines(action);
+  if (lines.length === 0) {
+    return 'Bu operasyonun doğrudan kaynak maliyeti yok.';
+  }
+  return [
+    'Bu tur harcanır (tur bitince enerji kısmen yenilenir).',
+    ...lines,
+    'Aynı turda 3–4 operasyon tipik; kaynaklar birlikte sınırlar.',
+  ].join(' ');
 }
 
 export function getActionGainLines(action: CampaignAction): string[] {

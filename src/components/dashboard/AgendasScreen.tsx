@@ -8,6 +8,9 @@ import './AgendasScreen.css';
 
 interface AgendasScreenProps {
   mode: AgendaPageMode;
+  focusAgendaId?: string | null;
+  onFocusApplied?: () => void;
+  onRadarViewed?: () => void;
   state: GameState;
   availableActions: CampaignAction[];
   selectedResponseId: string | null;
@@ -21,6 +24,9 @@ interface AgendasScreenProps {
 
 export function AgendasScreen({
   mode,
+  focusAgendaId = null,
+  onFocusApplied,
+  onRadarViewed,
   state,
   availableActions,
   selectedResponseId,
@@ -36,6 +42,9 @@ export function AgendasScreen({
       <AgendaHubPanel
         pageMode={mode}
         layout="page"
+        focusAgendaId={focusAgendaId}
+        onFocusApplied={onFocusApplied}
+        onRadarViewed={onRadarViewed}
         state={state}
         availableActions={availableActions}
         selectedResponseId={selectedResponseId}

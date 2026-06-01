@@ -2,7 +2,7 @@ import { getRegionById } from '../../data/regions';
 import { isRegionalAction } from '../../data/regionalActions';
 import { resourceLabels } from '../../data/labels';
 import { resolveSelectedActions } from '../../engine/eventEngine';
-import { formatOrganizationLoadUsage } from '../../engine/organizationLoadEngine';
+import { CoordinationMeter } from '../dashboard/CoordinationMeter';
 import { sumSelectedCosts } from '../../utils/actionFormat';
 import type { GameState, ResourceKey } from '../../types/game';
 import { ActionCostChips } from '../ui/ActionCostChips';
@@ -34,6 +34,8 @@ export function SelectedActionsPanel({ state, onRemove }: SelectedActionsPanelPr
       compact
       className="plan-panel"
     >
+      <CoordinationMeter state={state} />
+
       {selectedEntries.length === 0 ? (
         <p className="plan-empty">Henüz operasyon seçilmedi. Alttaki kartlardan sahaya aksiyon ekle.</p>
       ) : (
@@ -78,7 +80,6 @@ export function SelectedActionsPanel({ state, onRemove }: SelectedActionsPanelPr
           </ul>
           <div className="plan-total">
             Toplam maliyet: <span>{formatTotalCost(totalCost)}</span>
-            <span className="plan-load-total"> · örgüt yükü {formatOrganizationLoadUsage(state)}</span>
           </div>
         </>
       )}

@@ -1,0 +1,244 @@
+/* Haftalık enerji bütçesi — para paneli ile aynı düzen */
+
+.weekly-energy-panel .fm-panel-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.energy-hero {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: end;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--ps-border);
+  border-radius: var(--ps-radius-sm);
+  background: var(--ps-bg-inset);
+}
+
+.energy-hero-primary,
+.energy-hero-secondary {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.energy-hero-secondary {
+  text-align: right;
+}
+
+.energy-hero-label {
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ps-text-dim);
+}
+
+.energy-hero-value {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--ps-text);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+.energy-hero-secondary .energy-hero-value {
+  font-size: 13px;
+}
+
+.energy-hero-value--positive {
+  color: var(--ps-opportunity);
+}
+
+.energy-hero-value--negative {
+  color: var(--ps-crisis);
+}
+
+.energy-hero-value--neutral {
+  color: var(--ps-text-secondary);
+}
+
+.energy-hero-arrow {
+  align-self: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ps-text-faint);
+  line-height: 1;
+  padding-bottom: 2px;
+}
+
+.energy-footnote {
+  margin: 0;
+  font-size: 10px;
+  line-height: 1.4;
+  color: var(--ps-text-dim);
+}
+
+.energy-footnote strong {
+  color: var(--ps-text-secondary);
+  font-weight: 700;
+}
+
+.energy-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 10px;
+  border-radius: var(--ps-radius-sm);
+  background: var(--ps-bg-elevated);
+  border: 1px solid var(--ps-border-subtle);
+}
+
+.energy-summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+}
+
+.energy-summary-label {
+  color: var(--ps-text-dim);
+  font-weight: 600;
+}
+
+.energy-summary-value {
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.energy-summary-value.positive {
+  color: var(--ps-opportunity);
+}
+
+.energy-summary-value.negative {
+  color: var(--ps-crisis);
+}
+
+.energy-summary-row--net {
+  margin-top: 2px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--ps-border-subtle);
+}
+
+.energy-summary-row--net.is-positive .energy-summary-value {
+  color: var(--ps-opportunity);
+}
+
+.energy-summary-row--net.is-negative .energy-summary-value {
+  color: var(--ps-crisis);
+}
+
+.energy-details {
+  font-size: 10px;
+}
+
+.energy-details summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--ps-text-secondary);
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.energy-details summary::-webkit-details-marker {
+  display: none;
+}
+
+.energy-details-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background: var(--ps-bg-inset);
+  font-size: 9px;
+  font-weight: 800;
+  color: var(--ps-text-dim);
+}
+
+.energy-details-body {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.energy-details-heading {
+  display: block;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ps-text-faint);
+  margin-bottom: 4px;
+}
+
+.energy-lines {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.energy-lines li {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 10px;
+  line-height: 1.35;
+}
+
+.energy-line-label {
+  color: var(--ps-text-dim);
+  flex: 1;
+  min-width: 0;
+}
+
+.energy-line-amount {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.energy-lines--income .energy-line-amount {
+  color: var(--ps-opportunity);
+}
+
+.energy-lines--expense .energy-line-amount {
+  color: var(--ps-crisis);
+}
+
+.energy-empty {
+  margin: 0;
+  font-size: 10px;
+  color: var(--ps-text-faint);
+}
+
+.energy-cap-hint {
+  margin: 0;
+  font-size: 10px;
+  line-height: 1.4;
+  color: var(--ps-text-dim);
+}
+
+.energy-warning {
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: var(--ps-radius-sm);
+  background: color-mix(in srgb, var(--ps-crisis) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ps-crisis) 35%, transparent);
+  font-size: 10px;
+  line-height: 1.4;
+  color: var(--ps-crisis);
+  font-weight: 600;
+}

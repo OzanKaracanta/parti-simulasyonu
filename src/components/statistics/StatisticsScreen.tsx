@@ -219,7 +219,7 @@ export function StatisticsScreen({ state: rawState }: StatisticsScreenProps) {
       <aside className="statistics-sidebar" aria-label="Kaynaklar ve segmentler">
         <Panel title="Kaynaklar">
           <p className="statistics-panel-note">
-            Örgüt yükü: {orgLoadUsed}/{state.resources.organizationCapacity} (seçili operasyonlar).
+            Koordinasyon yükü: {orgLoadUsed}/{state.resources.organizationCapacity} (seçili operasyonlar).
           </p>
           <div className="statistics-resource-bars">
             {RESOURCE_DISPLAY_ORDER.map((key) => (

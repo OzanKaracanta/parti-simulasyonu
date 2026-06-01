@@ -497,6 +497,52 @@ export interface WeeklyHistoryItem {
   weekBacklash: WeekBacklashItem | null;
 }
 
+export type AdvisorBriefingBulletKind =
+  | 'support'
+  | 'agenda'
+  | 'segments'
+  | 'resources'
+  | 'rivals'
+  | 'outlook'
+  | 'insight';
+
+export type AdvisorBriefingTone = 'neutral' | 'positive' | 'negative';
+
+export interface AdvisorBriefingTextSegment {
+  text: string;
+  tone?: AdvisorBriefingTone;
+}
+
+export interface AdvisorBriefingBullet {
+  kind: AdvisorBriefingBulletKind;
+  label: string;
+  text: string;
+  segments: AdvisorBriefingTextSegment[];
+  severity?: 'neutral' | 'positive' | 'warning' | 'critical';
+}
+
+export interface AdvisorBriefingBacklashNote {
+  headline: string;
+  body: string;
+  effectSummary: string;
+  effectSegments: AdvisorBriefingTextSegment[];
+}
+
+/** Hafta geçişinde zorunlu danışman brifingi — DISMISS_ADVISOR_BRIEFING ile kapanır */
+export interface AdvisorBriefingItem {
+  id: string;
+  completedWeek: number;
+  displayWeek: number;
+  advisorName: string;
+  advisorTitle: string;
+  headline: string;
+  openingLine: string;
+  bullets: AdvisorBriefingBullet[];
+  backlashNote?: AdvisorBriefingBacklashNote;
+  closingLine: string;
+  isFinalWeek: boolean;
+}
+
 export interface RegionalResultItem {
   regionId: string;
   name: string;
@@ -609,8 +655,10 @@ export interface GameState {
   storyFlags: Record<string, boolean>;
   /** Sonraki hafta açılışında uygulanacak gölge yankı */
   pendingWeekBacklash: PendingWeekBacklash | null;
-  /** Yeni hafta pop-up — DISMISS_WEEK_BACKLASH ile kapanır */
+  /** Gölge yankı etkileri uygulandı — gösterim danışman brifinginde birleşik */
   activeWeekBacklash: WeekBacklashItem | null;
+  /** Hafta geçiş brifingi — DISMISS_ADVISOR_BRIEFING ile kapanır */
+  activeAdvisorBriefing: AdvisorBriefingItem | null;
   /** Son gölge yankının kampanya haftası (cooldown) */
   lastBacklashWeek: number;
   /** Tek seferlik gölge yankı bayrakları */

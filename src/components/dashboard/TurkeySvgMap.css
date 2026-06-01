@@ -31,6 +31,7 @@
   stroke-linecap: round;
   paint-order: stroke fill;
   cursor: pointer;
+  touch-action: manipulation;
   outline: none;
   transition:
     fill 0.18s ease,
@@ -89,34 +90,50 @@
   stroke-width: 1.05;
 }
 
-.turkey-region-agenda-marker {
-  pointer-events: none;
+.turkey-province-path.is-regional-agenda:not(.is-hovered):not(.is-selected) {
+  animation: turkey-region-agenda-pulse 1.6s ease-in-out infinite;
 }
 
-.turkey-region-agenda-dot {
-  fill: var(--ps-crisis);
-  stroke: var(--ps-bg-panel);
-  stroke-width: 1.4;
-  animation: turkey-agenda-blink 1.1s ease-in-out infinite;
+.turkey-province-path.is-regional-agenda[data-region='marmara']:not(.is-hovered):not(.is-selected) {
+  --region-agenda-base: color-mix(in srgb, var(--ps-info) 14%, var(--ps-bg-inset));
 }
 
-.turkey-region-agenda-label {
-  fill: var(--ps-crisis);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  dominant-baseline: central;
-  animation: turkey-agenda-blink 1.1s ease-in-out infinite;
+.turkey-province-path.is-regional-agenda[data-region='karadeniz']:not(.is-hovered):not(.is-selected) {
+  --region-agenda-base: color-mix(in srgb, var(--ps-info) 26%, var(--ps-bg-panel-header));
 }
 
-@keyframes turkey-agenda-blink {
+.turkey-province-path.is-regional-agenda[data-region='ege']:not(.is-hovered):not(.is-selected) {
+  --region-agenda-base: color-mix(in srgb, var(--ps-info) 36%, var(--ps-bg-panel-header));
+}
+
+.turkey-province-path.is-regional-agenda[data-region='ic-anadolu']:not(.is-hovered):not(.is-selected) {
+  --region-agenda-base: color-mix(in srgb, var(--ps-info) 20%, var(--ps-bg-panel));
+}
+
+.turkey-province-path.is-regional-agenda[data-region='akdeniz']:not(.is-hovered):not(.is-selected) {
+  --region-agenda-base: color-mix(in srgb, var(--ps-info) 42%, var(--ps-bg-panel-top));
+}
+
+.turkey-province-path.is-regional-agenda[data-region='dogu-anadolu']:not(.is-hovered):not(.is-selected) {
+  --region-agenda-base: color-mix(in srgb, var(--ps-info) 10%, var(--ps-bg-deep));
+}
+
+.turkey-province-path.is-regional-agenda[data-region='guneydogu-anadolu']:not(.is-hovered):not(
+    .is-selected
+  ) {
+  --region-agenda-base: color-mix(in srgb, var(--ps-info) 30%, var(--ps-bg-panel-header));
+}
+
+@keyframes turkey-region-agenda-pulse {
   0%,
   100% {
-    opacity: 1;
+    fill: color-mix(in srgb, var(--ps-crisis) 10%, var(--region-agenda-base, var(--ps-bg-panel)));
+    stroke: color-mix(in srgb, var(--ps-crisis) 18%, var(--ps-border-strong));
   }
 
   50% {
-    opacity: 0.3;
+    fill: color-mix(in srgb, var(--ps-crisis) 26%, var(--region-agenda-base, var(--ps-bg-panel)));
+    stroke: color-mix(in srgb, var(--ps-crisis) 32%, var(--ps-border-strong));
   }
 }
 
@@ -212,8 +229,26 @@
   vertical-align: middle;
 }
 
-.turkey-map-legend .dot.agenda {
-  background: var(--ps-crisis);
+.turkey-map-legend .swatch.agenda {
+  display: inline-block;
+  width: 12px;
+  height: 8px;
+  margin-right: 4px;
+  border-radius: 2px;
+  vertical-align: middle;
+  background: color-mix(in srgb, var(--ps-crisis) 14%, var(--ps-bg-panel));
+  animation: turkey-legend-agenda-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes turkey-legend-agenda-pulse {
+  0%,
+  100% {
+    background: color-mix(in srgb, var(--ps-crisis) 14%, var(--ps-bg-panel));
+  }
+
+  50% {
+    background: color-mix(in srgb, var(--ps-crisis) 28%, var(--ps-bg-panel));
+  }
 }
 
 .turkey-map-legend .dot.office {

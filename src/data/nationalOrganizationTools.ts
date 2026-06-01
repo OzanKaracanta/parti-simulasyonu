@@ -41,7 +41,8 @@ export const nationalOrganizationToolDefinitions: OrganizationToolDefinition[] =
         level: 1,
         title: 'Geçici Genel Merkez',
         buildCost: { money: 50, volunteers: 4 },
-        weeklyMaintenance: { money: 9 },
+        /** Kuruluş mirası — sabit kira yok; kurumsal merkez (L2) bakım getirir */
+        weeklyMaintenance: {},
         instantEffects: {
           metrics: { policyCredibility: 4, crisisManagement: 2 },
         },

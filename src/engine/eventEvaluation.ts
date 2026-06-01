@@ -3,13 +3,22 @@
 import { scaleWeeklyEventOutcomeEffects } from '../data/campaignConfig';
 import { getEventResponseById } from '../data/eventResponseFactory';
 import { segmentLabels } from '../data/segments';
+import {
+  buildPoliticalEffectsForTone,
+  mergePoliticalSegmentEffects,
+} from './politicalReactionText';
+import {
+  enrichResolvedForPlayerContext,
+  filterSocioSegmentEffectsByAxis,
+  getPoliticalAgendaScale,
+  resolveEffectiveReactionAxis,
+} from './reactionAxisEngine';
+import { modulatePoliticalEffectsForPlayerIdeology } from './playerIdeologyPoliticalEngine';
 import { resolveEventSegmentsForWeek } from './resolveEventSegments';
-import { buildPoliticalEffectsForTone } from './politicalReactionText';
 import {
   applyPoliticalSegmentEffects,
   buildPoliticalSegmentReactions,
   computePoliticalSegmentDiff,
-  MAIN_EVENT_POLITICAL_SCALE,
   scalePoliticalEffects,
 } from './politicalSegmentEngine';
 import {
@@ -26,6 +35,7 @@ import {
   scaleSegmentEffectsByMultiplier,
 } from './stanceEngine';
 import type { PoliticalSegmentId } from '../types/politicalSegments';
+import { stripEnergyFromOutcomeEffects } from './agendaEnergyEngine';
 import type {
   EventResponseLevel,
   GameState,
@@ -101,8 +111,19 @@ function resolveResponseApplication(
 ) {
   const alignment = evaluateResponseAlignment(state, event, response);
   const multiplier = computeAlignmentMultiplier(state, event, response);
-  const scaledSegmentEffects = scaleSegmentEffectsByMultiplier(
+  const resolvedSegments = enrichResolvedForPlayerContext(
+    event,
+    { playerIdeologyId: state.party.ideologyId, rivalParties: state.rivalParties },
+    resolveEventSegmentsForWeek(event, state.rivalParties),
+  );
+  const effectiveAxis = resolveEffectiveReactionAxis(event);
+  const filteredSocioEffects = filterSocioSegmentEffectsByAxis(
+    effectiveAxis,
     response.segmentEffects,
+    resolvedSegments,
+  );
+  const scaledSegmentEffects = scaleSegmentEffectsByMultiplier(
+    filteredSocioEffects,
     multiplier,
   );
   const consistencyBefore = state.messageConsistency;
@@ -114,13 +135,17 @@ function resolveResponseApplication(
   const segmentAfter = applySegmentEffects(state.segmentSupport, scaledSegmentEffects);
   const segmentChanges = computeSegmentDiff(state.segmentSupport, segmentAfter);
 
-  const resolvedSegments = resolveEventSegmentsForWeek(event, state.rivalParties);
-  const rawPoliticalEffects =
-    response.politicalSegmentEffects ??
-    buildPoliticalEffectsForTone(resolvedSegments, response.tone);
+  const tonePoliticalEffects = buildPoliticalEffectsForTone(resolvedSegments, response.tone);
+  const mergedPoliticalEffects = response.politicalSegmentEffects?.length
+    ? mergePoliticalSegmentEffects(tonePoliticalEffects, response.politicalSegmentEffects)
+    : tonePoliticalEffects;
+  const rawPoliticalEffects = modulatePoliticalEffectsForPlayerIdeology(
+    mergedPoliticalEffects,
+    state.party.ideologyId,
+  );
   const scaledPoliticalEffects = scalePoliticalEffects(
     rawPoliticalEffects,
-    MAIN_EVENT_POLITICAL_SCALE,
+    getPoliticalAgendaScale(effectiveAxis, 'main'),
   );
   const politicalAfter = applyPoliticalSegmentEffects(
     state.politicalSegmentSupport,
@@ -201,7 +226,10 @@ export function evaluateAndApplyEventResponse(
     politicalSegmentSupport: resolved.politicalAfter,
   };
 
-  nextState = applyWeeklyEventOutcomeEffects(nextState, resolved.mergedEffects);
+  nextState = applyWeeklyEventOutcomeEffects(
+    nextState,
+    stripEnergyFromOutcomeEffects(resolved.mergedEffects),
+  );
 
   const evaluation: EventEvaluationResult = {
     eventTitle: event.title,

@@ -10,6 +10,7 @@ import {
   selectRegionalAgendaResponse,
   selectSubAgendaResponse,
 } from '../engine/gameEngine';
+import { dismissActiveAdvisorBriefing } from '../engine/advisorEngine';
 import { canRespondToRegionalAgenda } from '../engine/regionalAgendaAccess';
 import { getEffectiveSubAgendaMaxSlots } from '../engine/subAgendaSlots';
 import { isActionUnlocked, isActionUnlockedInRegion } from '../systems/actionUnlockSystem';
@@ -212,5 +213,9 @@ export function playBotWeek(
     }
   }
 
-  return finishWeek(nextState);
+  let finished = finishWeek(nextState);
+  if (finished.activeAdvisorBriefing) {
+    finished = dismissActiveAdvisorBriefing(finished);
+  }
+  return finished;
 }

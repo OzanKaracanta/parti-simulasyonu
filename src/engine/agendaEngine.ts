@@ -4,16 +4,23 @@ import { RADAR_AGENDA_MAX, SUB_AGENDA_COUNT } from '../data/subAgendaConfig';
 import {
   createRadarAgendaFromWeeklyEvent,
   createSubAgendaFromWeeklyEvent,
+  enrichSubAgendaWithPlayerIdeology,
   enrichSubAgendaWithRivalSegments,
 } from '../data/subAgendaFactory';
 import { createInitialRivalParties } from '../data/rivals';
 import { weeklyEvents } from '../data/weeklyEvents';
+import {
+  getTutorialPrimaryEvent,
+  shouldGuaranteeTutorialRadar,
+} from '../tutorial/tutorialAgenda';
+import { TUTORIAL_LAST_WEEK } from '../tutorial/tutorialSteps';
 import { assignRegionalAgendas, type RegionalAgendaAssignmentInput } from './regionalAgendaEngine';
 import { removeConsumedRegionalSchedules } from './regionalStoryEngine';
 import type {
   GameState,
   RadarAgendaItem,
   RegionalAgendaItem,
+  IdeologyId,
   RivalPartyState,
   ScheduledRegionalStoryEvent,
   ScheduledStoryEvent,
@@ -35,11 +42,12 @@ function pickFromPool<T>(
 function pickSubAgendas(
   excludeIds: string[],
   rivalParties: RivalPartyState[],
+  playerIdeologyId: IdeologyId,
   count = SUB_AGENDA_COUNT,
 ): SubAgendaItem[] {
-  return pickFromPool(weeklyEvents, excludeIds, count, createSubAgendaFromWeeklyEvent).map(
-    (agenda) => enrichSubAgendaWithRivalSegments(agenda, rivalParties),
-  );
+  return pickFromPool(weeklyEvents, excludeIds, count, createSubAgendaFromWeeklyEvent)
+    .map((agenda) => enrichSubAgendaWithRivalSegments(agenda, rivalParties))
+    .map((agenda) => enrichSubAgendaWithPlayerIdeology(agenda, playerIdeologyId));
 }
 
 function pickRadarAgendas(excludeIds: string[]): RadarAgendaItem[] {
@@ -78,6 +86,7 @@ export function assignWeekAgenda(
   regionalContext: RegionalAgendaAssignmentInput,
   dueRegionalScheduled: ScheduledRegionalStoryEvent[] = [],
   rivalParties: RivalPartyState[] = [],
+  playerIdeologyId: IdeologyId = 'centrist-reform',
 ): WeekAgendaAssignment {
   const scheduled = findScheduledEvent(scheduledStoryEvents, campaignWeek);
   let primaryEvent: WeeklyEvent;
@@ -89,15 +98,26 @@ export function assignWeekAgenda(
       pickWeeklyEventExcluding(previousEventId ? [previousEventId] : []);
     storyHint = scheduled.reason;
   } else {
-    primaryEvent = pickWeeklyEventExcluding(previousEventId ? [previousEventId] : []);
+    const tutorialPrimary =
+      campaignWeek <= TUTORIAL_LAST_WEEK
+        ? getTutorialPrimaryEvent(campaignWeek)
+        : null;
+    primaryEvent =
+      tutorialPrimary ?? pickWeeklyEventExcluding(previousEventId ? [previousEventId] : []);
+    if (tutorialPrimary && !storyHint) {
+      storyHint = 'Öğretici tur — tanıdık bir gündem senaryosu';
+    }
   }
 
-  const subAgendas = pickSubAgendas([primaryEvent.id], rivalParties);
+  const subAgendas = pickSubAgendas([primaryEvent.id], rivalParties, playerIdeologyId);
   const usedEventIds = [
     primaryEvent.id,
     ...subAgendas.map((item) => item.sourceEventId),
   ];
-  const radarAgendas = pickRadarAgendas(usedEventIds);
+  let radarAgendas = pickRadarAgendas(usedEventIds);
+  if (shouldGuaranteeTutorialRadar(campaignWeek) && radarAgendas.length === 0) {
+    radarAgendas = pickFromPool(weeklyEvents, usedEventIds, 1, createRadarAgendaFromWeeklyEvent);
+  }
 
   if (radarAgendas.length > 0 && !storyHint) {
     storyHint = `Radar: ${radarAgendas.map((item) => item.title).join(' · ')}`;
@@ -110,7 +130,10 @@ export function assignWeekAgenda(
   );
 
   const regionalAgendas: RegionalAgendaItem[] = regionalAssignment.agendas.map((agenda) => ({
-    ...enrichSubAgendaWithRivalSegments(agenda, rivalParties),
+    ...enrichSubAgendaWithPlayerIdeology(
+      enrichSubAgendaWithRivalSegments(agenda, rivalParties),
+      playerIdeologyId,
+    ),
     regionId: agenda.regionId,
   }));
 
@@ -155,6 +178,7 @@ export function advanceWeekAgenda(state: GameState): GameState {
     regionalContext,
     dueRegionalScheduled,
     state.rivalParties,
+    state.party.ideologyId,
   );
 
   return {
@@ -180,11 +204,20 @@ export function advanceWeekAgenda(state: GameState): GameState {
 export function initializeFirstWeekAgenda(
   regionalContext: RegionalAgendaAssignmentInput,
   rivalParties: RivalPartyState[] = createInitialRivalParties(),
+  playerIdeologyId: IdeologyId = 'centrist-reform',
 ): Pick<
   GameState,
   'currentWeeklyEvent' | 'subAgendas' | 'radarAgendas' | 'regionalAgendas' | 'regionalAgendaRecentRegionIds'
 > {
-  const assignment = assignWeekAgenda(1, null, [], regionalContext, [], rivalParties);
+  const assignment = assignWeekAgenda(
+    1,
+    null,
+    [],
+    regionalContext,
+    [],
+    rivalParties,
+    playerIdeologyId,
+  );
 
   return {
     currentWeeklyEvent: assignment.primaryEvent,
@@ -212,6 +245,7 @@ export function createEmptyPoliticalState(): Pick<
   | 'storyFlags'
   | 'pendingWeekBacklash'
   | 'activeWeekBacklash'
+  | 'activeAdvisorBriefing'
   | 'lastBacklashWeek'
   | 'backlashStoryFlags'
 > {
@@ -239,6 +273,7 @@ export function createEmptyPoliticalState(): Pick<
     storyFlags: {},
     pendingWeekBacklash: null,
     activeWeekBacklash: null,
+    activeAdvisorBriefing: null,
     lastBacklashWeek: 0,
     backlashStoryFlags: {},
   };

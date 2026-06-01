@@ -1,8 +1,11 @@
+import { useCallback, useState } from 'react';
 import { Panel } from '../ui/Panel';
 import { StatBar } from '../ui/StatBar';
 import { RegionMapCallout, type RegionMapCalloutVariant } from './RegionMapCallout';
+import { RegionMapDetailModal } from './RegionMapDetailModal';
 import { TurkeySvgMap } from './TurkeySvgMap';
-import type { RegionId, RegionState } from '../../types/game';
+import type { RegionId, RegionState, SegmentId } from '../../types/game';
+import type { PoliticalSegmentId } from '../../types/politicalSegments';
 import './dashboard.css';
 
 interface RegionPanelProps {
@@ -47,6 +50,9 @@ export function RegionPanel({ regions, homeRegionId }: RegionPanelProps) {
 interface RegionMapProps {
   regions: RegionState[];
   homeRegionId: string;
+  partyName: string;
+  segmentSupport: Record<SegmentId, number>;
+  politicalSegmentSupport: Record<PoliticalSegmentId, number>;
   selectedRegionId?: string | null;
   onSelectRegion?: (regionId: string) => void;
   hasIlPartyOffice?: (regionId: string) => boolean;
@@ -55,11 +61,15 @@ interface RegionMapProps {
   onMapGoToAgendas?: () => void;
   onMapGoToCampaign?: () => void;
   onMapGoToOrganization?: () => void;
+  onMapGoToRegionalAgenda?: (regionId: RegionId) => void;
 }
 
 export function RegionMap({
   regions,
   homeRegionId,
+  partyName,
+  segmentSupport,
+  politicalSegmentSupport,
   selectedRegionId,
   onSelectRegion,
   hasIlPartyOffice,
@@ -68,14 +78,25 @@ export function RegionMap({
   onMapGoToAgendas,
   onMapGoToCampaign,
   onMapGoToOrganization,
+  onMapGoToRegionalAgenda,
 }: RegionMapProps) {
   const selectedId = selectedRegionId as RegionId | null | undefined;
-  const showCallout =
-    calloutVariant &&
-    selectedId &&
-    (calloutVariant === 'overview'
-      ? hasRegionalAgenda?.(selectedId)
-      : true);
+  const showCallout = calloutVariant === 'regions' && selectedId;
+  const [detailRegionId, setDetailRegionId] = useState<RegionId | null>(null);
+
+  const handleSelectRegion = useCallback(
+    (regionId: string) => {
+      onSelectRegion?.(regionId);
+      setDetailRegionId(regionId as RegionId);
+    },
+    [onSelectRegion],
+  );
+
+  const closeDetail = useCallback(() => setDetailRegionId(null), []);
+
+  const detailRegion = detailRegionId
+    ? regions.find((region) => region.id === detailRegionId)
+    : null;
 
   return (
     <div className="region-map-block">
@@ -84,11 +105,31 @@ export function RegionMap({
           regions={regions}
           homeRegionId={homeRegionId}
           selectedRegionId={selectedRegionId}
-          onSelectRegion={onSelectRegion}
+          onSelectRegion={handleSelectRegion}
           hasIlPartyOffice={hasIlPartyOffice}
           hasRegionalAgenda={hasRegionalAgenda}
         />
       </Panel>
+      {detailRegion ? (
+        <RegionMapDetailModal
+          region={detailRegion}
+          homeRegionId={homeRegionId}
+          partyName={partyName}
+          segmentSupport={segmentSupport}
+          politicalSegmentSupport={politicalSegmentSupport}
+          hasRegionalAgenda={hasRegionalAgenda?.(detailRegion.id) ?? false}
+          hasIlPartyOffice={hasIlPartyOffice?.(detailRegion.id) ?? false}
+          onClose={closeDetail}
+          onGoToAgenda={
+            hasRegionalAgenda?.(detailRegion.id) && onMapGoToRegionalAgenda
+              ? () => {
+                  onMapGoToRegionalAgenda(detailRegion.id as RegionId);
+                  closeDetail();
+                }
+              : undefined
+          }
+        />
+      ) : null}
       {showCallout && selectedId ? (
         <RegionMapCallout
           regionId={selectedId}

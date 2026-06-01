@@ -42,6 +42,7 @@ export function RegionalAgendaPanel({
 
   const card = (
     <RegionalAgendaCard
+      state={state}
       agenda={agenda}
       selection={selection}
       cardLocked={cardLocked}

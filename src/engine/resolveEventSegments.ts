@@ -8,6 +8,7 @@ import {
 } from './ideologyPoliticalMapping';
 import { resolveEventTargetRival } from '../data/rivals';
 import type { PoliticalSegmentId } from '../types/politicalSegments';
+import { resolveEffectiveReactionAxis } from './reactionAxisEngine';
 import type { PolicyTopicId, RivalPartyState, SegmentId, WeeklyEvent } from '../types/game';
 
 export type ReactionAxis = 'socioeconomic' | 'political' | 'mixed';
@@ -27,21 +28,26 @@ interface TopicSegmentFallback {
   tensionSegments: SegmentId[];
 }
 
+interface TopicPoliticalFallback {
+  primaryPoliticalSegments: PoliticalSegmentId[];
+  tensionPoliticalSegments: PoliticalSegmentId[];
+}
+
 const TOPIC_SEGMENT_FALLBACKS: Record<PolicyTopicId, TopicSegmentFallback> = {
   economy: {
     primarySegments: ['workers', 'retirees'],
     tensionSegments: ['merchants', 'industry'],
   },
   transparency: {
-    primarySegments: ['civilServants', 'merchants'],
-    tensionSegments: [],
+    primarySegments: [],
+    tensionSegments: ['merchants'],
   },
   labor: {
     primarySegments: ['workers'],
     tensionSegments: ['industry', 'merchants'],
   },
   security: {
-    primarySegments: ['retirees', 'civilServants'],
+    primarySegments: [],
     tensionSegments: ['youth'],
   },
   environment: {
@@ -57,13 +63,53 @@ const TOPIC_SEGMENT_FALLBACKS: Record<PolicyTopicId, TopicSegmentFallback> = {
     tensionSegments: ['civilServants'],
   },
   mediaPolitics: {
-    primarySegments: ['youth', 'civilServants'],
+    primarySegments: ['youth'],
     tensionSegments: [],
   },
 };
 
+/** Konu bazlı ideolojik eksen — elle yazılmamış mixed/political olaylar için */
+const TOPIC_POLITICAL_FALLBACKS: Record<PolicyTopicId, TopicPoliticalFallback> = {
+  economy: {
+    primaryPoliticalSegments: ['populist', 'socialDemocrat'],
+    tensionPoliticalSegments: ['liberal'],
+  },
+  labor: {
+    primaryPoliticalSegments: ['socialDemocrat', 'populist'],
+    tensionPoliticalSegments: ['liberal'],
+  },
+  socialWelfare: {
+    primaryPoliticalSegments: ['socialDemocrat', 'populist'],
+    tensionPoliticalSegments: ['liberal'],
+  },
+  environment: {
+    primaryPoliticalSegments: ['socialDemocrat', 'liberal'],
+    tensionPoliticalSegments: ['conservative', 'nationalist'],
+  },
+  localGovernance: {
+    primaryPoliticalSegments: ['liberal', 'socialDemocrat'],
+    tensionPoliticalSegments: ['conservative'],
+  },
+  transparency: {
+    primaryPoliticalSegments: ['liberal', 'socialDemocrat'],
+    tensionPoliticalSegments: ['conservative'],
+  },
+  mediaPolitics: {
+    primaryPoliticalSegments: ['liberal', 'populist'],
+    tensionPoliticalSegments: ['conservative', 'nationalist'],
+  },
+  security: {
+    primaryPoliticalSegments: ['nationalist', 'conservative'],
+    tensionPoliticalSegments: ['liberal', 'populist'],
+  },
+};
+
 function inferReactionAxis(event: WeeklyEvent): ReactionAxis {
-  if (event.reactionAxis) return event.reactionAxis;
+  const explicit = event.reactionAxis;
+  if (explicit) return explicit;
+
+  const topicDefault = resolveEffectiveReactionAxis(event);
+  if (topicDefault === 'political') return 'political';
 
   const hasPolitical =
     (event.primaryPoliticalSegments?.length ?? 0) > 0 ||
@@ -94,17 +140,29 @@ function resolveSocioeconomicSegments(
 
 function resolvePoliticalSegments(
   event: WeeklyEvent,
+  reactionAxis: ReactionAxis,
 ): Pick<ResolvedEventSegments, 'primaryPoliticalSegments' | 'tensionPoliticalSegments'> {
+  const fallback = TOPIC_POLITICAL_FALLBACKS[event.policyTopic];
+
+  if (reactionAxis === 'socioeconomic') {
+    return {
+      primaryPoliticalSegments: event.primaryPoliticalSegments ?? [],
+      tensionPoliticalSegments: event.tensionPoliticalSegments ?? [],
+    };
+  }
+
   return {
-    primaryPoliticalSegments: event.primaryPoliticalSegments ?? [],
-    tensionPoliticalSegments: event.tensionPoliticalSegments ?? [],
+    primaryPoliticalSegments:
+      event.primaryPoliticalSegments ?? fallback?.primaryPoliticalSegments ?? [],
+    tensionPoliticalSegments:
+      event.tensionPoliticalSegments ?? fallback?.tensionPoliticalSegments ?? [],
   };
 }
 
 export function resolveEventSegments(event: WeeklyEvent): ResolvedEventSegments {
   const reactionAxis = inferReactionAxis(event);
   const socio = resolveSocioeconomicSegments(event, reactionAxis);
-  const political = resolvePoliticalSegments(event);
+  const political = resolvePoliticalSegments(event, reactionAxis);
 
   return {
     reactionAxis,

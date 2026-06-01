@@ -1,5 +1,6 @@
 /** Radar gündem — izleme only, hafta sonu etkileri */
 
+import { useEffect } from 'react';
 import { policyTopicLabels, weeklyEventTypeLabels } from '../../data/labels';
 import { segmentLabels } from '../../data/segments';
 import type { GameState } from '../../types/game';
@@ -9,10 +10,20 @@ import './RadarAgendaPanel.css';
 interface RadarAgendaPanelProps {
   state: GameState;
   embedded?: boolean;
+  /** Öğretici: radar bölümü görüntülendi */
+  onViewed?: () => void;
 }
 
-export function RadarAgendaPanel({ state, embedded = false }: RadarAgendaPanelProps) {
+export function RadarAgendaPanel({
+  state,
+  embedded = false,
+  onViewed,
+}: RadarAgendaPanelProps) {
   const { radarAgendas } = state;
+
+  useEffect(() => {
+    if (radarAgendas.length > 0) onViewed?.();
+  }, [radarAgendas.length, onViewed]);
 
   if (radarAgendas.length === 0) {
     return embedded ? (

@@ -80,7 +80,14 @@ export function AgendaSegmentImpact({
       ? [{ groupId: 'socio', label: 'Hedef', items: socioLabels, tone: 'socio' as const }]
       : []),
     ...(showPoliticalPrimary
-      ? [{ groupId: 'pol', label: 'Politik', items: politicalLabels, tone: 'political' as const }]
+      ? [
+          {
+            groupId: 'pol',
+            label: reactionAxis === 'political' ? 'Hedef' : 'Politik',
+            items: politicalLabels,
+            tone: 'political' as const,
+          },
+        ]
       : []),
     ...(showSocioTension
       ? [{ groupId: 'tension-socio', label: 'Gerilim', items: tensionSocioLabels, tone: 'tension' as const }]

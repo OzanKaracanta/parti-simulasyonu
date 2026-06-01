@@ -1,0 +1,43 @@
+.tutorial-spotlight-root {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  pointer-events: none;
+}
+
+.tutorial-spotlight-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(8, 10, 14, 0.55);
+  pointer-events: auto;
+}
+
+.tutorial-spotlight-hole {
+  position: fixed;
+  border-radius: 10px;
+  box-shadow:
+    0 0 0 9999px rgba(8, 10, 14, 0.55),
+    0 0 0 2px var(--color-agenda, #d4a84b),
+    0 0 24px rgba(212, 168, 75, 0.35);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.tutorial-spotlight-tooltip {
+  position: fixed;
+  z-index: 2;
+  max-width: 300px;
+  padding: 0.65rem 0.85rem;
+  border-radius: 8px;
+  background: rgba(24, 28, 36, 0.98);
+  border: 1px solid rgba(212, 168, 75, 0.45);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+  pointer-events: auto;
+}
+
+.tutorial-spotlight-tooltip p {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--text-primary, #e8eaed);
+}

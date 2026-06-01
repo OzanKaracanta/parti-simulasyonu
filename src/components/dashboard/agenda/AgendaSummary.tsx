@@ -1,9 +1,10 @@
 import { policyTopicLabels } from '../../../data/labels';
 import { resolveEventTargetRival } from '../../../data/rivals';
 import { getIdeologyById } from '../../../data/setupOptions';
+import { enrichResolvedForPlayerContext } from '../../../engine/reactionAxisEngine';
 import { resolveEventSegmentsForWeek } from '../../../engine/resolveEventSegments';
 import type { AgendaPressure, AgendaStatus } from '../../../types/agenda';
-import type { GameState, WeeklyEvent } from '../../../types/game';
+import type { GameState, IdeologyId, WeeklyEvent } from '../../../types/game';
 import { AgendaSegmentImpact } from './AgendaSegmentImpact';
 import { ReactionAxisBadge } from './ReactionAxisBadge';
 import {
@@ -20,11 +21,24 @@ interface AgendaSummaryProps {
   status: AgendaStatus;
   storyHint?: string | null;
   rivalParties: GameState['rivalParties'];
+  playerIdeologyId: IdeologyId;
 }
 
-export function AgendaSummary({ week, event, pressure, status, storyHint, rivalParties }: AgendaSummaryProps) {
+export function AgendaSummary({
+  week,
+  event,
+  pressure,
+  status,
+  storyHint,
+  rivalParties,
+  playerIdeologyId,
+}: AgendaSummaryProps) {
   const topics = getEventTopicLine(event);
-  const resolved = resolveEventSegmentsForWeek(event, rivalParties);
+  const resolved = enrichResolvedForPlayerContext(
+    event,
+    { playerIdeologyId, rivalParties },
+    resolveEventSegmentsForWeek(event, rivalParties),
+  );
   const targetRival = event.attacksRival ? resolveEventTargetRival(event, rivalParties) : null;
 
   return (

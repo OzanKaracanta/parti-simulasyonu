@@ -10,8 +10,14 @@ export const resourceLabels: Record<ResourceKey, string> = {
   energy: 'Enerji',
   volunteers: 'Gönüllü',
   reputation: 'İtibar',
-  organizationCapacity: 'Örgüt Kapasitesi',
+  organizationCapacity: 'Koordinasyon',
 };
+
+/** TopBar — haftalık harcanabilir bütçe (seçimde düşer) */
+export const WEEKLY_BUDGET_RESOURCE_KEYS: ResourceKey[] = ['money', 'energy', 'volunteers'];
+
+/** Parti durumu — uzun vadeli, TopBar bütçesinden ayrı */
+export const PARTY_STATUS_RESOURCE_KEYS: ResourceKey[] = ['reputation'];
 
 export const metricLabels: Record<MetricKey, string> = {
   mediaPower: 'Medya Gücü',
@@ -49,9 +55,9 @@ export const weeklyEventTypeLabels: Record<WeeklyEventType, string> = {
 };
 
 export const reactionAxisLabels: Record<ReactionAxis, string> = {
-  socioeconomic: 'Ekonomik',
-  political: 'Politik',
-  mixed: 'Karma',
+  socioeconomic: 'Geçim / Ekonomi',
+  political: 'Toplum & Siyaset',
+  mixed: 'İkili gündem',
 };
 
 export const eventResponseLevelLabels: Record<EventResponseLevel, string> = {

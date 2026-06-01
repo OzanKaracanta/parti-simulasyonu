@@ -6,6 +6,7 @@ interface SubAgendaResponseOptionProps {
   option: SubAgendaResponseOptionType;
   selected: boolean;
   disabled?: boolean;
+  disabledReason?: string | null;
   onSelect: () => void;
 }
 
@@ -13,6 +14,7 @@ export function SubAgendaResponseOption({
   option,
   selected,
   disabled = false,
+  disabledReason = null,
   onSelect,
 }: SubAgendaResponseOptionProps) {
   return (
@@ -21,7 +23,8 @@ export function SubAgendaResponseOption({
       role="radio"
       aria-checked={selected}
       disabled={disabled}
-      className={`sub-agenda-response-card tone-${option.tone} ${selected ? 'is-selected' : ''}`}
+      title={disabledReason ?? undefined}
+      className={`sub-agenda-response-card tone-${option.tone} ${selected ? 'is-selected' : ''} ${disabled ? 'is-disabled' : ''}`}
       onClick={onSelect}
     >
       <span className="sub-agenda-response-check" aria-hidden>
@@ -31,7 +34,11 @@ export function SubAgendaResponseOption({
       <span className="sub-agenda-response-label">{option.label}</span>
       <span className="sub-agenda-response-desc">{option.description}</span>
       <span className="sub-agenda-response-cost">
-        {subAgendaEnergyCostLabels[option.energyCostLabel]}
+        <span className="sub-agenda-response-cost-value">−{option.energyCost} ⚡</span>
+        <span className="sub-agenda-response-cost-tier">
+          {subAgendaEnergyCostLabels[option.energyCostLabel]}
+        </span>
+        <span className="sub-agenda-response-cost-note">Seçimde düşer</span>
       </span>
     </button>
   );

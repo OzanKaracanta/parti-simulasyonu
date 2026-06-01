@@ -1,6 +1,7 @@
 import { segmentLabels } from '../../data/labels';
 import { getActionTargetSegments } from '../../data/actionSegments';
 import {
+  getActionCostBreakdownHint,
   getActionCostLines,
   getActionEffectLines,
   getActionGainLines,
@@ -19,6 +20,8 @@ interface OperationCardProps {
   disabledReason: string | null;
   onSelect: () => void;
   onUnselect: () => void;
+  /** Öğretici tur 4 — maliyet sütununda ek açıklama */
+  showCostBreakdown?: boolean;
 }
 
 function StatColumn({ title, lines, variant }: { title: string; lines: string[]; variant?: 'gain' }) {
@@ -46,6 +49,7 @@ export function OperationCard({
   disabledReason,
   onSelect,
   onUnselect,
+  showCostBreakdown = false,
 }: OperationCardProps) {
   const targetSegments = getActionTargetSegments(action.id);
   const costLines = getActionCostLines(action);
@@ -82,7 +86,13 @@ export function OperationCard({
       </div>
 
       <div className="operation-card-stats">
-        <StatColumn title="Maliyet" lines={costLines} />
+        {showCostBreakdown ? (
+          <Tooltip content={getActionCostBreakdownHint(action)}>
+            <StatColumn title="Maliyet ⓘ" lines={costLines} />
+          </Tooltip>
+        ) : (
+          <StatColumn title="Maliyet" lines={costLines} />
+        )}
         <StatColumn title="Etki" lines={effectLines} />
         <StatColumn title="Kazanç" lines={gainLines} variant="gain" />
       </div>

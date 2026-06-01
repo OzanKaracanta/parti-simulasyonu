@@ -91,11 +91,13 @@ export function TurkeySvgMap({
             const isHovered = hoveredId === province.regionId;
             const isSelected = selectedRegionId === province.regionId;
             const isHome = province.regionId === homeRegionId;
+            const hasAgenda = hasRegionalAgenda?.(province.regionId);
             const className = [
               'turkey-province-path',
               isHovered ? 'is-hovered' : '',
               isSelected ? 'is-selected' : '',
               isHome ? 'is-home' : '',
+              hasAgenda ? 'is-regional-agenda' : '',
             ]
               .filter(Boolean)
               .join(' ');
@@ -117,37 +119,17 @@ export function TurkeySvgMap({
 
         {REGION_IDS.map((regionId) => {
           const label = turkeyRegionLabels[regionId];
-          const showAgenda = hasRegionalAgenda?.(regionId);
           const showOffice = hasIlPartyOffice?.(regionId);
-          if (!label || (!showAgenda && !showOffice)) return null;
+          if (!label || !showOffice) return null;
 
           return (
             <g key={`${regionId}-markers`} pointerEvents="none">
-              {showAgenda ? (
-                <g className="turkey-region-agenda-marker">
-                  <circle
-                    cx={label.labelX - (showOffice ? 26 : 0)}
-                    cy={label.labelY}
-                    r={4.5}
-                    className="turkey-region-agenda-dot"
-                  />
-                  <text
-                    x={label.labelX - (showOffice ? 26 : 0) + 8}
-                    y={label.labelY}
-                    className="turkey-region-agenda-label"
-                  >
-                    Gündem
-                  </text>
-                </g>
-              ) : null}
-              {showOffice ? (
-                <circle
-                  cx={label.labelX + (showAgenda ? 30 : 0)}
-                  cy={label.labelY}
-                  r={4.5}
-                  className="turkey-region-office-dot"
-                />
-              ) : null}
+              <circle
+                cx={label.labelX}
+                cy={label.labelY}
+                r={4.5}
+                className="turkey-region-office-dot"
+              />
             </g>
           );
         })}
@@ -186,7 +168,7 @@ export function TurkeySvgMap({
 
       <div className="turkey-map-legend" aria-hidden="true">
         <span>
-          <i className="dot agenda" /> Gündem
+          <i className="swatch agenda" /> Bölgesel gündem
         </span>
         <span>
           <i className="dot office" /> İl Bürosu

@@ -40,7 +40,7 @@ export function ActionCostChips({ action, className }: ActionCostChipsProps) {
         </span>
       ))}
       {load > 0 ? (
-        <span className="cost-chip load" title="Örgüt yükü">
+        <span className="cost-chip load" title="Koordinasyon yükü (haftalık kota)">
           <span className="cost-chip-icon">⬡</span>
           <span className="cost-chip-value">{load}</span>
         </span>

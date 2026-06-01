@@ -1,6 +1,8 @@
 /** Alt gündem kartları — haftalık olay havuzundan prosedürel üretim */
 
+import { enrichResolvedWithPlayerIdeology } from '../engine/playerIdeologyPoliticalEngine';
 import { enrichResolvedSegmentsWithRivals, enrichWithRivalTarget, resolveEventSegments } from '../engine/resolveEventSegments';
+import type { IdeologyId } from '../types/game';
 import type { ResolvedEventSegments } from '../engine/resolveEventSegments';
 import type {
   RadarAgendaItem,
@@ -105,6 +107,45 @@ export function enrichSubAgendaWithRivalSegments(
     ...agenda,
     tensionPoliticalSegments: enriched.tensionPoliticalSegments,
     tensionRationale: enriched.tensionRationale,
+    politicalRationale: enriched.politicalRationale,
+    responseOptions: createSubAgendaResponseOptions(
+      agenda.sourceEventId,
+      agenda.title,
+      enriched,
+    ),
+  };
+}
+
+export function enrichSubAgendaWithPlayerIdeology(
+  agenda: SubAgendaItem,
+  playerIdeologyId: IdeologyId,
+): SubAgendaItem {
+  const enriched = enrichResolvedWithPlayerIdeology(
+    {
+      reactionAxis: agenda.reactionAxis,
+      primarySegments: agenda.primarySegments,
+      tensionSegments: agenda.tensionSegments,
+      primaryPoliticalSegments: agenda.primaryPoliticalSegments,
+      tensionPoliticalSegments: agenda.tensionPoliticalSegments,
+      tensionRationale: agenda.tensionRationale,
+      politicalRationale: agenda.politicalRationale,
+    },
+    playerIdeologyId,
+  );
+
+  const primaryUnchanged =
+    enriched.primaryPoliticalSegments.join(',') === agenda.primaryPoliticalSegments.join(',');
+  const tensionUnchanged =
+    enriched.tensionPoliticalSegments.join(',') === agenda.tensionPoliticalSegments.join(',');
+  const rationaleUnchanged =
+    enriched.politicalRationale === agenda.politicalRationale;
+
+  if (primaryUnchanged && tensionUnchanged && rationaleUnchanged) return agenda;
+
+  return {
+    ...agenda,
+    primaryPoliticalSegments: enriched.primaryPoliticalSegments,
+    tensionPoliticalSegments: enriched.tensionPoliticalSegments,
     politicalRationale: enriched.politicalRationale,
     responseOptions: createSubAgendaResponseOptions(
       agenda.sourceEventId,

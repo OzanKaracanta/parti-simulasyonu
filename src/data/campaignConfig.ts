@@ -17,10 +17,22 @@ export const SEGMENT_LOSS_WEEKLY_SCALE = CAMPAIGN_WEEKLY_SCALE;
 
 /**
  * Enerji ve gönüllü 0–100 ile sınırlı.
- * Erken oyunda ~3–4 operasyon/hafta hedefi: yenilenme tam dolum sağlamaz.
+ * Erken oyunda ~3–4 operasyon + 1–3 gündem tepkisi: yenilenme tam dolum sağlamaz.
  */
-export const WEEKLY_ENERGY_REGEN = 16;
+export const WEEKLY_ENERGY_REGEN = 22;
+
+/** Operasyon enerji maliyetleri (ham 8–16) — seçim anında uygulanır */
+export const CAMPAIGN_ACTION_ENERGY_MULTIPLIER = 0.88;
+
+/** Ana + alt + bölgesel gündem — haftalık toplam söylem enerjisi tavanı */
+export const MAX_WEEKLY_AGENDA_ENERGY_SPEND = 14;
+
 export const WEEKLY_VOLUNTEER_REGEN = 8;
+
+export function scaleActionEnergyCost(raw: number): number {
+  if (raw <= 0) return 0;
+  return Math.max(1, Math.round(raw * CAMPAIGN_ACTION_ENERGY_MULTIPLIER));
+}
 
 export function scaleCampaignWeeklyValue(value: number): number {
   if (value === 0) return 0;

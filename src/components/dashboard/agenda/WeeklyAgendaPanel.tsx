@@ -1,12 +1,30 @@
 /** Ana haftalık gündem — sade karar akışı */
 
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
+import { getAgendaFocusElementId, scrollToAgendaFocus } from '../overview/agendaFocusScroll';
 import { getUpcomingStoryHint } from '../../../engine/opinionEchoEngine';
 import type { CampaignAction, GameState, WeeklyEvent } from '../../../types/game';
 import { AgendaResponseCard } from './AgendaResponseCard';
 import { AgendaSummary } from './AgendaSummary';
 import { ExpectedOutcomePanel } from './ExpectedOutcomePanel';
 import { SupportOperationsSection } from './SupportOperationsSection';
+import {
+  buildPoliticalEffectsForTone,
+  mergePoliticalSegmentEffects,
+} from '../../../engine/politicalReactionText';
+import {
+  enrichResolvedForPlayerContext,
+  filterSocioSegmentEffectsByAxis,
+  resolveEffectiveReactionAxis,
+} from '../../../engine/reactionAxisEngine';
+import { modulatePoliticalEffectsForPlayerIdeology } from '../../../engine/playerIdeologyPoliticalEngine';
+import { resolveEventSegmentsForWeek } from '../../../engine/resolveEventSegments';
+import {
+  canSelectMainEventResponse,
+  getAgendaEnergyDisabledReason,
+  getMainEventResponseEnergyCost,
+  getProjectedAgendaEnergySpend,
+} from '../../../engine/agendaEnergyEngine';
 import {
   getAgendaStatus,
   getEventPressure,
@@ -21,6 +39,8 @@ interface WeeklyAgendaPanelProps {
   onSelectResponse: (responseId: string) => void;
   state: GameState;
   layout?: 'embedded' | 'page';
+  focusAgendaId?: string | null;
+  onFocusApplied?: () => void;
 }
 
 export function WeeklyAgendaPanel({
@@ -30,6 +50,8 @@ export function WeeklyAgendaPanel({
   onSelectResponse,
   state,
   layout = 'embedded',
+  focusAgendaId = null,
+  onFocusApplied,
 }: WeeklyAgendaPanelProps) {
   const storyHint = getUpcomingStoryHint(state);
 
@@ -40,15 +62,56 @@ export function WeeklyAgendaPanel({
       .filter((name): name is string => Boolean(name));
   }, [event, availableActions]);
 
-  const responseDisplays = useMemo(
-    () => (event ? event.responseOptions.map(toAgendaResponseDisplay) : []),
-    [event],
+  const resolvedSegments = useMemo(
+    () =>
+      event
+        ? enrichResolvedForPlayerContext(
+            event,
+            { playerIdeologyId: state.party.ideologyId, rivalParties: state.rivalParties },
+            resolveEventSegmentsForWeek(event, state.rivalParties),
+          )
+        : null,
+    [event, state],
   );
+
+  const responseDisplays = useMemo(() => {
+    if (!event || !resolvedSegments) return [];
+
+    return event.responseOptions.map((option) => {
+      const filteredSocio = filterSocioSegmentEffectsByAxis(
+        resolveEffectiveReactionAxis(event),
+        option.segmentEffects,
+        resolvedSegments,
+      );
+      const tonePolitical = buildPoliticalEffectsForTone(resolvedSegments, option.tone);
+      const mergedPolitical = option.politicalSegmentEffects?.length
+        ? mergePoliticalSegmentEffects(tonePolitical, option.politicalSegmentEffects)
+        : tonePolitical;
+      const politicalPreview = modulatePoliticalEffectsForPlayerIdeology(
+        mergedPolitical,
+        state.party.ideologyId,
+      );
+
+      return toAgendaResponseDisplay(
+        { ...option, segmentEffects: filteredSocio },
+        politicalPreview,
+      );
+    });
+  }, [event, resolvedSegments]);
 
   const selectedResponse = useMemo(
     () => responseDisplays.find((option) => option.id === selectedResponseId) ?? null,
     [responseDisplays, selectedResponseId],
   );
+
+  useEffect(() => {
+    if (!event || !focusAgendaId || focusAgendaId !== event.id) return;
+    const timer = window.setTimeout(() => {
+      scrollToAgendaFocus(event.id);
+      onFocusApplied?.();
+    }, 120);
+    return () => window.clearTimeout(timer);
+  }, [event, focusAgendaId, onFocusApplied]);
 
   if (!event) {
     return <p className="weekly-agenda-empty">Bu hafta için gündem bilgisi yükleniyor.</p>;
@@ -61,21 +124,39 @@ export function WeeklyAgendaPanel({
     <section className="agenda-decision-section">
       <h5 className="agenda-section-title">Bu hafta nasıl yanıt vereceksin?</h5>
       <div className="agenda-response-grid" role="radiogroup" aria-label="Ana gündem tepkisi">
-        {responseDisplays.map((option) => (
-          <AgendaResponseCard
-            key={option.id}
-            option={option}
-            selected={selectedResponseId === option.id}
-            onSelect={() => onSelectResponse(option.id)}
-          />
-        ))}
+        {responseDisplays.map((option) => {
+          const isSelected = selectedResponseId === option.id;
+          const canAfford = isSelected || canSelectMainEventResponse(state, option.id);
+          const oldCost = selectedResponseId
+            ? getMainEventResponseEnergyCost(state, selectedResponseId)
+            : 0;
+          const newCost = getMainEventResponseEnergyCost(state, option.id);
+          const projected = getProjectedAgendaEnergySpend(state, oldCost, newCost);
+          const disabledReason = canAfford
+            ? null
+            : getAgendaEnergyDisabledReason(state, newCost - oldCost, projected);
+
+          return (
+            <AgendaResponseCard
+              key={option.id}
+              option={option}
+              selected={isSelected}
+              disabled={!canAfford}
+              disabledReason={disabledReason}
+              onSelect={() => onSelectResponse(option.id)}
+            />
+          );
+        })}
       </div>
     </section>
   );
 
   if (layout === 'page') {
     return (
-      <div className={`weekly-agenda weekly-agenda--page type-${event.type}`}>
+      <div
+        id={getAgendaFocusElementId(event.id)}
+        className={`weekly-agenda weekly-agenda--page type-${event.type}`}
+      >
         <AgendaSummary
           week={state.campaignWeek}
           event={event}
@@ -83,6 +164,7 @@ export function WeeklyAgendaPanel({
           status={status}
           storyHint={storyHint}
           rivalParties={state.rivalParties}
+          playerIdeologyId={state.party.ideologyId}
         />
 
         <div className="weekly-agenda-body">
@@ -97,7 +179,10 @@ export function WeeklyAgendaPanel({
   }
 
   return (
-    <div className={`weekly-agenda type-${event.type}`}>
+    <div
+      id={getAgendaFocusElementId(event.id)}
+      className={`weekly-agenda type-${event.type}`}
+    >
       <AgendaSummary
         week={state.campaignWeek}
         event={event}
@@ -105,6 +190,7 @@ export function WeeklyAgendaPanel({
         status={status}
         storyHint={storyHint}
         rivalParties={state.rivalParties}
+        playerIdeologyId={state.party.ideologyId}
       />
 
       {decisionSection}

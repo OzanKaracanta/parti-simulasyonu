@@ -45,7 +45,8 @@ export interface BacklashDefinition {
 }
 
 export const BACKLASH_FIRST_WEEK = 5;
-export const BACKLASH_FALLBACK_ROLL = 0.45;
+/** Faz 6 — pasif/dengeli botlarda yıllık backlash bandını (11–16) tutturmak için */
+export const BACKLASH_FALLBACK_ROLL = 0.51;
 
 export const backlashDefinitions: BacklashDefinition[] = [
   // --- Kurallar ---

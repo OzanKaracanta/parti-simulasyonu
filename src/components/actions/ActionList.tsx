@@ -8,7 +8,7 @@ import {
   resolveActionForState,
 } from '../../engine/actionSynergyEngine';
 import { getActionDisabledReason } from '../../engine/gameEngine';
-import { formatOrganizationLoadUsage } from '../../engine/organizationLoadEngine';
+import { CoordinationMeter } from '../dashboard/CoordinationMeter';
 import type { ActionCategory, CampaignAction, GameState } from '../../types/game';
 import { Panel } from '../ui/Panel';
 import { TabBar } from '../ui/TabBar';
@@ -21,6 +21,7 @@ interface ActionListProps {
   onUnselect: (actionId: string) => void;
   /** Genel bakışta önerilen sekmesi varsayılan */
   defaultTab?: ActionCategory | 'recommended';
+  showCostBreakdown?: boolean;
 }
 
 function groupActionsByCategory(actions: CampaignAction[]): Record<string, CampaignAction[]> {
@@ -36,6 +37,7 @@ export function ActionList({
   onSelect,
   onUnselect,
   defaultTab,
+  showCostBreakdown = false,
 }: ActionListProps) {
   const nationalActions = useMemo(
     () => state.availableActions.filter((action) => !isRegionalAction(action.id)),
@@ -89,9 +91,10 @@ export function ActionList({
       title="Operasyonlar"
       variant="operation"
       headerExtra={
-        <span className="action-count-badge">
-          {state.selectedActionIds.length} seçili · örgüt yükü {formatOrganizationLoadUsage(state)}
-        </span>
+        <div className="action-list-header-extra">
+          <span className="action-count-badge">{state.selectedActionIds.length} seçili</span>
+          <CoordinationMeter state={state} compact />
+        </div>
       }
       className="action-list-panel operations-deck-panel"
     >
@@ -122,6 +125,7 @@ export function ActionList({
                 disabledReason={disabledReason}
                 onSelect={() => onSelect(baseAction.id)}
                 onUnselect={() => onUnselect(baseAction.id)}
+                showCostBreakdown={showCostBreakdown}
               />
             );
           })

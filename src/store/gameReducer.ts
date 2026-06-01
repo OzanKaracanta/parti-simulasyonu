@@ -13,6 +13,7 @@ import {
   calculateNationalSupport,
 } from '../engine/gameEngine';
 import { canFinishWeek } from '../engine/eventEvaluation';
+import { dismissActiveAdvisorBriefing } from '../engine/advisorEngine';
 import { dismissActiveWeekBacklash } from '../engine/backlashEngine';
 import { buildGameStateFromSetup, createSetupState } from '../engine/setupEngine';
 import { buildTool, revertOrganizationToolChange, upgradeTool } from '../systems/organizationSystem';
@@ -34,6 +35,7 @@ export type GameAction =
   | { type: 'CLEAR_REGIONAL_AGENDA_RESPONSE'; agendaId?: string }
   | { type: 'END_WEEK' }
   | { type: 'DISMISS_WEEK_BACKLASH' }
+  | { type: 'DISMISS_ADVISOR_BRIEFING' }
   | { type: 'START_GAME'; choices: SetupChoices }
   | { type: 'RESET_GAME' }
   | { type: 'BUILD_ORGANIZATION_TOOL'; toolId: string; regionId?: RegionId }
@@ -90,6 +92,9 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
     case 'DISMISS_WEEK_BACKLASH':
       return dismissActiveWeekBacklash(state);
+
+    case 'DISMISS_ADVISOR_BRIEFING':
+      return dismissActiveAdvisorBriefing(state);
 
     case 'START_GAME':
       return buildGameStateFromSetup(action.choices);

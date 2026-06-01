@@ -13,6 +13,10 @@ import { getActionSynergyLevel, type ActionSynergyLevel } from './actionSynergyE
 import { getSubAgendaResponse } from './subAgendaEvaluation';
 import { applySegmentEffects } from './segmentEngine';
 import { applyPoliticalSegmentEffects } from './politicalSegmentEngine';
+import {
+  modulatePoliticalEffectsForPlayerIdeology,
+} from './playerIdeologyPoliticalEngine';
+import { politicalSegmentsForIdeology } from './ideologyPoliticalMapping';
 import type {
   EventResponseLevel,
   GameState,
@@ -337,10 +341,23 @@ export function applyWeekBacklashEffects(
   let segmentSupport = applySegmentEffects(state.segmentSupport, def.segmentEffects);
   let politicalSegmentSupport = state.politicalSegmentSupport;
 
-  if (def.politicalSegmentEffects?.length) {
+  const politicalEffects =
+    def.politicalSegmentEffects?.length
+      ? modulatePoliticalEffectsForPlayerIdeology(
+          def.politicalSegmentEffects,
+          state.party.ideologyId,
+        )
+      : def.kind === 'rule'
+        ? politicalSegmentsForIdeology(state.party.ideologyId).map((segmentId) => ({
+            segmentId,
+            delta: -1,
+          }))
+        : [];
+
+  if (politicalEffects.length > 0) {
     politicalSegmentSupport = applyPoliticalSegmentEffects(
       politicalSegmentSupport,
-      def.politicalSegmentEffects,
+      politicalEffects,
     );
   }
 

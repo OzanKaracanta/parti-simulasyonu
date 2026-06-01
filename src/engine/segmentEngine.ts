@@ -59,6 +59,10 @@ function scoreFromMetrics(
   return total / weightSum;
 }
 
+const CAMPAIGN_SEGMENT_BASE = 12;
+const CAMPAIGN_SEGMENT_METRIC_FACTOR = 0.18;
+const CAMPAIGN_IDEOLOGY_BONUS_SCALE = 0.65;
+
 export function createInitialSegmentSupport(
   metrics: Record<MetricKey, number>,
   ideologyId: IdeologyId,
@@ -70,6 +74,24 @@ export function createInitialSegmentSupport(
     const metricScore = scoreFromMetrics(metrics, SEGMENT_METRIC_WEIGHTS[segmentId]);
     const base = 20 + metricScore * 0.32;
     const bonus = ideologyBonus[segmentId] ?? 0;
+    support[segmentId] = clampSegmentSupport(Math.round(base + bonus));
+  }
+
+  return support;
+}
+
+/** Kampanya t=0 — düşük taban; haftalık recovery için `createInitialSegmentSupport` kullanılmaya devam eder */
+export function createCampaignStartSegmentSupport(
+  metrics: Record<MetricKey, number>,
+  ideologyId: IdeologyId,
+): Record<SegmentId, number> {
+  const support = {} as Record<SegmentId, number>;
+  const ideologyBonus = IDEOLOGY_SEGMENT_BONUS[ideologyId] ?? {};
+
+  for (const segmentId of ALL_SEGMENT_IDS) {
+    const metricScore = scoreFromMetrics(metrics, SEGMENT_METRIC_WEIGHTS[segmentId]);
+    const base = CAMPAIGN_SEGMENT_BASE + metricScore * CAMPAIGN_SEGMENT_METRIC_FACTOR;
+    const bonus = Math.round((ideologyBonus[segmentId] ?? 0) * CAMPAIGN_IDEOLOGY_BONUS_SCALE);
     support[segmentId] = clampSegmentSupport(Math.round(base + bonus));
   }
 

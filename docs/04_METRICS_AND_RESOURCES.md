@@ -8,7 +8,7 @@ Kampanya aksiyonlarının ana maliyetidir. Reklam, danışmanlık, organizasyon 
 
 ### Enerji
 
-Lider ve kampanya ekibinin haftalık çalışma kapasitesini temsil eder. Her aksiyon enerji harcar. Hafta sonunda **kısmi yenilenme** uygulanır; tam dolum beklenmemeli. Erken kampanyada 3–4 operasyon enerjiyi anlamlı şekilde tüketir.
+Lider ve kampanya ekibinin haftalık çalışma kapasitesini temsil eder. Operasyon ve gündem tepkileri **seçim anında** enerji düşürür. Hafta sonunda **+22 kısmi yenilenme** uygulanır; tam dolum beklenmemeli. Erken kampanyada tipik hafta: 3–4 operasyon + 1–3 gündem tepkisi. Tüm gündem tepkileri haftalık **14 ⚡** söylem tavanıyla sınırlıdır. Operasyon enerji maliyetleri veri tabanı değerinin ~%88’idir.
 
 ### Gönüllü Gücü
 
@@ -16,11 +16,11 @@ Saha çalışması, broşür dağıtımı, yerel ziyaretler ve topluluk faaliyet
 
 ### İtibar
 
-Partinin kamuoyundaki güvenilirliğini temsil eder. Bazı finansman veya agresif medya aksiyonları itibar riski yaratabilir.
+Partinin kamuoyundaki güvenilirliğini temsil eder (uzun vadeli). TopBar’da haftalık bütçeden ayrı, parti bilgisinde gösterilir. Bazı finansman veya agresif medya aksiyonları itibar riski yaratabilir.
 
-### Örgüt Kapasitesi
+### Koordinasyon (örgüt kapasitesi)
 
-Partinin aynı hafta koordine edebileceği operasyon tavanını gösterir (0–100). Yerel teşkilat ve gönüllü ağıyla artar. Kampanya aksiyonları kapasiteyi **tüketmez**; `organizationLoad` ile haftalık yük tahsis edilir, hafta bitince yük serbest kalır.
+UI’da **Koordinasyon yükü** olarak gösterilir; TopBar haftalık bütçesinde yer almaz. Aynı hafta koordine edilebilecek operasyon tavanı (0–100). Yerel teşkilat ve gönüllü ağıyla artar. Değer **tükenmez**; `organizationLoad` ile haftalık yük tahsis edilir, hafta bitince yük sıfırlanır. Kampanya ekranında `kullanılan/tavan` olarak okunur.
 
 ## Temel metrikler
 
@@ -106,10 +106,10 @@ Partinin belirli bölgelerde kök salma ve kalıcı destek üretme gücüdür.
 
 ## Operasyonel bütçe
 
-Sabit “max N aksiyon” kuralı yoktur. Haftalık operasyon tavanı **para, enerji, gönüllü ve örgüt yükünün** birlikte oluşturduğu yumuşak limitle belirlenir:
+Sabit “max N aksiyon” kuralı yoktur. Haftalık operasyon tavanı **para, enerji, gönüllü ve koordinasyon kotasının** birlikte oluşturduğu yumuşak limitle belirlenir:
 
 - **Erken oyun (~1–10. hafta):** Çoğu oyuncu haftada 3–4 operasyon civarında kalır; para ve enerji genelde ilk kısıtlayıcılar.
-- **Orta oyun:** Finansman ve örgüt yatırımları para ve örgüt yükü tavanını genişletir.
+- **Orta oyun:** Finansman ve örgüt yatırımları para ve koordinasyon tavanını genişletir.
 - **Geç oyun:** Gönüllü ağı ve ulusal örgüt araçları sahada daha geniş operasyon setine izin verir.
 
 Tasarım hedefi: kaynak getiren ve kapasite açan araçlara yatırım, haftalık operasyon sayısını zamanla artırmalıdır.
@@ -118,4 +118,4 @@ Tasarım hedefi: kaynak getiren ve kapasite açan araçlara yatırım, haftalık
 
 Aksiyon etkileri lineer olmamalı. Aynı aksiyon üst üste yapıldığında azalan getiri uygulanmalı. Böylece oyuncu farklı stratejiler denemeye teşvik edilir.
 
-Kaynaklar birbirinin yerine geçmemeli: para nakit baskısını, enerji lider tükenmesini, gönüllü saha yoğunluğunu, örgüt yükü koordinasyon tavanını temsil etmelidir.
+Kaynaklar birbirinin yerine geçmemeli: para nakit baskısını, enerji lider tükenmesini, gönüllü saha yoğunluğunu, koordinasyon kotası haftalık plan tavanını temsil etmelidir.

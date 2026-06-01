@@ -7,7 +7,7 @@ import {
 } from '../../engine/actionSynergyEngine';
 import { getActionDisabledReason } from '../../engine/gameEngine';
 import { resolveRegionalActionForDisplay } from '../../engine/regionalActionEngine';
-import { formatOrganizationLoadUsage } from '../../engine/organizationLoadEngine';
+import { CoordinationMeter } from './CoordinationMeter';
 import { filterRegionalActionsForRegion } from '../../systems/actionUnlockSystem';
 import type { GameState, RegionId } from '../../types/game';
 import type { GameAction } from '../../store/gameReducer';
@@ -46,9 +46,10 @@ export function RegionalCampaignsPanel({ state, regionId, dispatch }: RegionalCa
       title="Bölgesel Kampanyalar"
       variant="operation"
       headerExtra={
-        <span className="action-count-badge">
-          {selectedInRegion} seçili · örgüt yükü {formatOrganizationLoadUsage(state)}
-        </span>
+        <div className="action-list-header-extra">
+          <span className="action-count-badge">{selectedInRegion} bu bölgede seçili</span>
+          <CoordinationMeter state={state} compact />
+        </div>
       }
       className="region-campaigns-panel"
     >

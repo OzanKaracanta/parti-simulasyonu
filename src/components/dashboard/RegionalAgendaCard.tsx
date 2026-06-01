@@ -3,14 +3,21 @@ import {
   policyTopicLabels,
   weeklyEventTypeLabels,
 } from '../../data/labels';
-import type { RegionalAgendaItem, SubAgendaSelection } from '../../types/game';
+import {
+  canSelectRegionalAgendaResponse,
+  getAgendaEnergyDisabledReason,
+  getProjectedAgendaEnergySpend,
+} from '../../engine/agendaEnergyEngine';
+import type { GameState, RegionalAgendaItem, SubAgendaSelection } from '../../types/game';
 import { AgendaSegmentImpact } from './agenda/AgendaSegmentImpact';
 import { ReactionAxisBadge } from './agenda/ReactionAxisBadge';
 import { SubAgendaResponseOption } from './SubAgendaResponseOption';
+import { getAgendaFocusElementId } from './overview/agendaFocusScroll';
 import './RegionalAgendaPanel.css';
 import './SubAgendaPanel.css';
 
 interface RegionalAgendaCardProps {
+  state: GameState;
   agenda: RegionalAgendaItem;
   selection: SubAgendaSelection | undefined;
   cardLocked: boolean;
@@ -20,6 +27,7 @@ interface RegionalAgendaCardProps {
 }
 
 export function RegionalAgendaCard({
+  state,
   agenda,
   selection,
   cardLocked,
@@ -51,6 +59,7 @@ export function RegionalAgendaCard({
 
   return (
     <article
+      id={getAgendaFocusElementId(agenda.id)}
       className={`regional-agenda-card-module type-${agenda.type} ${isActive ? 'is-active' : ''} ${cardLocked || accessReason ? 'is-locked' : ''}`}
     >
       <header className="regional-agenda-card-top">
@@ -108,12 +117,31 @@ export function RegionalAgendaCard({
         >
           {agenda.responseOptions.map((option) => {
             const isSelected = selection?.responseId === option.id;
+            const canAfford =
+              isSelected || canSelectRegionalAgendaResponse(state, agenda.id, option.id);
+            const existingCost = selection
+              ? agenda.responseOptions.find((item) => item.id === selection.responseId)?.energyCost ?? 0
+              : 0;
+            const projected = getProjectedAgendaEnergySpend(
+              state,
+              existingCost,
+              option.energyCost,
+            );
+            const disabledReason = canAfford
+              ? null
+              : getAgendaEnergyDisabledReason(
+                  state,
+                  option.energyCost - existingCost,
+                  projected,
+                );
 
             return (
               <SubAgendaResponseOption
                 key={option.id}
                 option={option}
                 selected={isSelected}
+                disabled={!canAfford}
+                disabledReason={disabledReason}
                 onSelect={() => {
                   if (isSelected) {
                     onClearResponse();

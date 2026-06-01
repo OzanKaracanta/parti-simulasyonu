@@ -15,3 +15,10 @@ export const SUB_AGENDA_MAX_SILENT_PENALTIES_PER_WEEK = 1;
 
 /** Aynı gerilim segmentine ikinci sert mesaj — ceza çarpanı */
 export const SUB_AGENDA_DOUBLE_TARGET_MULTIPLIER = 1.25;
+
+/** Jenerik alt gündem tonları — seçim anında enerji (ana gündem ölçeğiyle uyumlu) */
+export const SUB_AGENDA_TONE_ENERGY = {
+  bold: 4,
+  measured: 2,
+  passive: 1,
+} as const;

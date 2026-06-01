@@ -1,7 +1,8 @@
-import { resourceLabels } from '../../data/labels';
+import { resourceLabels, WEEKLY_BUDGET_RESOURCE_KEYS } from '../../data/labels';
 import { Panel } from '../ui/Panel';
 import { StatBar } from '../ui/StatBar';
 import type { GameState, ResourceKey } from '../../types/game';
+import { CoordinationMeter } from './CoordinationMeter';
 import './dashboard.css';
 
 const resourceMax: Partial<Record<ResourceKey, number>> = {
@@ -15,30 +16,53 @@ const resourceMax: Partial<Record<ResourceKey, number>> = {
 interface ResourceBarProps {
   resources: GameState['resources'];
   resourceChanges?: Partial<Record<ResourceKey, number>>;
+  organizationState?: GameState;
 }
 
-export function ResourceBar({ resources, resourceChanges }: ResourceBarProps) {
+export function ResourceBar({ resources, resourceChanges, organizationState }: ResourceBarProps) {
   return (
     <Panel title="Kaynak Durumu" compact>
-      {(Object.entries(resources) as [ResourceKey, number][]).map(([key, value]) => (
+      <p className="resource-bar-section-label">Haftalık bütçe</p>
+      {WEEKLY_BUDGET_RESOURCE_KEYS.map((key) => (
         <StatBar
           key={key}
           label={resourceLabels[key]}
-          value={value}
+          value={resources[key]}
           max={resourceMax[key] ?? 100}
           delta={resourceChanges?.[key]}
           variant="party"
         />
       ))}
+
+      <p className="resource-bar-section-label resource-bar-section-label--spaced">
+        Parti durumu
+      </p>
+      <StatBar
+        label={resourceLabels.reputation}
+        value={resources.reputation}
+        max={resourceMax.reputation ?? 100}
+        delta={resourceChanges?.reputation}
+        variant="party"
+      />
+
+      {organizationState ? (
+        <>
+          <p className="resource-bar-section-label resource-bar-section-label--spaced">
+            Operasyon planı
+          </p>
+          <CoordinationMeter state={organizationState} />
+        </>
+      ) : null}
     </Panel>
   );
 }
 
 interface ResourceTableProps {
   resources: GameState['resources'];
+  organizationLoadUsed?: number;
 }
 
-export function ResourceTable({ resources }: ResourceTableProps) {
+export function ResourceTable({ resources, organizationLoadUsed }: ResourceTableProps) {
   return (
     <Panel title="Kaynak Tablosu">
       <table className="fm-table">
@@ -51,8 +75,9 @@ export function ResourceTable({ resources }: ResourceTableProps) {
           </tr>
         </thead>
         <tbody>
-          {(Object.entries(resources) as [ResourceKey, number][]).map(([key, value]) => {
+          {WEEKLY_BUDGET_RESOURCE_KEYS.map((key) => {
             const max = resourceMax[key] ?? 100;
+            const value = resources[key];
             const pct = Math.round((value / max) * 100);
             return (
               <tr key={key}>
@@ -63,6 +88,24 @@ export function ResourceTable({ resources }: ResourceTableProps) {
               </tr>
             );
           })}
+          <tr>
+            <td>{resourceLabels.reputation}</td>
+            <td className="num">{resources.reputation}</td>
+            <td className="num">{resourceMax.reputation}</td>
+            <td>{Math.round((resources.reputation / (resourceMax.reputation ?? 100)) * 100)}%</td>
+          </tr>
+          {organizationLoadUsed !== undefined ? (
+            <tr>
+              <td>Koordinasyon yükü (bu hafta)</td>
+              <td className="num">{organizationLoadUsed}</td>
+              <td className="num">{resources.organizationCapacity}</td>
+              <td>
+                {resources.organizationCapacity > 0
+                  ? `${Math.round((organizationLoadUsed / resources.organizationCapacity) * 100)}%`
+                  : '—'}
+              </td>
+            </tr>
+          ) : null}
         </tbody>
       </table>
     </Panel>

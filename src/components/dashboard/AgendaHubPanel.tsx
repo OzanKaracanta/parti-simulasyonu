@@ -27,10 +27,13 @@ interface AgendaHubPanelProps {
   onSelectRegionalResponse?: (agendaId: string, responseId: string) => void;
   onClearRegionalResponse?: (agendaId?: string) => void;
   initialTab?: AgendaTabId;
+  onRadarViewed?: () => void;
   /** Tam sayfa Gündemler ekranı — Panel sarmalayıcı olmadan geniş düzen */
   layout?: 'embedded' | 'page';
   /** Sayfa modu — sekmeler yerine tek gündem türü */
   pageMode?: AgendaPageMode;
+  focusAgendaId?: string | null;
+  onFocusApplied?: () => void;
 }
 
 export type AgendaPageMode = 'national' | 'regional' | 'sub';
@@ -59,8 +62,11 @@ export function AgendaHubPanel({
   onSelectRegionalResponse,
   onClearRegionalResponse,
   initialTab = 'main',
+  onRadarViewed,
   layout = 'embedded',
   pageMode,
+  focusAgendaId = null,
+  onFocusApplied,
 }: AgendaHubPanelProps) {
   const subCount = state.subAgendas.length;
   const radarCount = state.radarAgendas.length;
@@ -144,7 +150,7 @@ export function AgendaHubPanel({
       ) : null}
 
       {safeTab === 'radar' ? (
-        <RadarAgendaPanel state={state} embedded />
+        <RadarAgendaPanel state={state} embedded onViewed={onRadarViewed} />
       ) : null}
 
       {showRegional ? (
@@ -179,8 +185,12 @@ export function AgendaHubPanel({
                 onSelectResponse={onSelectResponse}
                 state={state}
                 layout={layout}
+                focusAgendaId={focusAgendaId}
+                onFocusApplied={onFocusApplied}
               />
-              {radarCount > 0 ? <RadarAgendaPanel state={state} embedded /> : null}
+              {radarCount > 0 ? (
+                <RadarAgendaPanel state={state} embedded onViewed={onRadarViewed} />
+              ) : null}
             </>
           ) : null}
 
@@ -201,6 +211,8 @@ export function AgendaHubPanel({
               onClearResponse={onClearRegionalResponse}
               embedded
               layout={layout}
+              focusAgendaId={focusAgendaId}
+              onFocusApplied={onFocusApplied}
             />
           ) : null}
         </div>

@@ -19,6 +19,7 @@ import {
 } from '../data/regionBalance';
 import { metricLabels, resourceLabels } from '../data/labels';
 import { getRegionById } from '../data/regions';
+import { getFoundingRegionalMaintenanceMultiplier } from '../engine/foundingMaintenanceEngine';
 import {
   ALL_REGION_IDS,
   getRegionOrganizationLevels,
@@ -402,9 +403,15 @@ export function getToolWeeklyMaintenanceForRegion(
   tool: OrganizationToolDefinition,
   level: number,
   regionId: RegionId,
+  state?: GameState,
 ): Partial<Record<ResourceKey, number>> {
   const base = getToolWeeklyMaintenance(tool, level);
-  const multiplier = getRegionMaintenanceMultiplier(regionId, tool.id);
+  let multiplier = getRegionMaintenanceMultiplier(regionId, tool.id);
+
+  if (state) {
+    multiplier *= getFoundingRegionalMaintenanceMultiplier(state, regionId, tool.id);
+  }
+
   return scaleResourceCostForRegion(base, multiplier);
 }
 
@@ -466,7 +473,7 @@ export function buildOrganizationToolView(
     levelTitle: levelDef?.title ?? null,
     status: getToolStatus(tool, level, state, regionId),
     weeklyEffects: getToolWeeklyEffects(tool, level),
-    weeklyMaintenance: getToolWeeklyMaintenanceForRegion(tool, level, regionId),
+    weeklyMaintenance: getToolWeeklyMaintenanceForRegion(tool, level, regionId, state),
     nextInstantEffects: nextLevelDef?.instantEffects ?? null,
     buildCost: getToolBuildCostForRegion(tool, regionId, state.party.homeRegionId),
     upgradeCost: getToolUpgradeCostForRegion(tool, level, regionId, state.party.homeRegionId),
@@ -734,7 +741,7 @@ export function simulateWeeklyOrganizationEffects(state: GameState): {
       const levelDef = getLevelDefinition(tool, level);
       if (!levelDef) continue;
 
-      const maintenance = getToolWeeklyMaintenanceForRegion(tool, level, regionId);
+      const maintenance = getToolWeeklyMaintenanceForRegion(tool, level, regionId, nextState);
       const weeklyEffects = scaleWeeklyEffectsForRegion(
         tool.id,
         regionId,

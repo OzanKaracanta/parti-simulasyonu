@@ -36,3 +36,8 @@
   line-height: 1.45;
   color: var(--ps-text-muted);
 }
+
+.campaign-page-coordination {
+  margin-top: 10px;
+  max-width: 280px;
+}

@@ -1,0 +1,72 @@
+.coordination-meter {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 10px;
+  border-radius: var(--ps-radius-sm);
+  border: 1px solid var(--ps-border-subtle);
+  background: var(--ps-bg-inset);
+}
+
+.coordination-meter--compact {
+  padding: 4px 8px;
+  gap: 4px;
+  border: none;
+  background: transparent;
+}
+
+.coordination-meter-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.coordination-meter-label {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ps-text-dim);
+}
+
+.coordination-meter-value {
+  font-size: 11px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--ps-text-secondary);
+}
+
+.coordination-meter-bar {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--ps-bg-elevated);
+  overflow: hidden;
+}
+
+.coordination-meter-fill {
+  height: 100%;
+  border-radius: 2px;
+  background: var(--ps-agenda);
+  transition: width 0.15s ease;
+}
+
+.coordination-meter.is-warning .coordination-meter-fill {
+  background: var(--ps-caution, #c9a227);
+}
+
+.coordination-meter.is-full .coordination-meter-fill {
+  background: var(--ps-crisis);
+}
+
+.coordination-meter.is-full .coordination-meter-value {
+  color: var(--ps-crisis);
+}
+
+.coordination-meter-note {
+  margin: 0;
+  font-size: 9px;
+  line-height: 1.35;
+  color: var(--ps-crisis);
+  font-weight: 600;
+}

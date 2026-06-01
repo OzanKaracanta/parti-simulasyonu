@@ -32,10 +32,24 @@ import {
   type Dispatch,
   type CSSProperties,
 } from 'react';
+import { TutorialPanel } from '../tutorial/TutorialPanel';
+import { TutorialWeekIntroModal } from '../tutorial/TutorialWeekIntroModal';
+import {
+  canEndWeekStrict,
+  getTutorialProgress,
+  markRadarTutorialViewed,
+} from '../../tutorial/tutorialEngine';
+import {
+  isTutorialIntroSeen,
+  isTutorialSkipped,
+  setTutorialIntroSeen,
+} from '../../tutorial/tutorialStorage';
+import { WeekFlowPanel } from './WeekFlowPanel';
 import { colorOptions } from '../../data/setupOptions';
 import { isRegionalAction } from '../../data/regionalActions';
 import { getAgendaStatusSnapshot } from '../../engine/agendaStatus';
 import { ELIGIBILITY_OFFICE_TOOL_ID } from '../../engine/electionEligibilityEngine';
+import { ensurePoliticalSegmentSupport } from '../../engine/politicalSegmentEngine';
 import { hasRegionalAgendaForRegion } from '../../engine/regionalAgendaEngine';
 import { getRegionOrganizationToolLevel } from '../../systems/regionOrganization';
 import { SelectedActionsPanel } from '../actions/SelectedActionsPanel';
@@ -51,9 +65,11 @@ import { EventFeed } from './EventFeed';
 import { SidebarNav } from './SidebarNav';
 import { RivalPanel } from './RivalPanel';
 import { SidebarSegmentSupport } from './SidebarSegmentSupport';
+import { AdvisorBriefingModal } from './AdvisorBriefingModal';
 import { TopBar } from './TopBar';
-import { WeekBacklashModal } from './WeekBacklashModal';
+import { WeeklyAgendaNewsSection } from './overview/WeeklyAgendaNewsSection';
 import { WeeklyCashFlowPanel } from './WeeklyCashFlowPanel';
+import { WeeklyEnergyBudgetPanel } from './WeeklyEnergyBudgetPanel';
 import type { GameAction } from '../../store/gameReducer';
 import type { GameState, RegionId } from '../../types/game';
 import './CommandCenterPanel.css';
@@ -68,6 +84,41 @@ export function DashboardScreen({ state, dispatch }: DashboardScreenProps) {
   const [view, setView] = useState<DashboardView>('overview');
   const [selectedRegionId, setSelectedRegionId] = useState<RegionId>(state.party.homeRegionId);
   const [organizationFocusRegion, setOrganizationFocusRegion] = useState<RegionId | null>(null);
+  const [tutorialSkipped, setTutorialSkipped] = useState(() => isTutorialSkipped());
+  const [tutorialTick, setTutorialTick] = useState(0);
+  const [agendaFocusId, setAgendaFocusId] = useState<string | null>(null);
+  const [showWeekIntro, setShowWeekIntro] = useState(
+    () => state.campaignWeek === 1 && !isTutorialSkipped() && !isTutorialIntroSeen(),
+  );
+
+  const showTutorialCostBreakdown =
+    !tutorialSkipped && state.campaignWeek === 4;
+
+  const tutorialHighlightView = useMemo(() => {
+    const progress = getTutorialProgress(state, tutorialSkipped);
+    return progress?.nextStep?.targetView ?? null;
+  }, [state, tutorialSkipped, tutorialTick]);
+
+  const finishCheck = useMemo(
+    () => canEndWeekStrict(state, tutorialSkipped),
+    [state, tutorialSkipped, tutorialTick],
+  );
+
+  const handleRadarTutorialViewed = useCallback(() => {
+    markRadarTutorialViewed(state);
+    setTutorialTick((n) => n + 1);
+  }, [state.party.name, state.campaignWeek]);
+
+  const handleTutorialNavigate = useCallback(
+    (target: DashboardView) => {
+      if (target === 'organization-regional') {
+        setOrganizationFocusRegion(state.party.homeRegionId);
+        setSelectedRegionId(state.party.homeRegionId);
+      }
+      setView(target);
+    },
+    [state.party.homeRegionId],
+  );
 
   const selectAction = (actionId: string) => dispatch({ type: 'SELECT_ACTION', actionId });
   const unselectAction = (actionId: string) => dispatch({ type: 'UNSELECT_ACTION', actionId });
@@ -92,12 +143,19 @@ export function DashboardScreen({ state, dispatch }: DashboardScreenProps) {
     [state],
   );
 
-  const openAgendaNational = () => setView('agenda-national');
-  const openAgendaRegional = () => setView('agenda-regional');
+  const openAgendaNational = (focusAgendaId?: string) => {
+    if (focusAgendaId) setAgendaFocusId(focusAgendaId);
+    setView('agenda-national');
+  };
+  const openAgendaRegional = (focusAgendaId?: string, regionId?: RegionId) => {
+    if (regionId) setSelectedRegionId(regionId);
+    if (focusAgendaId) setAgendaFocusId(focusAgendaId);
+    setView('agenda-regional');
+  };
   const openAgendaSub = () => setView('agenda-sub');
   const openCampaignRegional = () => setView('campaign-regional');
 
-  const goToAgendasForSelectedRegion = () => openAgendaRegional();
+  const goToAgendasForSelectedRegion = () => openAgendaRegional(undefined, selectedRegionId);
   const goToCampaignForSelectedRegion = () => openCampaignRegional();
   const goToOrganizationForSelectedRegion = () => {
     setOrganizationFocusRegion(selectedRegionId);
@@ -106,19 +164,32 @@ export function DashboardScreen({ state, dispatch }: DashboardScreenProps) {
   const clearOrganizationFocus = useCallback(() => setOrganizationFocusRegion(null), []);
 
   const lastHistory = state.history.length > 0 ? state.history[state.history.length - 1] : null;
+  const politicalSegmentSupport = ensurePoliticalSegmentSupport(state).politicalSegmentSupport;
+
+  const dismissWeekIntro = () => {
+    setTutorialIntroSeen();
+    setShowWeekIntro(false);
+  };
 
   return (
     <div
       className="dashboard-layout"
       style={{ '--party-color': partyColor } as CSSProperties}
     >
-      <TopBar state={state} onEndWeek={() => dispatch({ type: 'END_WEEK' })} />
+      {showWeekIntro && !tutorialSkipped ? (
+        <TutorialWeekIntroModal partyName={state.party.name} onDismiss={dismissWeekIntro} />
+      ) : null}
 
-      {state.activeWeekBacklash ? (
-        <WeekBacklashModal
-          item={state.activeWeekBacklash}
-          week={state.campaignWeek}
-          onDismiss={() => dispatch({ type: 'DISMISS_WEEK_BACKLASH' })}
+      <TopBar
+        state={state}
+        finishCheck={finishCheck}
+        onEndWeek={() => dispatch({ type: 'END_WEEK' })}
+      />
+
+      {state.activeAdvisorBriefing ? (
+        <AdvisorBriefingModal
+          briefing={state.activeAdvisorBriefing}
+          onDismiss={() => dispatch({ type: 'DISMISS_ADVISOR_BRIEFING' })}
         />
       ) : null}
 
@@ -128,24 +199,44 @@ export function DashboardScreen({ state, dispatch }: DashboardScreenProps) {
             active={view}
             onChange={setView}
             pendingAgendaCount={pendingAgendaCount}
+            tutorialHighlightView={tutorialHighlightView}
           />
         </aside>
 
         <main className="dashboard-main">
+          <TutorialPanel
+            state={state}
+            skipped={tutorialSkipped}
+            onSkipChange={setTutorialSkipped}
+            onNavigate={handleTutorialNavigate}
+          />
+
           {view === 'overview' && (
             <div className="overview-command-layout">
               <section className="overview-map-section" aria-label="Türkiye haritası">
                 <RegionMap
                   regions={state.regions}
                   homeRegionId={state.party.homeRegionId}
+                  partyName={state.party.name}
+                  segmentSupport={state.segmentSupport}
+                  politicalSegmentSupport={politicalSegmentSupport}
                   selectedRegionId={selectedRegionId}
                   onSelectRegion={(id) => setSelectedRegionId(id as RegionId)}
                   hasIlPartyOffice={hasIlPartyOffice}
                   hasRegionalAgenda={(regionId) =>
                     hasRegionalAgendaForRegion(state.regionalAgendas, regionId as RegionId)
                   }
-                  calloutVariant="overview"
-                  onMapGoToAgendas={goToAgendasForSelectedRegion}
+                  onMapGoToRegionalAgenda={(regionId) =>
+                    openAgendaRegional(undefined, regionId)
+                  }
+                />
+                <WeeklyAgendaNewsSection
+                  state={state}
+                  onOpenNationalAgenda={(agendaId) => openAgendaNational(agendaId)}
+                  onOpenRegionalAgenda={(agendaId, regionId) =>
+                    openAgendaRegional(agendaId, regionId as RegionId)
+                  }
+                  onViewAllRegionalAgendas={() => openAgendaRegional()}
                 />
                 <div className="overview-map-tables" aria-label="Ulusal taban ve rakip partiler">
                   <SidebarSegmentSupport
@@ -166,14 +257,21 @@ export function DashboardScreen({ state, dispatch }: DashboardScreenProps) {
 
               <section className="overview-command-panel" aria-label="Komuta merkezi">
                 <CommandCenterPanel subtitle="Harita, plan ve bütçe özeti">
+                  <WeekFlowPanel
+                    state={state}
+                    tutorialSkipped={tutorialSkipped}
+                    finishCheck={finishCheck}
+                    onNavigate={handleTutorialNavigate}
+                  />
                   <AgendaStatusSummary
                     state={state}
-                    onOpenAgendaNational={openAgendaNational}
-                    onOpenAgendaRegional={openAgendaRegional}
+                    onOpenAgendaNational={() => openAgendaNational()}
+                    onOpenAgendaRegional={() => openAgendaRegional()}
                     onOpenAgendaSub={openAgendaSub}
                   />
                   <SelectedActionsPanel state={state} onRemove={unselectAction} />
                   <WeeklyCashFlowPanel state={state} />
+                  <WeeklyEnergyBudgetPanel state={state} />
                 </CommandCenterPanel>
               </section>
             </div>
@@ -182,6 +280,9 @@ export function DashboardScreen({ state, dispatch }: DashboardScreenProps) {
           {view === 'agenda-national' && (
             <AgendasScreen
               mode="national"
+              focusAgendaId={agendaFocusId}
+              onFocusApplied={() => setAgendaFocusId(null)}
+              onRadarViewed={handleRadarTutorialViewed}
               state={state}
               availableActions={state.availableActions}
               selectedResponseId={state.selectedEventResponseId}
@@ -197,6 +298,8 @@ export function DashboardScreen({ state, dispatch }: DashboardScreenProps) {
           {view === 'agenda-regional' && (
             <AgendasScreen
               mode="regional"
+              focusAgendaId={agendaFocusId}
+              onFocusApplied={() => setAgendaFocusId(null)}
               state={state}
               availableActions={state.availableActions}
               selectedResponseId={state.selectedEventResponseId}
@@ -234,6 +337,7 @@ export function DashboardScreen({ state, dispatch }: DashboardScreenProps) {
               onSelectAction={selectAction}
               onUnselectAction={unselectAction}
               dispatch={dispatch}
+              showTutorialCostBreakdown={showTutorialCostBreakdown}
             />
           )}
 
@@ -247,6 +351,7 @@ export function DashboardScreen({ state, dispatch }: DashboardScreenProps) {
               onSelectAction={selectAction}
               onUnselectAction={unselectAction}
               dispatch={dispatch}
+              showTutorialCostBreakdown={showTutorialCostBreakdown}
             />
           )}
 
@@ -256,6 +361,9 @@ export function DashboardScreen({ state, dispatch }: DashboardScreenProps) {
                 <RegionMap
                   regions={state.regions}
                   homeRegionId={state.party.homeRegionId}
+                  partyName={state.party.name}
+                  segmentSupport={state.segmentSupport}
+                  politicalSegmentSupport={politicalSegmentSupport}
                   selectedRegionId={selectedRegionId}
                   onSelectRegion={(id) => setSelectedRegionId(id as RegionId)}
                   hasIlPartyOffice={hasIlPartyOffice}
@@ -266,6 +374,9 @@ export function DashboardScreen({ state, dispatch }: DashboardScreenProps) {
                   onMapGoToAgendas={goToAgendasForSelectedRegion}
                   onMapGoToCampaign={goToCampaignForSelectedRegion}
                   onMapGoToOrganization={goToOrganizationForSelectedRegion}
+                  onMapGoToRegionalAgenda={(regionId) =>
+                    openAgendaRegional(undefined, regionId)
+                  }
                 />
               </div>
               <RegionPanel regions={state.regions} homeRegionId={state.party.homeRegionId} />
@@ -296,7 +407,9 @@ export function DashboardScreen({ state, dispatch }: DashboardScreenProps) {
 
           {view === 'statistics' && <StatisticsScreen state={state} />}
 
-          {view === 'reports' && <ReportsScreen state={state} />}
+          {view === 'reports' && (
+            <ReportsScreen state={state} tutorialSkipped={tutorialSkipped} />
+          )}
         </main>
       </div>
 

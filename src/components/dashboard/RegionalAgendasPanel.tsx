@@ -1,6 +1,8 @@
 /** Bölgesel gündemler — çoklu bölge kart grid'i */
 
+import { useEffect } from 'react';
 import { getRegionalAgendaMaxSlots } from '../../data/regionalAgendaConfig';
+import { scrollToAgendaFocus } from './overview/agendaFocusScroll';
 import {
   canRespondToRegionalAgenda,
   getRegionalAgendaAccessReason,
@@ -16,6 +18,8 @@ interface RegionalAgendasPanelProps {
   onClearResponse: (agendaId?: string) => void;
   embedded?: boolean;
   layout?: 'embedded' | 'page';
+  focusAgendaId?: string | null;
+  onFocusApplied?: () => void;
 }
 
 export function RegionalAgendasPanel({
@@ -24,11 +28,26 @@ export function RegionalAgendasPanel({
   onClearResponse,
   embedded = false,
   layout = 'embedded',
+  focusAgendaId = null,
+  onFocusApplied,
 }: RegionalAgendasPanelProps) {
   const { regionalAgendas, selectedRegionalAgendaSelections } = state;
   const maxSlots = getRegionalAgendaMaxSlots(state.campaignWeek);
   const slotsUsed = selectedRegionalAgendaSelections.length;
   const slotsFull = slotsUsed >= maxSlots;
+
+  useEffect(() => {
+    if (!focusAgendaId) return;
+    const hasTarget = regionalAgendas.some((agenda) => agenda.id === focusAgendaId);
+    if (!hasTarget) return;
+
+    const timer = window.setTimeout(() => {
+      scrollToAgendaFocus(focusAgendaId);
+      onFocusApplied?.();
+    }, 120);
+
+    return () => window.clearTimeout(timer);
+  }, [focusAgendaId, regionalAgendas, onFocusApplied]);
 
   if (regionalAgendas.length === 0) {
     return embedded ? (
@@ -67,6 +86,7 @@ export function RegionalAgendasPanel({
           return (
             <RegionalAgendaCard
               key={agenda.id}
+              state={state}
               agenda={agenda}
               selection={selection}
               cardLocked={cardLocked}

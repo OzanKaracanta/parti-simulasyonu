@@ -1,13 +1,16 @@
-import type { CSSProperties } from 'react';
+import { useMemo, type CSSProperties } from 'react';
 import { colorOptions } from '../../data/setupOptions';
-import { resourceLabels } from '../../data/labels';
+import { resourceLabels, WEEKLY_BUDGET_RESOURCE_KEYS } from '../../data/labels';
 import { canFinishWeek } from '../../engine/eventEvaluation';
+import { computeWeeklyEnergyPreview } from '../../engine/weeklyEnergyBudget';
 import type { GameState, ResourceKey } from '../../types/game';
 import './dashboard.css';
 
 interface TopBarProps {
   state: GameState;
   onEndWeek: () => void;
+  /** Öğretici veya ek kurallar — verilmezse yalnızca gündem zorunluluğu */
+  finishCheck?: { ok: boolean; reason?: string };
 }
 
 const resourceIcons: Record<ResourceKey, string> = {
@@ -18,11 +21,23 @@ const resourceIcons: Record<ResourceKey, string> = {
   organizationCapacity: '⬡',
 };
 
-export function TopBar({ state, onEndWeek }: TopBarProps) {
+export function TopBar({ state, onEndWeek, finishCheck: finishCheckProp }: TopBarProps) {
   const partyColor = colorOptions.find((c) => c.id === state.party.colorId)?.hex ?? '#3498db';
   const weeksLeft = state.maxWeeks - state.campaignWeek;
   const progressPct = ((state.campaignWeek - 1) / (state.maxWeeks - 1)) * 100;
-  const finishCheck = canFinishWeek(state);
+  const finishCheck = finishCheckProp ?? canFinishWeek(state);
+  const energyPreview = useMemo(() => computeWeeklyEnergyPreview(state), [state]);
+
+  const energySpentThisWeek =
+    energyPreview.alreadySpentOnActions + energyPreview.alreadySpentOnAgendas;
+  const energyChipHint =
+    energySpentThisWeek > 0
+      ? `Bu hafta −${energySpentThisWeek} harcandı · ~${energyPreview.projectedEndEnergy} hafta sonu (+${energyPreview.regenAmount} yenilenme)`
+      : `~${energyPreview.projectedEndEnergy} hafta sonu (+${energyPreview.regenAmount} yenilenme)`;
+
+  const endWeekTitle = finishCheck.ok
+    ? [finishCheck.reason, energyPreview.endWeekSummary].filter(Boolean).join(' · ')
+    : finishCheck.reason;
 
   return (
     <header
@@ -37,6 +52,15 @@ export function TopBar({ state, onEndWeek }: TopBarProps) {
           <h1 title={state.party.name}>{state.party.name}</h1>
           <p title={`${state.party.leaderName} · ${state.party.profile}`}>
             {state.party.leaderName} · {state.party.profile}
+          </p>
+          <p
+            className="party-reputation"
+            title="Uzun vadeli parti güvenilirliği — haftalık bütçeden ayrı"
+          >
+            <span className="party-reputation-icon" aria-hidden>
+              ★
+            </span>
+            İtibar {state.resources.reputation}
           </p>
         </div>
       </div>
@@ -65,25 +89,45 @@ export function TopBar({ state, onEndWeek }: TopBarProps) {
       </div>
 
       <div className="topbar-actions">
-        <div className="topbar-resources">
-          {(Object.entries(state.resources) as [ResourceKey, number][]).map(([key, value]) => (
-            <div className="resource-chip" key={key} title={resourceLabels[key]}>
-              <span className="resource-icon">{resourceIcons[key]}</span>
-              <div className="resource-detail">
-                <span className="resource-name">{resourceLabels[key]}</span>
-                <span className="resource-value">{value}</span>
-              </div>
-            </div>
-          ))}
+        <div className="topbar-resources" aria-label="Haftalık bütçe">
+          <span className="topbar-resources-kicker">Haftalık bütçe</span>
+          <div className="topbar-resources-chips">
+            {WEEKLY_BUDGET_RESOURCE_KEYS.map((key) => {
+              const value = state.resources[key];
+              const isEnergy = key === 'energy';
+              const chipTitle = isEnergy ? energyChipHint : resourceLabels[key];
+
+              return (
+                <div
+                  className={`resource-chip ${isEnergy ? 'resource-chip--energy' : ''}`}
+                  key={key}
+                  title={chipTitle}
+                >
+                  <span className="resource-icon">{resourceIcons[key]}</span>
+                  <div className="resource-detail">
+                    <span className="resource-name">{resourceLabels[key]}</span>
+                    <span className="resource-value">{value}</span>
+                    {isEnergy && energySpentThisWeek > 0 ? (
+                      <span className="resource-pending">−{energySpentThisWeek} bu hafta</span>
+                    ) : null}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
         <button
           type="button"
           className="ps-btn ps-btn--success end-week-btn"
           onClick={onEndWeek}
           disabled={!finishCheck.ok}
-          title={finishCheck.reason}
+          title={endWeekTitle}
+          data-tutorial-nav="end-week"
         >
-          Haftayı Bitir »
+          <span className="end-week-btn-label">Haftayı Bitir »</span>
+          {finishCheck.ok ? (
+            <span className="end-week-btn-energy">{energyPreview.endWeekSummary}</span>
+          ) : null}
         </button>
       </div>
     </header>
