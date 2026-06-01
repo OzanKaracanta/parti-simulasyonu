@@ -15,6 +15,7 @@ import { RegionPanel } from '../dashboard/RegionPanel';
 import { SidebarSegmentSupport } from '../dashboard/SidebarSegmentSupport';
 import { SidebarPoliticalSegmentSupport } from '../dashboard/SidebarPoliticalSegmentSupport';
 import { ensurePoliticalSegmentSupport } from '../../engine/politicalSegmentEngine';
+import { OrganizationToolsSummaryPanel } from '../organization/OrganizationToolsSummaryPanel';
 import { Panel } from '../ui/Panel';
 import { StatBar } from '../ui/StatBar';
 import './StatisticsScreen.css';
@@ -102,6 +103,10 @@ export function StatisticsScreen({ state: rawState }: StatisticsScreenProps) {
           <span className="statistics-hero-value">{formatOrganizationLoadUsage(state)}</span>
           <span className="statistics-hero-meta">Bu hafta seçili operasyonlar</span>
         </div>
+      </section>
+
+      <section className="statistics-org-summary" aria-label="Örgüt araçları özeti">
+        <OrganizationToolsSummaryPanel state={state} />
       </section>
 
       <div className="statistics-primary">

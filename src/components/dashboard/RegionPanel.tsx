@@ -1,7 +1,8 @@
 import { Panel } from '../ui/Panel';
 import { StatBar } from '../ui/StatBar';
+import { RegionMapCallout, type RegionMapCalloutVariant } from './RegionMapCallout';
 import { TurkeySvgMap } from './TurkeySvgMap';
-import type { RegionState } from '../../types/game';
+import type { RegionId, RegionState } from '../../types/game';
 import './dashboard.css';
 
 interface RegionPanelProps {
@@ -50,6 +51,10 @@ interface RegionMapProps {
   onSelectRegion?: (regionId: string) => void;
   hasIlPartyOffice?: (regionId: string) => boolean;
   hasRegionalAgenda?: (regionId: string) => boolean;
+  calloutVariant?: RegionMapCalloutVariant;
+  onMapGoToAgendas?: () => void;
+  onMapGoToCampaign?: () => void;
+  onMapGoToOrganization?: () => void;
 }
 
 export function RegionMap({
@@ -59,18 +64,42 @@ export function RegionMap({
   onSelectRegion,
   hasIlPartyOffice,
   hasRegionalAgenda,
+  calloutVariant,
+  onMapGoToAgendas,
+  onMapGoToCampaign,
+  onMapGoToOrganization,
 }: RegionMapProps) {
+  const selectedId = selectedRegionId as RegionId | null | undefined;
+  const showCallout =
+    calloutVariant &&
+    selectedId &&
+    (calloutVariant === 'overview'
+      ? hasRegionalAgenda?.(selectedId)
+      : true);
+
   return (
-    <Panel title="Ülke Genel Durumu" className="region-map-panel">
-      <TurkeySvgMap
-        regions={regions}
-        homeRegionId={homeRegionId}
-        selectedRegionId={selectedRegionId}
-        onSelectRegion={onSelectRegion}
-        hasIlPartyOffice={hasIlPartyOffice}
-        hasRegionalAgenda={hasRegionalAgenda}
-      />
-    </Panel>
+    <div className="region-map-block">
+      <Panel title="Ülke Genel Durumu" className="region-map-panel">
+        <TurkeySvgMap
+          regions={regions}
+          homeRegionId={homeRegionId}
+          selectedRegionId={selectedRegionId}
+          onSelectRegion={onSelectRegion}
+          hasIlPartyOffice={hasIlPartyOffice}
+          hasRegionalAgenda={hasRegionalAgenda}
+        />
+      </Panel>
+      {showCallout && selectedId ? (
+        <RegionMapCallout
+          regionId={selectedId}
+          variant={calloutVariant}
+          hasRegionalAgenda={hasRegionalAgenda?.(selectedId) ?? false}
+          onGoToAgendas={onMapGoToAgendas}
+          onGoToCampaign={onMapGoToCampaign}
+          onGoToOrganization={onMapGoToOrganization}
+        />
+      ) : null}
+    </div>
   );
 }
 

@@ -48,6 +48,23 @@
   color: var(--ps-text);
 }
 
+.agenda-hub-page-subtitle {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--ps-text-muted);
+  max-width: 42rem;
+}
+
+.agenda-hub-page-header--solo {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.agenda-hub-page-header--solo .agenda-hub-page-heading {
+  padding-bottom: 14px;
+}
+
 .agenda-hub-page-header .agenda-tabs-wrap {
   flex: 1;
   min-width: 280px;

@@ -1,5 +1,33 @@
 .region-selector-bar .fm-panel-body {
   padding-top: 8px;
+  padding-bottom: 10px;
+}
+
+.region-selector-embedded {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-bottom: 20px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--ps-border);
+}
+
+.region-selector-embedded-label {
+  margin: 0;
+  font-size: var(--ps-font-body);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: var(--ps-letter-label);
+  color: var(--ps-text-muted);
+}
+
+.org-page--regional .region-selector-embedded {
+  padding-bottom: 24px;
+  margin-bottom: 16px;
+}
+
+.org-page--regional .org-tools-panel--full .org-tools-grid--quad {
+  margin-top: 4px;
 }
 
 .region-selector-chips {

@@ -18,6 +18,7 @@ import {
   scaleResourceCostForRegion,
 } from '../data/regionBalance';
 import { metricLabels, resourceLabels } from '../data/labels';
+import { getRegionById } from '../data/regions';
 import {
   ALL_REGION_IDS,
   getRegionOrganizationLevels,
@@ -504,6 +505,68 @@ export function getAllActiveOrganizationToolViews(state: GameState): Organizatio
   views.push(...getActiveNationalOrganizationToolViews(state));
 
   return views;
+}
+
+export interface OrganizationToolSummaryEntry {
+  scope: 'national' | RegionId;
+  scopeLabel: string;
+  toolId: string;
+  toolName: string;
+  level: number;
+  levelTitle: string | null;
+  maxLevel: number;
+}
+
+export interface OrganizationToolSummaryGroup {
+  scope: 'national' | RegionId;
+  scopeLabel: string;
+  tools: OrganizationToolSummaryEntry[];
+}
+
+/** Kampanya genelinde kurulu örgüt araçları — özet paneli */
+export function getOrganizationToolsSummaryGroups(state: GameState): OrganizationToolSummaryGroup[] {
+  const groups: OrganizationToolSummaryGroup[] = [];
+
+  const nationalTools: OrganizationToolSummaryEntry[] = getActiveNationalOrganizationToolViews(
+    state,
+  ).map((view) => ({
+    scope: 'national' as const,
+    scopeLabel: 'Ulusal',
+    toolId: view.definition.id,
+    toolName: view.definition.name,
+    level: view.level,
+    levelTitle: view.levelTitle,
+    maxLevel: view.definition.maxLevel,
+  }));
+
+  if (nationalTools.length > 0) {
+    groups.push({ scope: 'national', scopeLabel: 'Ulusal', tools: nationalTools });
+  }
+
+  for (const regionId of ALL_REGION_IDS) {
+    const id = regionId as RegionId;
+    const tools: OrganizationToolSummaryEntry[] = getOrganizationToolViews(state, id)
+      .filter((view) => view.level > 0)
+      .map((view) => ({
+        scope: id,
+        scopeLabel: getRegionById(id).name,
+        toolId: view.definition.id,
+        toolName: view.definition.name,
+        level: view.level,
+        levelTitle: view.levelTitle,
+        maxLevel: view.definition.maxLevel,
+      }));
+
+    if (tools.length > 0) {
+      groups.push({
+        scope: id,
+        scopeLabel: getRegionById(id).name,
+        tools,
+      });
+    }
+  }
+
+  return groups;
 }
 
 export function canBuildTool(

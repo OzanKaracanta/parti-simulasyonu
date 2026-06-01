@@ -21,6 +21,50 @@
   max-height: calc(100vh - 200px);
 }
 
+/* Bölgesel kampanyalar — 3 sütunlu kompakt kartlar */
+
+.region-campaigns-grid .operation-card-grid {
+  height: 100%;
+  min-width: 0;
+  padding: 10px 12px;
+  gap: 8px;
+}
+
+.region-campaigns-grid .operation-card-title {
+  font-size: 12px;
+  line-height: 1.25;
+}
+
+.region-campaigns-grid .operation-card-desc {
+  font-size: 10px;
+  line-height: 1.35;
+  color: var(--ps-text-secondary);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}
+
+.region-campaigns-grid .operation-card-stats {
+  grid-template-columns: 1fr;
+  gap: 6px;
+  padding: 6px 0;
+}
+
+.region-campaigns-grid .operation-stat-list li {
+  font-size: 9px;
+}
+
+.region-campaigns-grid .operation-card-footer {
+  flex-direction: column;
+  align-items: stretch;
+  margin-top: auto;
+}
+
+.region-campaigns-grid .operation-deploy-btn {
+  width: 100%;
+}
+
 .operations-empty {
   grid-column: 1 / -1;
   margin: 0;

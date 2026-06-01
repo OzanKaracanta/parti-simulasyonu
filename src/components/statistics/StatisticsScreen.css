@@ -3,11 +3,31 @@
   grid-template-columns: minmax(0, 1fr) minmax(260px, 300px);
   grid-template-areas:
     'hero hero'
+    'org-summary org-summary'
     'primary sidebar';
   gap: 10px;
   width: 100%;
   max-width: 1280px;
   align-items: start;
+}
+
+.statistics-org-summary {
+  grid-area: org-summary;
+  min-width: 0;
+}
+
+.statistics-org-summary .org-tools-summary-panel {
+  width: 100%;
+}
+
+.statistics-org-summary .org-tools-summary-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.statistics-org-summary .org-tools-summary-group {
+  min-width: 0;
 }
 
 .statistics-hero {
@@ -67,7 +87,14 @@
   grid-area: primary;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
+  min-width: 0;
+}
+
+.statistics-primary > .fm-panel,
+.statistics-primary > .region-map-panel {
+  flex: 0 0 auto;
+  width: 100%;
   min-width: 0;
 }
 
@@ -75,13 +102,16 @@
   grid-area: sidebar;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   min-width: 0;
-  position: sticky;
-  top: 8px;
   align-self: start;
-  max-height: calc(100vh - 120px);
-  overflow-y: auto;
+}
+
+.statistics-sidebar > .fm-panel,
+.statistics-sidebar > .sidebar-segment-card {
+  flex: 0 0 auto;
+  width: 100%;
+  min-width: 0;
 }
 
 .statistics-panel-note {
@@ -150,6 +180,7 @@
     grid-template-columns: 1fr;
     grid-template-areas:
       'hero'
+      'org-summary'
       'primary'
       'sidebar';
     max-width: none;

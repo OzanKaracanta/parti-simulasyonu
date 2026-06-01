@@ -1,12 +1,13 @@
-/** Gündemler ekranı — ulusal, alt, radar ve bölgesel kararlar */
+/** Gündemler ekranı — ulusal, bölgesel veya alt gündem sayfası */
 
 import type { Dispatch } from 'react';
 import type { CampaignAction, GameState, RegionId } from '../../types/game';
 import type { GameAction } from '../../store/gameReducer';
-import { AgendaHubPanel } from './AgendaHubPanel';
+import { AgendaHubPanel, type AgendaPageMode } from './AgendaHubPanel';
 import './AgendasScreen.css';
 
 interface AgendasScreenProps {
+  mode: AgendaPageMode;
   state: GameState;
   availableActions: CampaignAction[];
   selectedResponseId: string | null;
@@ -19,6 +20,7 @@ interface AgendasScreenProps {
 }
 
 export function AgendasScreen({
+  mode,
   state,
   availableActions,
   selectedResponseId,
@@ -32,6 +34,7 @@ export function AgendasScreen({
   return (
     <div className="agendas-screen">
       <AgendaHubPanel
+        pageMode={mode}
         layout="page"
         state={state}
         availableActions={availableActions}

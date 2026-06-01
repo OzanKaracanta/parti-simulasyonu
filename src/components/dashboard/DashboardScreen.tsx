@@ -1,30 +1,52 @@
+export type AgendaDashboardView = 'agenda-national' | 'agenda-regional' | 'agenda-sub';
+
+export type CampaignDashboardView = 'campaign-national' | 'campaign-regional';
+
+export type OrganizationDashboardView = 'organization-national' | 'organization-regional';
+
 export type DashboardView =
   | 'overview'
-  | 'agendas'
-  | 'campaign'
+  | AgendaDashboardView
+  | CampaignDashboardView
+  | OrganizationDashboardView
   | 'regions'
-  | 'organization'
   | 'statistics'
   | 'reports';
 
-import { useCallback, useMemo, useState, type Dispatch, type CSSProperties } from 'react';
+export function isAgendaView(view: DashboardView): view is AgendaDashboardView {
+  return view === 'agenda-national' || view === 'agenda-regional' || view === 'agenda-sub';
+}
+
+export function isCampaignView(view: DashboardView): view is CampaignDashboardView {
+  return view === 'campaign-national' || view === 'campaign-regional';
+}
+
+export function isOrganizationView(view: DashboardView): view is OrganizationDashboardView {
+  return view === 'organization-national' || view === 'organization-regional';
+}
+
+import {
+  useCallback,
+  useMemo,
+  useState,
+  type Dispatch,
+  type CSSProperties,
+} from 'react';
 import { colorOptions } from '../../data/setupOptions';
 import { isRegionalAction } from '../../data/regionalActions';
 import { getAgendaStatusSnapshot } from '../../engine/agendaStatus';
 import { ELIGIBILITY_OFFICE_TOOL_ID } from '../../engine/electionEligibilityEngine';
 import { hasRegionalAgendaForRegion } from '../../engine/regionalAgendaEngine';
 import { getRegionOrganizationToolLevel } from '../../systems/regionOrganization';
-import { ActionList } from '../actions/ActionList';
 import { SelectedActionsPanel } from '../actions/SelectedActionsPanel';
+import { CampaignScreen } from './CampaignScreen';
 import { ReportsScreen } from '../report/ReportsScreen';
 import { StatisticsScreen } from '../statistics/StatisticsScreen';
 import { AgendaStatusSummary } from './AgendaStatusSummary';
 import { AgendasScreen } from './AgendasScreen';
 import { CommandCenterPanel } from './CommandCenterPanel';
-import { RegionalCommandPanels } from './RegionalCommandPanels';
 import { OrganizationScreen } from '../organization/OrganizationScreen';
 import { RegionMap, RegionPanel } from './RegionPanel';
-import { RegionSelectorBar } from './RegionSelectorBar';
 import { EventFeed } from './EventFeed';
 import { SidebarNav } from './SidebarNav';
 import { RivalPanel } from './RivalPanel';
@@ -45,6 +67,7 @@ interface DashboardScreenProps {
 export function DashboardScreen({ state, dispatch }: DashboardScreenProps) {
   const [view, setView] = useState<DashboardView>('overview');
   const [selectedRegionId, setSelectedRegionId] = useState<RegionId>(state.party.homeRegionId);
+  const [organizationFocusRegion, setOrganizationFocusRegion] = useState<RegionId | null>(null);
 
   const selectAction = (actionId: string) => dispatch({ type: 'SELECT_ACTION', actionId });
   const unselectAction = (actionId: string) => dispatch({ type: 'UNSELECT_ACTION', actionId });
@@ -69,7 +92,18 @@ export function DashboardScreen({ state, dispatch }: DashboardScreenProps) {
     [state],
   );
 
-  const openAgendas = () => setView('agendas');
+  const openAgendaNational = () => setView('agenda-national');
+  const openAgendaRegional = () => setView('agenda-regional');
+  const openAgendaSub = () => setView('agenda-sub');
+  const openCampaignRegional = () => setView('campaign-regional');
+
+  const goToAgendasForSelectedRegion = () => openAgendaRegional();
+  const goToCampaignForSelectedRegion = () => openCampaignRegional();
+  const goToOrganizationForSelectedRegion = () => {
+    setOrganizationFocusRegion(selectedRegionId);
+    setView('organization-regional');
+  };
+  const clearOrganizationFocus = useCallback(() => setOrganizationFocusRegion(null), []);
 
   const lastHistory = state.history.length > 0 ? state.history[state.history.length - 1] : null;
 
@@ -110,6 +144,8 @@ export function DashboardScreen({ state, dispatch }: DashboardScreenProps) {
                   hasRegionalAgenda={(regionId) =>
                     hasRegionalAgendaForRegion(state.regionalAgendas, regionId as RegionId)
                   }
+                  calloutVariant="overview"
+                  onMapGoToAgendas={goToAgendasForSelectedRegion}
                 />
                 <div className="overview-map-tables" aria-label="Ulusal taban ve rakip partiler">
                   <SidebarSegmentSupport
@@ -130,7 +166,12 @@ export function DashboardScreen({ state, dispatch }: DashboardScreenProps) {
 
               <section className="overview-command-panel" aria-label="Komuta merkezi">
                 <CommandCenterPanel subtitle="Harita, plan ve bütçe özeti">
-                  <AgendaStatusSummary state={state} onOpenAgendas={openAgendas} />
+                  <AgendaStatusSummary
+                    state={state}
+                    onOpenAgendaNational={openAgendaNational}
+                    onOpenAgendaRegional={openAgendaRegional}
+                    onOpenAgendaSub={openAgendaSub}
+                  />
                   <SelectedActionsPanel state={state} onRemove={unselectAction} />
                   <WeeklyCashFlowPanel state={state} />
                 </CommandCenterPanel>
@@ -138,8 +179,9 @@ export function DashboardScreen({ state, dispatch }: DashboardScreenProps) {
             </div>
           )}
 
-          {view === 'agendas' && (
+          {view === 'agenda-national' && (
             <AgendasScreen
+              mode="national"
               state={state}
               availableActions={state.availableActions}
               selectedResponseId={state.selectedEventResponseId}
@@ -152,29 +194,60 @@ export function DashboardScreen({ state, dispatch }: DashboardScreenProps) {
             />
           )}
 
-          {view === 'campaign' && (
-            <div className="campaign-layout">
-              <section className="theater-column" aria-label="Kampanya operasyonları">
-                <ActionList
-                  state={{ ...state, availableActions: nationalActions }}
-                  onSelect={selectAction}
-                  onUnselect={unselectAction}
-                />
-              </section>
-              <section className="campaign-side-column" aria-label="Bölgesel kampanya">
-                <RegionSelectorBar
-                  regions={state.regions}
-                  homeRegionId={state.party.homeRegionId}
-                  selectedRegionId={selectedRegionId}
-                  onSelectRegion={setSelectedRegionId}
-                />
-                <RegionalCommandPanels
-                  state={state}
-                  regionId={selectedRegionId}
-                  dispatch={dispatch}
-                />
-              </section>
-            </div>
+          {view === 'agenda-regional' && (
+            <AgendasScreen
+              mode="regional"
+              state={state}
+              availableActions={state.availableActions}
+              selectedResponseId={state.selectedEventResponseId}
+              selectedRegionId={selectedRegionId}
+              onSelectRegion={setSelectedRegionId}
+              onSelectResponse={selectResponse}
+              onSelectSubAgendaResponse={selectSubAgendaResponse}
+              onClearSubAgendaResponse={clearSubAgendaResponse}
+              dispatch={dispatch}
+            />
+          )}
+
+          {view === 'agenda-sub' && (
+            <AgendasScreen
+              mode="sub"
+              state={state}
+              availableActions={state.availableActions}
+              selectedResponseId={state.selectedEventResponseId}
+              selectedRegionId={selectedRegionId}
+              onSelectRegion={setSelectedRegionId}
+              onSelectResponse={selectResponse}
+              onSelectSubAgendaResponse={selectSubAgendaResponse}
+              onClearSubAgendaResponse={clearSubAgendaResponse}
+              dispatch={dispatch}
+            />
+          )}
+
+          {view === 'campaign-national' && (
+            <CampaignScreen
+              mode="national"
+              state={state}
+              nationalActions={nationalActions}
+              selectedRegionId={selectedRegionId}
+              onSelectRegion={setSelectedRegionId}
+              onSelectAction={selectAction}
+              onUnselectAction={unselectAction}
+              dispatch={dispatch}
+            />
+          )}
+
+          {view === 'campaign-regional' && (
+            <CampaignScreen
+              mode="regional"
+              state={state}
+              nationalActions={nationalActions}
+              selectedRegionId={selectedRegionId}
+              onSelectRegion={setSelectedRegionId}
+              onSelectAction={selectAction}
+              onUnselectAction={unselectAction}
+              dispatch={dispatch}
+            />
           )}
 
           {view === 'regions' && (
@@ -189,14 +262,36 @@ export function DashboardScreen({ state, dispatch }: DashboardScreenProps) {
                   hasRegionalAgenda={(regionId) =>
                     hasRegionalAgendaForRegion(state.regionalAgendas, regionId as RegionId)
                   }
+                  calloutVariant="regions"
+                  onMapGoToAgendas={goToAgendasForSelectedRegion}
+                  onMapGoToCampaign={goToCampaignForSelectedRegion}
+                  onMapGoToOrganization={goToOrganizationForSelectedRegion}
                 />
               </div>
               <RegionPanel regions={state.regions} homeRegionId={state.party.homeRegionId} />
             </div>
           )}
 
-          {view === 'organization' && (
-            <OrganizationScreen state={state} dispatch={dispatch} />
+          {view === 'organization-national' && (
+            <OrganizationScreen
+              mode="national"
+              state={state}
+              dispatch={dispatch}
+              selectedRegionId={selectedRegionId}
+              onSelectRegion={setSelectedRegionId}
+            />
+          )}
+
+          {view === 'organization-regional' && (
+            <OrganizationScreen
+              mode="regional"
+              state={state}
+              dispatch={dispatch}
+              selectedRegionId={selectedRegionId}
+              onSelectRegion={setSelectedRegionId}
+              focusRegionId={organizationFocusRegion}
+              onFocusApplied={clearOrganizationFocus}
+            />
           )}
 
           {view === 'statistics' && <StatisticsScreen state={state} />}

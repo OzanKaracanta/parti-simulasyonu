@@ -29,7 +29,23 @@ interface AgendaHubPanelProps {
   initialTab?: AgendaTabId;
   /** Tam sayfa Gündemler ekranı — Panel sarmalayıcı olmadan geniş düzen */
   layout?: 'embedded' | 'page';
+  /** Sayfa modu — sekmeler yerine tek gündem türü */
+  pageMode?: AgendaPageMode;
 }
+
+export type AgendaPageMode = 'national' | 'regional' | 'sub';
+
+const PAGE_MODE_TITLES: Record<AgendaPageMode, string> = {
+  national: 'Ulusal Gündem',
+  regional: 'Bölgesel Gündem',
+  sub: 'Alt Gündemler',
+};
+
+const PAGE_MODE_HINTS: Record<AgendaPageMode, string> = {
+  national: 'Haftalık ulusal olay, radar izleme ve yanıt seçimi',
+  regional: 'Bölge bazlı gündem kartları ve mesaj slotları',
+  sub: 'Ek gündem kartları — sınırlı yanıt slotu',
+};
 
 export function AgendaHubPanel({
   state,
@@ -44,6 +60,7 @@ export function AgendaHubPanel({
   onClearRegionalResponse,
   initialTab = 'main',
   layout = 'embedded',
+  pageMode,
 }: AgendaHubPanelProps) {
   const subCount = state.subAgendas.length;
   const radarCount = state.radarAgendas.length;
@@ -87,15 +104,18 @@ export function AgendaHubPanel({
     setActiveTab(initialTab);
   }, [initialTab]);
 
+  const showRegionalPage =
+    (layout === 'page' && pageMode === 'regional') || safeTab === 'regional';
+
   useEffect(() => {
-    if (safeTab !== 'regional' || !onSelectRegion || state.regionalAgendas.length === 0) return;
+    if (!showRegionalPage || !onSelectRegion || state.regionalAgendas.length === 0) return;
     const hasAgendaForSelection = regionId
       ? state.regionalAgendas.some((agenda) => agenda.regionId === regionId)
       : false;
     if (!hasAgendaForSelection) {
       onSelectRegion(state.regionalAgendas[0].regionId);
     }
-  }, [safeTab, regionId, state.regionalAgendas, onSelectRegion]);
+  }, [showRegionalPage, regionId, state.regionalAgendas, onSelectRegion]);
 
   const showRegional =
     safeTab === 'regional' && onSelectRegionalResponse && onClearRegionalResponse;
@@ -138,6 +158,55 @@ export function AgendaHubPanel({
       ) : null}
     </>
   );
+
+  if (layout === 'page' && pageMode) {
+    return (
+      <div className={`agenda-hub-page agenda-hub-page--${pageMode}`}>
+        <div className="agenda-hub-page-header agenda-hub-page-header--solo">
+          <div className="agenda-hub-page-heading">
+            <span className="agenda-hub-page-kicker">Hafta {state.campaignWeek}</span>
+            <h2 className="agenda-hub-page-title">{PAGE_MODE_TITLES[pageMode]}</h2>
+            <p className="agenda-hub-page-subtitle">{PAGE_MODE_HINTS[pageMode]}</p>
+          </div>
+        </div>
+        <div className="agenda-hub-content agenda-hub-content--page">
+          {pageMode === 'national' ? (
+            <>
+              <WeeklyAgendaPanel
+                event={state.currentWeeklyEvent}
+                availableActions={availableActions}
+                selectedResponseId={selectedResponseId}
+                onSelectResponse={onSelectResponse}
+                state={state}
+                layout={layout}
+              />
+              {radarCount > 0 ? <RadarAgendaPanel state={state} embedded /> : null}
+            </>
+          ) : null}
+
+          {pageMode === 'sub' ? (
+            <SubAgendaPanel
+              state={state}
+              onSelectResponse={onSelectSubAgendaResponse}
+              onClearResponse={onClearSubAgendaResponse}
+              embedded
+              layout={layout}
+            />
+          ) : null}
+
+          {pageMode === 'regional' && onSelectRegionalResponse && onClearRegionalResponse ? (
+            <RegionalAgendasPanel
+              state={state}
+              onSelectResponse={onSelectRegionalResponse}
+              onClearResponse={onClearRegionalResponse}
+              embedded
+              layout={layout}
+            />
+          ) : null}
+        </div>
+      </div>
+    );
+  }
 
   if (layout === 'page') {
     return (

@@ -364,6 +364,68 @@
   color: var(--ps-text-muted);
 }
 
+.sidebar-nav-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* Üst menü — alt sekme seçiliyken yalnızca beyaz metin, vurgu yok */
+.sidebar-nav-group-toggle.has-active-child {
+  color: var(--ps-text);
+  background: transparent;
+  box-shadow: none;
+  transform: none;
+}
+
+.sidebar-nav-group-toggle.has-active-child:hover {
+  color: var(--ps-text);
+  background: var(--ps-bg-hover);
+  transform: translateX(2px);
+}
+
+.sidebar-nav-group-toggle .sidebar-nav-chevron {
+  margin-left: 4px;
+  font-size: 9px;
+  color: var(--ps-text-faint);
+}
+
+.sidebar-nav-group-toggle.has-active-child .sidebar-nav-chevron {
+  color: var(--ps-text-muted);
+}
+
+.sidebar-nav-submenu {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-left: 8px;
+  margin-left: 14px;
+  border-left: 2px solid color-mix(in srgb, var(--party-color, var(--ps-info)) 25%, var(--ps-border));
+}
+
+.sidebar-nav-subitem {
+  padding: 7px 10px;
+  font-size: 10px;
+}
+
+.sidebar-nav-subitem .sidebar-nav-icon {
+  font-size: 11px;
+  width: 14px;
+  opacity: 0.85;
+}
+
+.sidebar-nav-subitem.active {
+  color: var(--ps-text);
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--party-color, var(--ps-info)) 22%, transparent),
+    transparent
+  );
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--party-color, var(--ps-info)) 35%, transparent),
+    0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
 .dashboard-main {
   flex: 1;
   min-width: 0;
@@ -465,6 +527,17 @@
   align-items: start;
 }
 
+.campaign-layout-single {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.campaign-operations-column {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
 .campaign-side-column {
   display: flex;
   flex-direction: column;
@@ -475,6 +548,7 @@
   max-height: calc(100vh - 120px);
   overflow-y: auto;
 }
+
 
 .overview-main-column {
   display: flex;
@@ -572,8 +646,27 @@
   gap: 8px;
 }
 
+.region-campaigns-panel .fm-panel-body {
+  padding: 0;
+}
+
 .region-campaigns-grid {
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  max-height: none;
+  overflow-y: visible;
+  align-items: stretch;
+}
+
+@media (max-width: 1100px) {
+  .region-campaigns-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .region-campaigns-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .regions-map-column {

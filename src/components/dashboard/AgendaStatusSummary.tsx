@@ -7,14 +7,21 @@ import './AgendaStatusSummary.css';
 
 interface AgendaStatusSummaryProps {
   state: GameState;
-  onOpenAgendas: () => void;
+  onOpenAgendaNational: () => void;
+  onOpenAgendaRegional: () => void;
+  onOpenAgendaSub: () => void;
 }
 
 function statusValueClass(pending: boolean): string {
   return pending ? 'agenda-status-value is-pending' : 'agenda-status-value is-done';
 }
 
-export function AgendaStatusSummary({ state, onOpenAgendas }: AgendaStatusSummaryProps) {
+export function AgendaStatusSummary({
+  state,
+  onOpenAgendaNational,
+  onOpenAgendaRegional,
+  onOpenAgendaSub,
+}: AgendaStatusSummaryProps) {
   const status = getAgendaStatusSnapshot(state);
   const regionalSlots = getRegionalAgendaSlotSummary(state);
 
@@ -23,14 +30,16 @@ export function AgendaStatusSummary({ state, onOpenAgendas }: AgendaStatusSummar
     label: string;
     value: string;
     pending?: boolean;
+    onOpen: () => void;
   }[] = [
     {
       key: 'main',
-      label: 'Ana gündem',
+      label: 'Ulusal gündem',
       value: status.mainPending
         ? 'Yanıt seçilmedi'
         : (status.mainResponseLabel ?? 'Tamamlandı'),
       pending: status.mainPending,
+      onOpen: onOpenAgendaNational,
     },
   ];
 
@@ -39,25 +48,37 @@ export function AgendaStatusSummary({ state, onOpenAgendas }: AgendaStatusSummar
       key: 'sub',
       label: 'Alt gündemler',
       value: `${status.subSlotsUsed}/${status.subMaxSlots} slot`,
+      onOpen: onOpenAgendaSub,
     });
   }
 
   if (status.radarCount > 0) {
     rows.push({
       key: 'radar',
-      label: 'Radar',
+      label: 'Radar (ulusal)',
       value: `${status.radarCount} izleniyor`,
+      onOpen: onOpenAgendaNational,
     });
   }
 
   if (status.regionalCount > 0) {
     rows.push({
       key: 'regional',
-      label: 'Bölgesel',
+      label: 'Bölgesel gündem',
       value: `${status.regionalAnswered}/${status.regionalCount} yanıt · slot ${regionalSlots}`,
       pending: status.regionalPending > 0,
+      onOpen: onOpenAgendaRegional,
     });
   }
+
+  const primaryOpen =
+    status.regionalPending > 0
+      ? onOpenAgendaRegional
+      : status.mainPending
+        ? onOpenAgendaNational
+        : status.subCount > 0 && status.subSlotsUsed < status.subMaxSlots
+          ? onOpenAgendaSub
+          : onOpenAgendaNational;
 
   return (
     <Panel
@@ -75,18 +96,20 @@ export function AgendaStatusSummary({ state, onOpenAgendas }: AgendaStatusSummar
     >
       <div className="agenda-status-metrics" role="list">
         {rows.map((row) => (
-          <div
+          <button
             key={row.key}
-            className={`agenda-status-metric${row.pending ? ' is-pending' : ''}`}
+            type="button"
+            className={`agenda-status-metric agenda-status-metric-btn${row.pending ? ' is-pending' : ''}`}
+            onClick={row.onOpen}
             role="listitem"
           >
             <span className="agenda-status-label">{row.label}</span>
             <span className={statusValueClass(Boolean(row.pending))}>{row.value}</span>
-          </div>
+          </button>
         ))}
       </div>
 
-      <button type="button" className="agenda-status-cta" onClick={onOpenAgendas}>
+      <button type="button" className="agenda-status-cta" onClick={primaryOpen}>
         Gündemlere git
         {status.pendingCount > 0 ? ` (${status.pendingCount})` : ''}
       </button>

@@ -13,7 +13,8 @@
   overflow: hidden;
 }
 
-.agenda-status-metric {
+.agenda-status-metric,
+.agenda-status-metric-btn {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
@@ -21,6 +22,21 @@
   padding: 7px 10px;
   font-size: 11px;
   border-bottom: 1px solid var(--ps-border-subtle);
+}
+
+.agenda-status-metric-btn {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid var(--ps-border-subtle);
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: background var(--ps-transition-fast);
+}
+
+.agenda-status-metric-btn:hover {
+  background: var(--ps-bg-hover);
 }
 
 .agenda-status-metric:last-child {
