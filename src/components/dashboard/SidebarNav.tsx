@@ -11,7 +11,7 @@ interface SidebarNavProps {
   active: DashboardView;
   onChange: (view: DashboardView) => void;
   pendingAgendaCount?: number;
-  /** Öğretici spotlight — ilgili alt menüyü açık tut */
+  /** Öğretici — sıradaki adımın alt menüsünü açık tut */
   tutorialHighlightView?: DashboardView | null;
 }
 
@@ -91,7 +91,6 @@ function NavButton({
       onClick={onClick}
       aria-current={isActive ? 'page' : undefined}
       title={item.hint}
-      data-tutorial-nav={item.id}
     >
       <span className="sidebar-nav-icon" aria-hidden>
         {item.icon}

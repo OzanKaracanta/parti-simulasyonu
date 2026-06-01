@@ -122,7 +122,6 @@ export function TopBar({ state, onEndWeek, finishCheck: finishCheckProp }: TopBa
           onClick={onEndWeek}
           disabled={!finishCheck.ok}
           title={endWeekTitle}
-          data-tutorial-nav="end-week"
         >
           <span className="end-week-btn-label">Haftayı Bitir »</span>
           {finishCheck.ok ? (

@@ -8,10 +8,7 @@ import {
   isTutorialActive,
 } from '../../tutorial/tutorialEngine';
 import { setTutorialSkipped } from '../../tutorial/tutorialStorage';
-import { getTutorialNavTarget } from '../../tutorial/tutorialNavTargets';
 import { TUTORIAL_LAST_WEEK } from '../../tutorial/tutorialSteps';
-import type { TutorialNavTarget } from '../../tutorial/tutorialNavTargets';
-import { TutorialSpotlight } from './TutorialSpotlight';
 import './TutorialPanel.css';
 
 interface TutorialPanelProps {
@@ -53,24 +50,7 @@ export function TutorialPanel({
 
   const doneCount = progress.steps.filter((s) => s.done).length;
 
-  let spotlightTarget: TutorialNavTarget | null = null;
-  let spotlightMessage = '';
-
-  if (progress.nextStep) {
-    spotlightTarget = getTutorialNavTarget(progress.nextStep.targetView);
-    spotlightMessage = progress.nextStep.description;
-  } else if (progress.allRequiredDone) {
-    spotlightTarget = 'end-week';
-    spotlightMessage = 'Tüm öğretici adımlar tamam — turu bitirmek için bu düğmeyi kullan.';
-  }
-
   return (
-    <>
-      <TutorialSpotlight
-        target={spotlightTarget}
-        message={spotlightMessage}
-        visible={Boolean(spotlightTarget)}
-      />
     <section className="tutorial-panel" aria-label="Öğretici tur">
       <header className="tutorial-panel-header">
         <div>
@@ -128,6 +108,5 @@ export function TutorialPanel({
         ) : null}
       </footer>
     </section>
-    </>
   );
 }

@@ -27,6 +27,7 @@ export function isOrganizationView(view: DashboardView): view is OrganizationDas
 
 import {
   useCallback,
+  useEffect,
   useMemo,
   useState,
   type Dispatch,
@@ -37,6 +38,7 @@ import { TutorialWeekIntroModal } from '../tutorial/TutorialWeekIntroModal';
 import {
   canEndWeekStrict,
   getTutorialProgress,
+  isTutorialActive,
   markRadarTutorialViewed,
 } from '../../tutorial/tutorialEngine';
 import {
@@ -44,6 +46,7 @@ import {
   isTutorialSkipped,
   setTutorialIntroSeen,
 } from '../../tutorial/tutorialStorage';
+import { TUTORIAL_LAST_WEEK } from '../../tutorial/tutorialSteps';
 import { WeekFlowPanel } from './WeekFlowPanel';
 import { colorOptions } from '../../data/setupOptions';
 import { isRegionalAction } from '../../data/regionalActions';
@@ -171,6 +174,18 @@ export function DashboardScreen({ state, dispatch }: DashboardScreenProps) {
     setShowWeekIntro(false);
   };
 
+  const suppressAdvisorBriefingDuringTutorial =
+    !tutorialSkipped && isTutorialActive(state, false);
+
+  useEffect(() => {
+    if (!suppressAdvisorBriefingDuringTutorial || !state.activeAdvisorBriefing) return;
+    dispatch({ type: 'DISMISS_ADVISOR_BRIEFING' });
+  }, [
+    suppressAdvisorBriefingDuringTutorial,
+    state.activeAdvisorBriefing,
+    dispatch,
+  ]);
+
   return (
     <div
       className="dashboard-layout"
@@ -186,7 +201,8 @@ export function DashboardScreen({ state, dispatch }: DashboardScreenProps) {
         onEndWeek={() => dispatch({ type: 'END_WEEK' })}
       />
 
-      {state.activeAdvisorBriefing ? (
+      {state.activeAdvisorBriefing &&
+      (tutorialSkipped || state.campaignWeek > TUTORIAL_LAST_WEEK) ? (
         <AdvisorBriefingModal
           briefing={state.activeAdvisorBriefing}
           onDismiss={() => dispatch({ type: 'DISMISS_ADVISOR_BRIEFING' })}
