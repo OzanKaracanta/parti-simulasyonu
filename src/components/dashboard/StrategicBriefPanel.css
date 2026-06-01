@@ -1,0 +1,104 @@
+.strategic-brief-panel .fm-panel-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px 12px;
+}
+
+.brief-pressure {
+  padding: 10px 12px;
+  border-radius: var(--ps-radius-md);
+  border: 1px solid var(--ps-border);
+  background: var(--ps-bg-inset);
+}
+
+.brief-pressure.brief-crisis {
+  border-color: var(--ps-crisis-border);
+  background: var(--ps-crisis-dim);
+}
+
+.brief-pressure.brief-agenda {
+  border-color: var(--ps-agenda-border);
+  background: var(--ps-agenda-dim);
+}
+
+.brief-pressure.brief-opportunity {
+  border-color: var(--ps-opportunity-border);
+  background: var(--ps-opportunity-dim);
+}
+
+.brief-pressure-label {
+  display: block;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ps-text);
+  margin-bottom: 4px;
+}
+
+.brief-pressure p {
+  margin: 0 0 8px;
+  font-size: 10px;
+  line-height: 1.45;
+  color: var(--ps-text-muted);
+}
+
+.brief-module {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 8px;
+  border-top: 1px solid var(--ps-border-subtle);
+}
+
+.brief-module-title {
+  font-size: var(--ps-font-caption);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ps-text-dim);
+}
+
+.brief-module p {
+  margin: 0;
+  font-size: 10px;
+  line-height: 1.4;
+  color: var(--ps-text-muted);
+}
+
+.brief-ready {
+  color: var(--ps-opportunity) !important;
+  font-weight: 600;
+}
+
+.brief-pending {
+  color: var(--ps-agenda) !important;
+}
+
+.brief-muted {
+  color: var(--ps-text-dim) !important;
+  font-style: italic;
+}
+
+.brief-media.tone-critical {
+  color: var(--ps-crisis);
+}
+
+.brief-media.tone-positive {
+  color: var(--ps-opportunity);
+}
+
+.brief-media.tone-mixed {
+  color: var(--ps-agenda);
+}
+
+.brief-gap.negative {
+  color: var(--ps-crisis);
+  font-weight: 700;
+}
+
+.brief-gap.positive {
+  color: var(--ps-opportunity);
+  font-weight: 700;
+}

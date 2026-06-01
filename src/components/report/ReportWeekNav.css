@@ -1,0 +1,56 @@
+.report-week-nav {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+  background: linear-gradient(180deg, var(--ps-bg-panel-top) 0%, var(--ps-bg-panel) 100%);
+  border: 1px solid var(--ps-border);
+  border-radius: var(--ps-radius-sm);
+}
+
+.report-week-select-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 140px;
+}
+
+.report-week-select-label {
+  font-size: var(--ps-font-caption);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ps-text-dim);
+}
+
+.report-week-select {
+  flex: 1;
+  min-width: 0;
+  padding: 4px 8px;
+  font-size: var(--ps-font-body);
+  font-weight: 600;
+  color: var(--ps-text);
+  background: var(--ps-bg-inset);
+  border: 1px solid var(--ps-border);
+  border-radius: var(--ps-radius-sm);
+  cursor: pointer;
+}
+
+.report-week-select:focus {
+  outline: 1px solid var(--ps-info);
+  outline-offset: 1px;
+}
+
+.report-week-latest-badge {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 3px 8px;
+  border-radius: var(--ps-radius-sm);
+  background: var(--ps-info-dim);
+  color: var(--ps-info);
+}

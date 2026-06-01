@@ -1,0 +1,53 @@
+@import './styles/tokens.css';
+@import './styles/design-system.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: var(--ps-bg-deep);
+  background-image:
+    radial-gradient(ellipse 120% 80% at 50% -20%, rgba(26, 74, 122, 0.12), transparent 50%),
+    linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+  background-size: auto, 28px 28px, 28px 28px;
+  color: var(--ps-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+h1,
+h2,
+p {
+  margin: 0;
+}
+
+button {
+  font: inherit;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--ps-bg-inset);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--ps-border);
+  border-radius: var(--ps-radius-sm);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ps-border-strong);
+}

@@ -1,0 +1,54 @@
+.report-week-segment-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  margin-bottom: 10px;
+  padding: 8px 10px;
+  border-radius: var(--ps-radius-sm);
+  background: var(--ps-bg-inset);
+  border: 1px solid var(--ps-border-subtle);
+}
+
+.report-week-segment-summary-label {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ps-text-dim);
+}
+
+.report-week-segment-summary-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 6px;
+}
+
+.report-week-segment-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  border: 1px solid transparent;
+}
+
+.report-week-segment-chip.kind-socio {
+  background: rgba(110, 190, 140, 0.1);
+  border-color: rgba(110, 190, 140, 0.2);
+}
+
+.report-week-segment-chip.kind-political {
+  background: rgba(130, 175, 230, 0.1);
+  border-color: rgba(130, 175, 230, 0.2);
+}
+
+.report-week-segment-chip.positive {
+  color: var(--ps-opportunity);
+}
+
+.report-week-segment-chip.negative {
+  color: var(--ps-crisis-light);
+}

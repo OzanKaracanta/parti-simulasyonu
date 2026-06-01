@@ -1,0 +1,18 @@
+.setup-region-map__svg {
+  max-height: min(38vh, 360px);
+}
+
+.setup-region-map__hint {
+  margin: 0;
+  font-size: var(--ps-font-body);
+  color: var(--ps-text-muted);
+}
+
+.setup-region-map .turkey-province-path.is-selected {
+  fill: color-mix(in srgb, var(--party-color, var(--ps-gain)) 42%, var(--ps-bg-panel-top));
+  stroke: var(--party-color, var(--ps-gain));
+}
+
+.setup-region-map .turkey-province-path.is-selected.is-hovered {
+  fill: color-mix(in srgb, var(--party-color, var(--ps-gain)) 58%, #fff);
+}

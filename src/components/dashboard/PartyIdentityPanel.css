@@ -1,0 +1,155 @@
+.party-identity-panel .fm-panel-body {
+  padding: 10px;
+}
+
+.consistency-box {
+  margin-bottom: 10px;
+  padding: var(--ps-space-sm);
+  background: var(--ps-bg-elevated);
+  border: 1px solid var(--ps-border);
+  border-radius: var(--ps-radius-sm);
+}
+
+.consistency-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--ps-space-xs);
+}
+
+.consistency-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ps-text-dim);
+}
+
+.consistency-value {
+  font-size: var(--ps-font-title);
+  font-weight: 700;
+}
+
+.consistency-value.positive {
+  color: var(--ps-opportunity);
+}
+
+.consistency-value.negative {
+  color: var(--ps-crisis);
+}
+
+.consistency-value.neutral {
+  color: var(--ps-agenda);
+}
+
+.consistency-bar {
+  height: 5px;
+  background: var(--ps-bg-inset);
+  border-radius: var(--ps-radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--ps-border);
+}
+
+.consistency-fill {
+  height: 100%;
+  border-radius: var(--ps-radius-sm);
+}
+
+.consistency-fill.positive {
+  background: var(--ps-opportunity);
+}
+
+.consistency-fill.negative {
+  background: var(--ps-crisis);
+}
+
+.consistency-fill.neutral {
+  background: var(--ps-agenda);
+}
+
+.stance-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ps-space-sm);
+}
+
+.stance-row-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 3px;
+}
+
+.stance-topic {
+  font-size: 10px;
+  color: var(--ps-text-secondary);
+}
+
+.stance-tag {
+  font-size: var(--ps-font-caption);
+  font-weight: 600;
+  padding: 1px 5px;
+  border-radius: var(--ps-radius-sm);
+}
+
+.stance-tag.left {
+  color: var(--ps-crisis);
+  background: var(--ps-crisis-dim);
+}
+
+.stance-tag.center {
+  color: var(--ps-text-muted);
+  background: var(--ps-bg-hover);
+}
+
+.stance-tag.right {
+  color: var(--ps-info);
+  background: var(--ps-info-dim);
+}
+
+.stance-track {
+  position: relative;
+  height: 4px;
+  background: var(--ps-bg-elevated);
+  border: 1px solid var(--ps-border);
+  border-radius: var(--ps-radius-sm);
+}
+
+.stance-center-mark {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--ps-border-strong);
+}
+
+.stance-marker {
+  position: absolute;
+  top: -2px;
+  width: 8px;
+  height: 8px;
+  margin-left: -4px;
+  border-radius: 50%;
+}
+
+.stance-marker.left {
+  background: var(--ps-crisis);
+}
+
+.stance-marker.center {
+  background: var(--ps-text-muted);
+}
+
+.stance-marker.right {
+  background: var(--ps-info);
+}
+
+.stance-compact-note {
+  margin: 6px 0 0;
+  font-size: var(--ps-font-caption);
+  color: var(--ps-text-dim);
+  font-style: italic;
+}

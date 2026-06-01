@@ -1,0 +1,412 @@
+/* Haftalık gündem — sade strateji paneli */
+
+.weekly-agenda {
+  display: flex;
+  flex-direction: column;
+}
+
+.weekly-agenda-empty {
+  margin: 0;
+  padding: 14px 16px;
+  font-size: var(--ps-font-body);
+  color: var(--ps-text-dim);
+  font-style: italic;
+}
+
+.agenda-tabs-wrap .fm-tabs {
+  padding: 0 12px;
+  gap: 4px;
+  min-height: 32px;
+}
+
+.agenda-tabs-wrap .fm-tab {
+  font-size: 10px;
+  padding: 6px 10px;
+  letter-spacing: 0.03em;
+}
+
+.agenda-hub-panel .fm-panel-header h2 {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--ps-text-dim);
+}
+
+/* Özet */
+.agenda-summary {
+  padding: 16px 16px 14px;
+  border-bottom: 1px solid var(--ps-border-subtle);
+}
+
+.agenda-summary-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.agenda-summary-badges {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.agenda-summary-week {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ps-text-dim);
+}
+
+.agenda-status-badge {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 4px 10px;
+  border-radius: var(--ps-radius-sm);
+  flex-shrink: 0;
+}
+
+.agenda-status-badge.status-response_required {
+  color: var(--ps-crisis-light);
+  background: var(--ps-crisis-dim);
+  border: 1px solid rgba(231, 76, 60, 0.35);
+}
+
+.agenda-status-badge.status-optional {
+  color: var(--ps-agenda);
+  background: var(--ps-agenda-dim);
+  border: 1px solid var(--ps-agenda-border);
+}
+
+.agenda-summary-title {
+  margin: 0 0 10px;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.25;
+  color: var(--ps-text);
+  letter-spacing: -0.02em;
+}
+
+.agenda-summary-desc {
+  margin: 0 0 8px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--ps-text-secondary);
+  font-weight: 400;
+}
+
+.agenda-summary-rival-target {
+  margin: 0 0 8px;
+  padding: 6px 8px;
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--ps-warning, #d97706);
+  background: var(--ps-warning-dim, rgba(217, 119, 6, 0.08));
+  border: 1px solid var(--ps-warning-border, rgba(217, 119, 6, 0.25));
+  border-radius: var(--ps-radius-sm);
+}
+
+.agenda-summary-rival-target strong {
+  color: var(--ps-warning, #d97706);
+  font-weight: 700;
+}
+
+.agenda-summary-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin-top: 6px;
+  font-size: 9px;
+  color: var(--ps-text-dim);
+  opacity: 0.85;
+}
+
+.agenda-summary-meta strong {
+  color: var(--ps-text-dim);
+  font-weight: 700;
+}
+
+.agenda-summary-hint {
+  margin: 10px 0 0;
+  font-size: 10px;
+  color: var(--ps-text-dim);
+  line-height: 1.45;
+}
+
+.agenda-summary-hint-label {
+  color: var(--ps-agenda);
+  font-weight: 700;
+  margin-right: 4px;
+}
+
+/* Bölüm başlıkları */
+.agenda-decision-section,
+.agenda-support-section,
+.agenda-outcome-panel {
+  padding: 16px;
+  border-bottom: 1px solid var(--ps-border-subtle);
+}
+
+.agenda-section-title {
+  margin: 0 0 12px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--ps-text-dim);
+}
+
+/* Ana tepki kartları */
+.agenda-decision-section {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.agenda-response-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.agenda-response-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+  min-height: 200px;
+  padding: 16px 16px 14px;
+  text-align: left;
+  font-family: inherit;
+  color: inherit;
+  cursor: pointer;
+  background: var(--ps-bg-inset);
+  border: 1px solid var(--ps-border-strong);
+  border-radius: var(--ps-radius-md);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.28);
+  transition:
+    border-color 0.18s ease,
+    background 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.14s ease;
+}
+
+.agenda-response-card::before {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 2px;
+  margin: -2px 0 4px;
+  border-radius: 2px 2px 0 0;
+  opacity: 0.7;
+}
+
+.agenda-response-card.stance-decisive::before {
+  background: var(--ps-agenda);
+}
+
+.agenda-response-card.stance-measured::before {
+  background: var(--ps-info);
+}
+
+.agenda-response-card.stance-passive::before {
+  background: var(--ps-text-dim);
+}
+
+.agenda-response-card:hover:not(.is-selected) {
+  border-color: var(--ps-border-glow);
+  background: #0a1018;
+  transform: translateY(-1px);
+}
+
+.agenda-response-card.is-selected {
+  border-color: var(--ps-opportunity-border);
+  background: var(--ps-opportunity-dim);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--ps-opportunity) 35%, transparent),
+    inset 3px 0 0 var(--ps-opportunity),
+    0 4px 14px rgba(0, 0, 0, 0.35);
+}
+
+.agenda-response-card.is-selected::before {
+  background: var(--ps-opportunity);
+  opacity: 1;
+}
+
+.agenda-response-stance {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--ps-text-dim);
+}
+
+.agenda-response-card.stance-decisive .agenda-response-stance {
+  color: var(--ps-agenda);
+}
+
+.agenda-response-title {
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.35;
+  color: var(--ps-text);
+}
+
+.agenda-response-desc {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--ps-text-muted);
+  flex: 1;
+}
+
+.agenda-response-effects {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+
+.agenda-effect-line {
+  font-size: 10px;
+  line-height: 1.4;
+  display: flex;
+  gap: 6px;
+}
+
+.agenda-effect-line.type-positive {
+  color: var(--ps-opportunity);
+}
+
+.agenda-effect-line.type-negative {
+  color: var(--ps-crisis-light);
+}
+
+.agenda-effect-line.type-neutral {
+  color: var(--ps-text-dim);
+}
+
+.agenda-effect-prefix {
+  font-weight: 800;
+  width: 10px;
+  flex-shrink: 0;
+}
+
+.agenda-response-risk {
+  margin: 4px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--ps-border-subtle);
+  width: 100%;
+  font-size: 10px;
+  color: var(--ps-text-dim);
+  line-height: 1.45;
+}
+
+.agenda-response-risk span {
+  font-weight: 700;
+  color: var(--ps-crisis-light);
+}
+
+/* Önerilen destekleyici operasyonlar — salt okunur */
+.agenda-support-names {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.agenda-support-names li {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ps-text-muted);
+  padding: 6px 12px;
+  background: var(--ps-bg-inset);
+  border: 1px solid var(--ps-border);
+  border-radius: var(--ps-radius-md);
+  white-space: nowrap;
+}
+
+/* Beklenen sonuç */
+.agenda-outcome-panel {
+  background: rgba(0, 0, 0, 0.08);
+  border-bottom: none;
+}
+
+.agenda-outcome-empty {
+  margin: 0;
+  font-size: 11px;
+  color: var(--ps-text-dim);
+  line-height: 1.5;
+  font-style: italic;
+}
+
+.agenda-outcome-plan,
+.agenda-outcome-ops {
+  margin: 0 0 10px;
+  font-size: 12px;
+  color: var(--ps-text);
+  line-height: 1.45;
+}
+
+.agenda-outcome-effects {
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 6px 12px;
+}
+
+.agenda-outcome-effects li {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.agenda-outcome-effects li.type-positive {
+  color: var(--ps-opportunity);
+}
+
+.agenda-outcome-effects li.type-negative {
+  color: var(--ps-crisis-light);
+}
+
+.agenda-outcome-effects li.type-neutral {
+  color: var(--ps-text-muted);
+}
+
+.agenda-outcome-risk {
+  margin: 0;
+  font-size: 11px;
+  color: var(--ps-text-muted);
+  line-height: 1.5;
+  padding: 10px 12px;
+  border-radius: var(--ps-radius-md);
+  background: rgba(231, 76, 60, 0.08);
+  border: 1px solid rgba(231, 76, 60, 0.2);
+}
+
+.agenda-outcome-risk strong {
+  color: var(--ps-crisis-light);
+}
+
+@media (max-width: 900px) {
+  .agenda-response-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .agenda-response-card {
+    min-height: 0;
+  }
+}

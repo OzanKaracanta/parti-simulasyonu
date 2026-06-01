@@ -1,0 +1,106 @@
+.setup-preview {
+  position: sticky;
+  top: var(--ps-space-lg);
+  align-self: start;
+}
+
+.setup-preview__eyebrow {
+  margin: 0 0 var(--ps-space-sm);
+  font-size: var(--ps-font-body);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: var(--ps-letter-label);
+  color: var(--ps-text-muted);
+}
+
+.setup-preview__card {
+  --setup-party-color: var(--ps-border-strong);
+  border: 1px solid var(--ps-border);
+  border-radius: var(--ps-radius-md);
+  background: linear-gradient(180deg, var(--ps-bg-panel-top) 0%, var(--ps-bg-panel) 100%);
+  box-shadow: var(--ps-shadow-card);
+  overflow: hidden;
+}
+
+.setup-preview__banner {
+  height: 6px;
+  background: var(--setup-party-color);
+}
+
+.setup-preview__body {
+  display: flex;
+  gap: var(--ps-space-md);
+  padding: var(--ps-space-lg);
+}
+
+.setup-preview__emblem {
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--ps-radius-md);
+  border: 2px solid var(--setup-party-color);
+  background: color-mix(in srgb, var(--setup-party-color) 18%, transparent);
+}
+
+.setup-preview__symbol {
+  font-size: var(--ps-font-body);
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.2;
+  color: var(--ps-text);
+}
+
+.setup-preview__symbol-icon {
+  color: var(--setup-party-color, var(--ps-text));
+}
+
+.setup-preview__info {
+  min-width: 0;
+}
+
+.setup-preview__name {
+  margin: 0 0 4px;
+  font-size: var(--ps-font-h2);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--ps-text);
+}
+
+.setup-preview__leader {
+  margin: 0 0 6px;
+  font-size: var(--ps-font-body-lg);
+  color: var(--ps-text-secondary);
+}
+
+.setup-preview__region {
+  margin: 0;
+  font-size: var(--ps-font-body);
+  color: var(--ps-text-muted);
+}
+
+.setup-preview__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0 var(--ps-space-lg) var(--ps-space-lg);
+  list-style: none;
+}
+
+.setup-preview__tags li {
+  font-size: var(--ps-font-body);
+  padding: 4px 8px;
+  border-radius: var(--ps-radius-sm);
+  background: var(--ps-bg-inset);
+  border: 1px solid var(--ps-border-subtle);
+  color: var(--ps-text-secondary);
+}
+
+.setup-preview__hint {
+  margin: var(--ps-space-md) 0 0;
+  font-size: var(--ps-font-body);
+  color: var(--ps-text-muted);
+  line-height: 1.4;
+}

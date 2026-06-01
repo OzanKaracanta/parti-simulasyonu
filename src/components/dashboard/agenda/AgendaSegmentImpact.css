@@ -1,0 +1,119 @@
+/* Satır içi dipnot — kutu/arkaplan yok, açıklama metninin altında */
+
+.agenda-segment-impact {
+  margin: 0;
+  padding: 0;
+}
+
+.agenda-impact-inline {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 4px;
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.agenda-segment-impact.variant-sub .agenda-impact-inline {
+  font-size: 9px;
+}
+
+.agenda-impact-inline-segment {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 4px;
+}
+
+.agenda-impact-sep {
+  margin: 0 4px;
+  color: var(--ps-text-dim);
+  opacity: 0.45;
+  user-select: none;
+}
+
+.agenda-impact-inline-group {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 5px;
+}
+
+.agenda-impact-inline-label {
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ps-text-dim);
+  opacity: 0.75;
+}
+
+.agenda-segment-impact.variant-sub .agenda-impact-inline-label {
+  font-size: 8px;
+}
+
+.agenda-impact-inline-val {
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+.agenda-impact-inline-val.tone-socio {
+  color: rgba(110, 190, 140, 0.75);
+}
+
+.agenda-impact-inline-val.tone-political {
+  color: rgba(130, 175, 230, 0.75);
+}
+
+.agenda-impact-inline-val.tone-tension {
+  color: rgba(210, 170, 100, 0.75);
+}
+
+.agenda-impact-rationale-wrap {
+  margin-top: 4px;
+}
+
+.agenda-impact-rationale-toggle {
+  display: inline;
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--ps-text-dim);
+  opacity: 0.7;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+
+.agenda-impact-rationale-toggle::-webkit-details-marker {
+  display: none;
+}
+
+.agenda-impact-rationale-toggle::before {
+  content: '▸ ';
+  font-size: 8px;
+}
+
+.agenda-impact-rationale-wrap[open] .agenda-impact-rationale-toggle::before {
+  content: '▾ ';
+}
+
+.agenda-impact-rationale {
+  margin: 3px 0 0;
+  font-size: 10px;
+  line-height: 1.45;
+  color: var(--ps-text-dim);
+}
+
+.agenda-impact-rationale + .agenda-impact-rationale {
+  margin-top: 5px;
+}
+
+.agenda-impact-rationale-kind {
+  font-weight: 700;
+  color: var(--ps-text-secondary);
+}
+
+.agenda-segment-impact.variant-sub .agenda-impact-rationale {
+  font-size: 9px;
+}

@@ -1,0 +1,467 @@
+/**
+ * Parti Simülasyonu — design system primitives (Seviye 3)
+ * Bileşen CSS’leri bu sınıfları genişletir; mümkün olduğunca token kullan.
+ */
+
+/* ── Typography ── */
+
+.ps-text-display {
+  font-size: var(--ps-font-display);
+  font-weight: 800;
+  letter-spacing: var(--ps-letter-tight);
+  color: var(--ps-text);
+  line-height: 1.2;
+}
+
+.ps-text-h1 {
+  font-size: var(--ps-font-h1);
+  font-weight: 800;
+  color: var(--ps-text);
+}
+
+.ps-text-h2,
+.ps-section-title {
+  font-size: var(--ps-font-h2);
+  font-weight: 700;
+  color: var(--ps-text);
+  margin: 0 0 var(--ps-space-md);
+}
+
+.ps-text-label {
+  font-size: var(--ps-font-body-lg);
+  color: var(--ps-text-muted);
+}
+
+.ps-text-caption {
+  font-size: var(--ps-font-caption);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: var(--ps-letter-label);
+  color: var(--ps-text-dim);
+}
+
+.ps-text-muted {
+  color: var(--ps-text-muted);
+}
+
+.ps-text-body {
+  font-size: var(--ps-font-body-lg);
+  color: var(--ps-text-secondary);
+  line-height: 1.45;
+}
+
+/* ── Semantic values ── */
+
+.positive,
+.ps-positive {
+  color: var(--ps-opportunity);
+}
+
+.negative,
+.ps-negative {
+  color: var(--ps-crisis);
+}
+
+.neutral,
+.ps-neutral {
+  color: var(--ps-agenda);
+}
+
+/* ── Page shells ── */
+
+.ps-page {
+  width: min(1100px, 100%);
+  margin: 0 auto;
+  text-align: left;
+}
+
+.ps-page--narrow {
+  width: min(960px, 100%);
+}
+
+.ps-page-header {
+  margin-bottom: var(--ps-space-xl);
+  padding-bottom: var(--ps-space-lg);
+  border-bottom: 1px solid var(--ps-border);
+}
+
+.ps-page-header p {
+  margin: var(--ps-space-sm) 0 0;
+  font-size: var(--ps-font-body-lg);
+  color: var(--ps-text-muted);
+}
+
+/* ── Surfaces (kart tipleri) ── */
+
+.ps-surface {
+  background: linear-gradient(180deg, var(--ps-bg-panel-top) 0%, var(--ps-bg-panel) 100%);
+  border: 1px solid var(--ps-border);
+  border-radius: var(--ps-radius-md);
+  box-shadow: var(--ps-shadow-card);
+}
+
+.ps-surface--inset {
+  background: var(--ps-bg-inset);
+  border: 1px solid var(--ps-border);
+  border-radius: var(--ps-radius-md);
+  box-shadow: none;
+}
+
+.ps-surface--hero {
+  padding: var(--ps-space-lg);
+  background: var(--ps-bg-inset);
+  border: 1px solid var(--ps-border);
+  border-radius: var(--ps-radius-lg);
+}
+
+.ps-card {
+  padding: var(--ps-space-lg);
+  background: linear-gradient(180deg, var(--ps-bg-panel-top) 0%, var(--ps-bg-panel) 100%);
+  border: 1px solid var(--ps-border);
+  border-radius: var(--ps-radius-md);
+  box-shadow: var(--ps-shadow-card);
+}
+
+.ps-card--selectable {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ps-space-sm);
+  padding: var(--ps-space-md);
+  background: var(--ps-bg-inset);
+  border: 1px solid var(--ps-border);
+  border-radius: var(--ps-radius-md);
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color var(--ps-transition),
+    background var(--ps-transition),
+    box-shadow var(--ps-transition);
+}
+
+.ps-card--selectable:hover {
+  border-color: var(--ps-border-strong);
+  background: var(--ps-bg-hover);
+}
+
+.ps-card--selectable.selected,
+.ps-card--selectable.ps-selected {
+  border-color: var(--ps-opportunity-border);
+  background: var(--ps-opportunity-dim);
+  box-shadow: inset 3px 0 0 var(--ps-opportunity);
+}
+
+.ps-card--selectable strong {
+  font-size: var(--ps-font-title);
+  color: var(--ps-text);
+}
+
+.ps-card--selectable span {
+  font-size: var(--ps-font-body);
+  color: var(--ps-text-muted);
+  line-height: 1.35;
+}
+
+/* ── Form controls ── */
+
+.ps-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ps-space-xs);
+  margin-bottom: var(--ps-space-md);
+}
+
+.ps-field label {
+  font-size: var(--ps-font-body-lg);
+  color: var(--ps-text-muted);
+}
+
+.ps-input,
+.ps-select {
+  border: 1px solid var(--ps-border-strong);
+  border-radius: var(--ps-radius-md);
+  padding: 10px 12px;
+  background: var(--ps-bg-inset);
+  color: var(--ps-text);
+  font: inherit;
+  transition: border-color var(--ps-transition), outline var(--ps-transition);
+}
+
+.ps-input:focus,
+.ps-select:focus {
+  outline: 2px solid var(--ps-border-focus);
+  outline-offset: 1px;
+  border-color: var(--ps-border-focus);
+}
+
+.ps-input::placeholder {
+  color: var(--ps-text-dim);
+}
+
+/* ── Buttons ── */
+
+.ps-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ps-space-sm);
+  padding: 10px 18px;
+  font-size: var(--ps-font-body-lg);
+  font-weight: 700;
+  font-family: inherit;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ps-text-inverse);
+  border: 1px solid transparent;
+  border-radius: var(--ps-radius-sm);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: filter var(--ps-transition), opacity var(--ps-transition);
+}
+
+.ps-btn:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.ps-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: none;
+}
+
+.ps-btn--primary {
+  background: var(--ps-btn-primary-bg);
+  border-color: var(--ps-btn-primary-border);
+}
+
+.ps-btn--success {
+  background: var(--ps-btn-success-bg);
+  border-color: var(--ps-btn-success-border);
+}
+
+.ps-btn--danger {
+  background: var(--ps-btn-danger-bg);
+  border-color: var(--ps-btn-danger-border);
+  color: var(--ps-text-inverse);
+}
+
+.ps-btn--ghost {
+  background: var(--ps-bg-inset);
+  border-color: var(--ps-border);
+  color: var(--ps-text-muted);
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: 600;
+}
+
+.ps-btn--sm {
+  padding: 6px 12px;
+  font-size: var(--ps-font-caption);
+  letter-spacing: 0.06em;
+}
+
+.ps-btn--block {
+  width: 100%;
+}
+
+/* ── Badges (genişletilmiş fm-badge) ── */
+
+.fm-badge.info,
+.fm-badge.neutral {
+  background: var(--ps-info-dim);
+  color: var(--ps-info);
+  border: 1px solid var(--ps-info-border);
+}
+
+.fm-badge.week {
+  background: var(--ps-info-dim);
+  color: var(--ps-info);
+}
+
+.fm-badge.success {
+  background: var(--ps-opportunity-dim);
+  color: var(--ps-opportunity);
+}
+
+.fm-badge.partial,
+.fm-badge.warning {
+  background: var(--ps-agenda-dim);
+  color: var(--ps-agenda);
+}
+
+.fm-badge.ignored,
+.fm-badge.danger {
+  background: var(--ps-crisis-dim);
+  color: var(--ps-crisis);
+}
+
+.fm-badge.synergy-strong {
+  background: var(--ps-opportunity-dim);
+  color: var(--ps-opportunity);
+  border: 1px solid var(--ps-opportunity-border);
+}
+
+.fm-badge.synergy-moderate {
+  background: var(--ps-info-dim);
+  color: var(--ps-info);
+  border: 1px solid var(--ps-info-border);
+}
+
+.fm-badge.synergy-misaligned {
+  background: var(--ps-crisis-dim);
+  color: var(--ps-crisis);
+  border: 1px solid var(--ps-crisis-border);
+}
+
+.fm-badge.synergy-weak {
+  background: rgba(107, 128, 153, 0.15);
+  color: var(--ps-text-dim);
+  border: 1px solid var(--ps-border);
+}
+
+/* ── Tags & chips ── */
+
+.ps-tag {
+  display: inline-block;
+  font-size: var(--ps-font-body);
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: var(--ps-radius-sm);
+  background: var(--ps-info-dim);
+  color: var(--ps-info);
+  border: 1px solid var(--ps-info-border);
+}
+
+.ps-tag--opportunity {
+  background: var(--ps-opportunity-dim);
+  color: var(--ps-opportunity);
+  border-color: var(--ps-opportunity-border);
+}
+
+.ps-tag--crisis {
+  background: var(--ps-crisis-dim);
+  color: var(--ps-crisis);
+  border-color: var(--ps-crisis-border);
+}
+
+/* ── Report / content blocks ── */
+
+.ps-block {
+  padding: var(--ps-space-sm) var(--ps-space-md);
+  background: var(--ps-bg-hover);
+  border: 1px solid var(--ps-border-subtle);
+  border-radius: var(--ps-radius-sm);
+  margin-bottom: var(--ps-space-sm);
+}
+
+.ps-block-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ps-space-sm);
+  margin-bottom: var(--ps-space-sm);
+}
+
+.ps-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.ps-list li {
+  font-size: var(--ps-font-body);
+  color: var(--ps-text-muted);
+}
+
+.ps-list li.positive {
+  color: var(--ps-opportunity);
+}
+
+.ps-list li.negative {
+  color: var(--ps-crisis);
+}
+
+.ps-error {
+  color: var(--ps-crisis);
+  font-size: var(--ps-font-body-lg);
+  margin-top: var(--ps-space-sm);
+}
+
+.ps-insight {
+  margin: 0;
+  padding-top: var(--ps-space-sm);
+  border-top: 1px solid var(--ps-border);
+  font-size: var(--ps-font-body);
+  color: var(--ps-agenda);
+  line-height: 1.45;
+  font-style: italic;
+}
+
+/* ── Stat display ── */
+
+.ps-stat-value {
+  font-size: var(--ps-font-stat);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.ps-progress {
+  height: 6px;
+  background: var(--ps-bg-inset);
+  border: 1px solid var(--ps-border);
+  border-radius: var(--ps-radius-sm);
+  overflow: hidden;
+}
+
+.ps-progress-fill {
+  height: 100%;
+  border-radius: var(--ps-radius-sm);
+  transition: width var(--ps-transition-slow);
+}
+
+.ps-progress-fill.positive {
+  background: var(--ps-opportunity);
+}
+
+.ps-progress-fill.negative {
+  background: var(--ps-crisis);
+}
+
+.ps-progress-fill.neutral {
+  background: var(--ps-info);
+}
+
+.ps-progress-fill.party {
+  background: linear-gradient(90deg, var(--party-color), var(--ps-opportunity));
+}
+
+/* ── Emblem ── */
+
+.ps-emblem {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  color: var(--ps-text-inverse);
+  flex-shrink: 0;
+  border-radius: var(--ps-radius-sm);
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.ps-emblem--lg {
+  width: 52px;
+  height: 52px;
+  font-size: 24px;
+}
+
+.ps-emblem--md {
+  width: 40px;
+  height: 40px;
+  font-size: 17px;
+}

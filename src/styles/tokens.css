@@ -1,0 +1,120 @@
+/**
+ * Parti Simülasyonu — design tokens (Seviye 3)
+ * Stil cümlesi: dark, premium, tactical, information-dense political strategy UI
+ */
+
+:root {
+  /* Backgrounds */
+  --ps-bg-deep: #080c12;
+  --ps-bg-base: #0a0f18;
+  --ps-bg-elevated: #111827;
+  --ps-bg-panel: #141c2a;
+  --ps-bg-panel-top: #1a2436;
+  --ps-bg-panel-header: #1e2838;
+  --ps-bg-panel-header-alt: #243044;
+  --ps-bg-inset: #0c121c;
+  --ps-bg-hover: rgba(255, 255, 255, 0.04);
+  --ps-bg-selected: rgba(46, 204, 113, 0.1);
+
+  /* Borders */
+  --ps-border: #2a3548;
+  --ps-border-subtle: rgba(42, 53, 68, 0.6);
+  --ps-border-strong: #3d4f68;
+  --ps-border-glow: rgba(93, 173, 226, 0.35);
+  --ps-border-focus: var(--ps-info);
+
+  /* Text */
+  --ps-text: #e8edf4;
+  --ps-text-secondary: #c8d4e0;
+  --ps-text-muted: #8ba4c0;
+  --ps-text-dim: #6b8099;
+  --ps-text-faint: #4a5568;
+  --ps-text-inverse: #ffffff;
+  --ps-crisis-light: #ffb4b4;
+
+  /* Semantic — oyun dili */
+  --ps-crisis: #e74c3c;
+  --ps-crisis-dim: rgba(231, 76, 60, 0.15);
+  --ps-crisis-border: rgba(231, 76, 60, 0.35);
+  --ps-opportunity: #2ecc71;
+  --ps-opportunity-dim: rgba(46, 204, 113, 0.15);
+  --ps-opportunity-border: rgba(46, 204, 113, 0.35);
+  --ps-agenda: #f0c040;
+  --ps-agenda-dim: rgba(240, 192, 64, 0.12);
+  --ps-agenda-border: rgba(240, 192, 64, 0.3);
+  --ps-info: #5dade2;
+  --ps-info-dim: rgba(93, 173, 226, 0.12);
+  --ps-info-border: rgba(93, 173, 226, 0.25);
+  --ps-cost: #e88a8a;
+  --ps-effect: #6ecf96;
+  --ps-gain: #7ec8f0;
+
+  /* Buttons */
+  --ps-btn-primary-bg: linear-gradient(180deg, #2d6cdf 0%, #1a4a9e 100%);
+  --ps-btn-primary-border: #3d7ee8;
+  --ps-btn-success-bg: linear-gradient(180deg, #27ae60 0%, #1e8449 100%);
+  --ps-btn-success-border: var(--ps-opportunity);
+  --ps-btn-danger-bg: linear-gradient(180deg, #922b21 0%, #6e1f18 100%);
+  --ps-btn-danger-border: var(--ps-crisis);
+
+  /* Shadows & radius */
+  --ps-shadow-panel: 0 4px 24px rgba(0, 0, 0, 0.45), 0 1px 0 rgba(255, 255, 255, 0.04) inset;
+  --ps-shadow-card: 0 2px 12px rgba(0, 0, 0, 0.35);
+  --ps-shadow-dropdown: 0 6px 18px rgba(0, 0, 0, 0.45);
+  --ps-shadow-float: 0 12px 40px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.06);
+  --ps-radius-sm: 3px;
+  --ps-radius-md: 6px;
+  --ps-radius-lg: 8px;
+  --ps-radius-xl: 14px;
+  --ps-radius-nav: 18px;
+
+  /* Typography */
+  --ps-font-family: 'Segoe UI', Inter, system-ui, -apple-system, sans-serif;
+  --ps-font-display: 28px;
+  --ps-font-h1: 22px;
+  --ps-font-h2: 13px;
+  --ps-font-title: 13px;
+  --ps-font-body: 11px;
+  --ps-font-body-lg: 13px;
+  --ps-font-caption: 9px;
+  --ps-font-stat: 24px;
+  --ps-letter-label: 0.08em;
+  --ps-letter-tight: 0.02em;
+
+  /* Spacing */
+  --ps-space-xs: 4px;
+  --ps-space-sm: 8px;
+  --ps-space-md: 12px;
+  --ps-space-lg: 16px;
+  --ps-space-xl: 24px;
+
+  /* Motion */
+  --ps-transition-fast: 0.12s ease;
+  --ps-transition: 0.15s ease;
+  --ps-transition-slow: 0.35s ease;
+
+  /* Party accent — dashboard’da set edilir */
+  --party-color: #3498db;
+
+  /* Örgüt araç durumları */
+  --ps-status-available-bg: #1f4d37;
+  --ps-status-available-text: #7dffb0;
+  --ps-status-locked-bg: #3a2a2a;
+  --ps-status-locked-text: #dd8888;
+  --ps-status-active-bg: #1a3348;
+  --ps-status-active-text: #7ec8ff;
+  --ps-status-maxed-bg: #4a4018;
+  --ps-status-maxed-text: #ffd56b;
+  --ps-status-warn-bg: #4a3018;
+  --ps-status-warn-text: #ffb86b;
+  --ps-risk-text: #d4a574;
+
+  /* Gradient stops (panel header / stat bars) */
+  --ps-gradient-stop-command: #2a3a52;
+  --ps-gradient-stop-critical: #3a2e1a;
+  --ps-gradient-stop-deployed: #2a3544;
+  --ps-gradient-stop-good: #1a6b3a;
+  --ps-gradient-stop-mid: #8b6914;
+  --ps-gradient-stop-low: #8b2020;
+  --ps-gradient-stop-info: #1a4a7a;
+}

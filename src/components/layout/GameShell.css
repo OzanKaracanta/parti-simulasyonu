@@ -1,0 +1,26 @@
+.game-shell {
+  min-height: 100vh;
+  background: var(--ps-bg-deep);
+  color: var(--ps-text);
+  font-family: var(--ps-font-family);
+  font-size: var(--ps-font-body-lg);
+  line-height: 1.4;
+}
+
+.game-shell--dashboard {
+  padding: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.game-shell--setup {
+  padding: var(--ps-space-xl);
+}
+
+.game-shell--result {
+  padding: var(--ps-space-xl);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  overflow-y: auto;
+}

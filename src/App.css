@@ -1,0 +1,45 @@
+/* Kurulum → dashboard geçişi */
+
+.game-shell--setup.is-launch-exit {
+  animation: launch-setup-exit 0.42s ease-in forwards;
+  pointer-events: none;
+}
+
+.game-shell--dashboard.is-launch-enter {
+  animation: launch-dashboard-enter 0.56s ease-out;
+}
+
+@keyframes launch-setup-exit {
+  from {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(0.985);
+    filter: blur(6px);
+  }
+}
+
+@keyframes launch-dashboard-enter {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .game-shell--setup.is-launch-exit,
+  .game-shell--dashboard.is-launch-enter {
+    animation: none;
+  }
+
+  .game-shell--setup.is-launch-exit {
+    opacity: 0;
+  }
+}

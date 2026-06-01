@@ -1,0 +1,120 @@
+.segment-panel .fm-panel-body {
+  padding: 10px;
+}
+
+.segment-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.segment-row {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.segment-row-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--ps-space-sm);
+}
+
+.segment-name {
+  font-size: var(--ps-font-body);
+  color: var(--ps-text-secondary);
+}
+
+.segment-value {
+  font-size: var(--ps-font-body);
+  font-weight: 600;
+  color: var(--ps-text);
+  display: flex;
+  align-items: center;
+  gap: var(--ps-space-xs);
+}
+
+.segment-delta {
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.segment-delta.positive {
+  color: var(--ps-opportunity);
+}
+
+.segment-delta.negative {
+  color: var(--ps-crisis);
+}
+
+.segment-delta.neutral {
+  color: var(--ps-text-muted);
+}
+
+.segment-bar {
+  height: 4px;
+  background: var(--ps-bg-elevated);
+  border: 1px solid var(--ps-border);
+  border-radius: var(--ps-radius-sm);
+  overflow: hidden;
+}
+
+.segment-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--ps-info), var(--party-color));
+  border-radius: var(--ps-radius-sm);
+  transition: width var(--ps-transition-slow);
+}
+
+.segment-compact-note {
+  margin: 6px 0 0;
+  font-size: var(--ps-font-caption);
+  color: var(--ps-text-dim);
+  font-style: italic;
+}
+
+.segment-changes-empty {
+  margin: 0;
+  font-size: var(--ps-font-body);
+  color: var(--ps-text-dim);
+  font-style: italic;
+  line-height: 1.4;
+}
+
+.segment-changes-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.segment-change-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--ps-space-sm);
+  padding: 4px 6px;
+  background: var(--ps-bg-hover);
+  border: 1px solid var(--ps-border-subtle);
+  border-radius: var(--ps-radius-sm);
+}
+
+.segment-change-row.positive {
+  border-color: var(--ps-opportunity-dim);
+}
+
+.segment-change-row.negative {
+  border-color: var(--ps-crisis-dim);
+}
+
+.segment-change-row .segment-delta {
+  font-size: var(--ps-font-body);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}

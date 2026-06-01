@@ -1,0 +1,37 @@
+.region-selector-bar .fm-panel-body {
+  padding-top: 8px;
+}
+
+.region-selector-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.region-selector-chip {
+  border: 1px solid var(--ps-border);
+  background: var(--ps-bg-panel);
+  color: var(--ps-text-secondary);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    border-color var(--ps-transition),
+    background var(--ps-transition);
+}
+
+.region-selector-chip:hover {
+  border-color: var(--party-color, var(--ps-accent));
+}
+
+.region-selector-chip.selected {
+  border-color: var(--party-color, var(--ps-accent));
+  background: color-mix(in srgb, var(--party-color, var(--ps-accent)) 12%, transparent);
+  color: var(--ps-text);
+}
+
+.region-selector-chip.home:not(.selected) {
+  border-color: color-mix(in srgb, var(--party-color, var(--ps-accent)) 35%, var(--ps-border));
+}

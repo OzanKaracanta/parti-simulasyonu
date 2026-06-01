@@ -1,0 +1,89 @@
+.week-flow-panel .fm-panel-body {
+  padding: 10px 12px;
+}
+
+.week-flow-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ps-space-sm);
+}
+
+.week-flow-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--ps-radius-md);
+  background: var(--ps-bg-inset);
+  border: 1px solid var(--ps-border);
+  box-shadow: var(--ps-shadow-card);
+}
+
+.week-flow-step.done {
+  border-color: var(--ps-opportunity-border);
+  background: var(--ps-opportunity-dim);
+}
+
+.week-flow-step.active {
+  border-color: var(--ps-agenda-border);
+  background: var(--ps-agenda-dim);
+}
+
+.week-flow-index {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  flex-shrink: 0;
+  background: var(--ps-bg-panel);
+  color: var(--ps-text-muted);
+}
+
+.week-flow-step.done .week-flow-index {
+  background: var(--ps-opportunity-dim);
+  color: var(--ps-opportunity);
+}
+
+.week-flow-step.active .week-flow-index {
+  background: var(--ps-agenda-dim);
+  color: var(--ps-agenda);
+}
+
+.week-flow-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.week-flow-label {
+  font-size: var(--ps-font-body);
+  font-weight: 700;
+  color: var(--ps-text);
+}
+
+.week-flow-required {
+  color: var(--ps-crisis);
+  margin-left: 2px;
+}
+
+.week-flow-detail {
+  font-size: 10px;
+  color: var(--ps-text-dim);
+  line-height: 1.35;
+}
+
+.week-flow-step.done .week-flow-detail {
+  color: var(--ps-text-muted);
+}
+
+.week-flow-step.active .week-flow-detail {
+  color: var(--ps-agenda);
+}

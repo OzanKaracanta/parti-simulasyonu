@@ -1,0 +1,12 @@
+.agendas-screen {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  min-height: calc(100vh - 140px);
+}
+
+.agendas-screen .agenda-hub-page {
+  flex: 1;
+  min-height: 0;
+}

@@ -1,0 +1,48 @@
+.command-center {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.command-center-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: var(--ps-space-sm) var(--ps-space-md);
+  background: linear-gradient(180deg, var(--ps-bg-panel-header-alt) 0%, var(--ps-bg-panel-header) 100%);
+  border: 1px solid var(--ps-border);
+  border-radius: var(--ps-radius-sm);
+  box-shadow: var(--ps-shadow-panel);
+}
+
+.command-center-icon {
+  font-size: 18px;
+  color: var(--ps-info);
+  line-height: 1;
+}
+
+.command-center-title {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ps-text);
+}
+
+.command-center-subtitle {
+  margin: 2px 0 0;
+  font-size: 10px;
+  color: var(--ps-text-dim);
+}
+
+.command-center-modules {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.command-center-modules .fm-panel {
+  margin: 0;
+}

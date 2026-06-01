@@ -1,0 +1,70 @@
+.opinion-feed-panel .fm-panel-body {
+  padding: 10px;
+}
+
+.opinion-feed-empty {
+  font-size: 10px;
+  color: var(--ps-text-dim);
+  font-style: italic;
+  margin: 0;
+  line-height: 1.45;
+}
+
+.opinion-feed-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ps-space-sm);
+}
+
+.opinion-feed-item {
+  padding: var(--ps-space-sm);
+  background: var(--ps-bg-elevated);
+  border: 1px solid var(--ps-border);
+  border-radius: var(--ps-radius-sm);
+}
+
+.opinion-feed-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--ps-space-sm);
+  margin-bottom: var(--ps-space-xs);
+}
+
+.opinion-tone {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.opinion-tone.positive {
+  color: var(--ps-opportunity);
+}
+
+.opinion-tone.mixed {
+  color: var(--ps-agenda);
+}
+
+.opinion-tone.critical {
+  color: var(--ps-crisis);
+}
+
+.opinion-tone.neutral {
+  color: var(--ps-text-muted);
+}
+
+.opinion-week {
+  font-size: var(--ps-font-caption);
+  color: var(--ps-text-dim);
+}
+
+.opinion-body {
+  font-size: 10px;
+  color: var(--ps-text-muted);
+  line-height: 1.45;
+  margin: 0;
+}

@@ -1,0 +1,191 @@
+.rival-panel .fm-panel-body {
+  padding: 10px;
+}
+
+.rival-player-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px var(--ps-space-sm);
+  margin-bottom: var(--ps-space-sm);
+  background: var(--ps-info-dim);
+  border: 1px solid var(--ps-info-border);
+  border-radius: var(--ps-radius-sm);
+}
+
+.rival-player-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--ps-info);
+}
+
+.rival-player-value {
+  font-size: var(--ps-font-title);
+  font-weight: 700;
+  color: var(--ps-text);
+}
+
+.rival-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rival-row {
+  display: flex;
+  align-items: center;
+  gap: var(--ps-space-sm);
+  padding: 6px var(--ps-space-sm);
+  background: var(--ps-bg-elevated);
+  border: 1px solid var(--ps-border);
+  border-radius: var(--ps-radius-sm);
+}
+
+.rival-emblem {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--ps-font-caption);
+  font-weight: 800;
+  color: var(--ps-text-inverse);
+  border-radius: var(--ps-radius-sm);
+  flex-shrink: 0;
+}
+
+.rival-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.rival-name {
+  font-size: var(--ps-font-body);
+  font-weight: 600;
+  color: var(--ps-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rival-leader {
+  font-size: var(--ps-font-caption);
+  color: var(--ps-text-dim);
+}
+
+.rival-row-ruling {
+  border-color: var(--ps-warning-border, #d97706);
+  background: var(--ps-warning-dim, rgba(217, 119, 6, 0.08));
+}
+
+.rival-ruling-badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 5px;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ps-warning, #d97706);
+  background: var(--ps-warning-dim, rgba(217, 119, 6, 0.12));
+  border: 1px solid var(--ps-warning-border, rgba(217, 119, 6, 0.35));
+  border-radius: 3px;
+  vertical-align: middle;
+}
+
+.rival-support {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ps-text-secondary);
+}
+
+.rival-moves {
+  margin-top: 10px;
+  padding-top: var(--ps-space-sm);
+  border-top: 1px solid var(--ps-border);
+}
+
+.rival-moves-title {
+  display: block;
+  font-size: var(--ps-font-caption);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ps-text-dim);
+  margin-bottom: var(--ps-space-xs);
+}
+
+.rival-moves ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ps-space-xs);
+}
+
+.rival-moves li {
+  font-size: 10px;
+  color: var(--ps-text-muted);
+  line-height: 1.4;
+}
+
+.rival-moves strong {
+  color: var(--ps-text-secondary);
+}
+
+.rival-panel-table .fm-panel-body {
+  padding: 8px 10px 10px;
+}
+
+.rival-table .rival-table-player td {
+  background: var(--ps-info-dim);
+  border-color: var(--ps-info-border);
+}
+
+.rival-table-you {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 5px;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ps-info);
+  background: color-mix(in srgb, var(--ps-info) 12%, transparent);
+  border: 1px solid var(--ps-info-border);
+  border-radius: 3px;
+  vertical-align: middle;
+}
+
+.rival-table-emblem {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  margin-right: 6px;
+  font-size: 9px;
+  font-weight: 800;
+  color: var(--ps-text-inverse);
+  border-radius: var(--ps-radius-sm);
+  vertical-align: middle;
+}
+
+.rival-table tbody tr.rival-table-ruling {
+  background: var(--ps-warning-dim, rgba(217, 119, 6, 0.08));
+}
+
+.rival-table tbody td:first-child {
+  white-space: nowrap;
+}
+
+.rival-table .rival-ruling-badge {
+  margin-left: 4px;
+}

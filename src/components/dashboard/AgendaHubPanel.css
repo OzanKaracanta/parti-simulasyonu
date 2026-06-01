@@ -1,0 +1,45 @@
+.agenda-hub-panel .fm-panel-body {
+  padding-top: 0;
+}
+
+.agenda-hub-done-badge {
+  font-size: var(--ps-font-caption);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ps-opportunity);
+  padding: 3px 8px;
+  border: 1px solid var(--ps-opportunity-border);
+  border-radius: var(--ps-radius-sm);
+  background: var(--ps-opportunity-dim);
+}
+
+.agenda-hub-panel .fm-tabs {
+  margin: 0;
+  border-bottom: 1px solid var(--ps-border);
+}
+
+.agenda-hub-panel .fm-panel-header {
+  padding: 8px 14px;
+}
+
+.agenda-hub-content {
+  min-height: 0;
+}
+
+.agenda-hub-content .radar-agenda-intro,
+.agenda-hub-content .radar-agenda-list {
+  margin-left: 16px;
+  margin-right: 16px;
+}
+
+.agenda-hub-content .radar-agenda-list {
+  margin-bottom: 14px;
+}
+
+.sub-agenda-empty,
+.radar-agenda-empty {
+  font-size: 11px;
+  color: var(--ps-text-dim);
+  margin: 4px 0 0;
+}

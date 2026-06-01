@@ -1,0 +1,7 @@
+.game-shell {
+  min-height: 100vh;
+  padding: 24px;
+  background: #111827;
+  color: #f9fafb;
+  font-family: Inter, system-ui, sans-serif;
+}
