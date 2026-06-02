@@ -614,6 +614,8 @@ export interface GameState {
   nationalOrganizationToolLevels: Record<string, number>;
   /** Bu hafta geri alınabilir kurulum/yükseltme kayıtları */
   organizationRevertStack: OrganizationRevertEntry[];
+  /** Bu turda teşkilat kurulumu veya yükseltmesi yapıldı (ilk 5 hafta uyarısı) */
+  weekOrganizationChanged: boolean;
   currentWeeklyEvent: WeeklyEvent | null;
   /** Bu hafta seçilen gündem tepkisi */
   selectedEventResponseId: string | null;

@@ -1,8 +1,7 @@
-import { useMemo, type CSSProperties } from 'react';
+import type { CSSProperties } from 'react';
 import { colorOptions } from '../../data/setupOptions';
 import { resourceLabels, WEEKLY_BUDGET_RESOURCE_KEYS } from '../../data/labels';
 import { canFinishWeek } from '../../engine/eventEvaluation';
-import { computeWeeklyEnergyPreview } from '../../engine/weeklyEnergyBudget';
 import type { GameState, ResourceKey } from '../../types/game';
 import './dashboard.css';
 
@@ -26,18 +25,7 @@ export function TopBar({ state, onEndWeek, finishCheck: finishCheckProp }: TopBa
   const weeksLeft = state.maxWeeks - state.campaignWeek;
   const progressPct = ((state.campaignWeek - 1) / (state.maxWeeks - 1)) * 100;
   const finishCheck = finishCheckProp ?? canFinishWeek(state);
-  const energyPreview = useMemo(() => computeWeeklyEnergyPreview(state), [state]);
-
-  const energySpentThisWeek =
-    energyPreview.alreadySpentOnActions + energyPreview.alreadySpentOnAgendas;
-  const energyChipHint =
-    energySpentThisWeek > 0
-      ? `Bu hafta −${energySpentThisWeek} harcandı · ~${energyPreview.projectedEndEnergy} hafta sonu (+${energyPreview.regenAmount} yenilenme)`
-      : `~${energyPreview.projectedEndEnergy} hafta sonu (+${energyPreview.regenAmount} yenilenme)`;
-
-  const endWeekTitle = finishCheck.ok
-    ? [finishCheck.reason, energyPreview.endWeekSummary].filter(Boolean).join(' · ')
-    : finishCheck.reason;
+  const endWeekTitle = finishCheck.reason;
 
   return (
     <header
@@ -93,22 +81,17 @@ export function TopBar({ state, onEndWeek, finishCheck: finishCheckProp }: TopBa
           <div className="topbar-resources-chips">
             {WEEKLY_BUDGET_RESOURCE_KEYS.map((key) => {
               const value = state.resources[key];
-              const isEnergy = key === 'energy';
-              const chipTitle = isEnergy ? energyChipHint : resourceLabels[key];
 
               return (
                 <div
-                  className={`resource-chip ${isEnergy ? 'resource-chip--energy' : ''}`}
+                  className="resource-chip"
                   key={key}
-                  title={chipTitle}
+                  title={resourceLabels[key]}
                 >
                   <span className="resource-icon">{resourceIcons[key]}</span>
                   <div className="resource-detail">
                     <span className="resource-name">{resourceLabels[key]}</span>
                     <span className="resource-value">{value}</span>
-                    {isEnergy && energySpentThisWeek > 0 ? (
-                      <span className="resource-pending">−{energySpentThisWeek} bu hafta</span>
-                    ) : null}
                   </div>
                 </div>
               );
@@ -122,10 +105,7 @@ export function TopBar({ state, onEndWeek, finishCheck: finishCheckProp }: TopBa
           disabled={!finishCheck.ok}
           title={endWeekTitle}
         >
-          <span className="end-week-btn-label">Haftayı Bitir »</span>
-          {finishCheck.ok ? (
-            <span className="end-week-btn-energy">{energyPreview.endWeekSummary}</span>
-          ) : null}
+          Haftayı Bitir »
         </button>
       </div>
     </header>

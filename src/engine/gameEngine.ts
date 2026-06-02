@@ -640,6 +640,7 @@ export function finishWeek(state: GameState): GameState {
     selectedSubAgendaSelections: [],
     selectedRegionalAgendaSelections: [],
     organizationRevertStack: [],
+    weekOrganizationChanged: false,
     nationalSupport: supportAfter,
     history: weekState.history,
     currentWeeklyEvent: isFinalWeek ? weekState.currentWeeklyEvent : null,

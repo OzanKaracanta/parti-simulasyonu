@@ -13,6 +13,7 @@ import {
   calculateNationalSupport,
 } from '../engine/gameEngine';
 import { canFinishWeek } from '../engine/eventEvaluation';
+import { markWeekOrganizationChanged } from '../engine/earlyWeekEndWarning';
 import { dismissActiveAdvisorBriefing } from '../engine/advisorEngine';
 import { dismissActiveWeekBacklash } from '../engine/backlashEngine';
 import { buildGameStateFromSetup, createSetupState } from '../engine/setupEngine';
@@ -108,7 +109,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         : action.regionId
           ? buildTool(state, action.toolId, action.regionId)
           : null;
-      return nextState ?? state;
+      return nextState ? markWeekOrganizationChanged(nextState) : state;
     }
 
     case 'UPGRADE_ORGANIZATION_TOOL': {
@@ -117,7 +118,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         : action.regionId
           ? upgradeTool(state, action.toolId, action.regionId)
           : null;
-      return nextState ?? state;
+      return nextState ? markWeekOrganizationChanged(nextState) : state;
     }
 
     case 'REVERT_ORGANIZATION_TOOL': {

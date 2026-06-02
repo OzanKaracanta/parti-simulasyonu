@@ -29,6 +29,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type Dispatch,
   type CSSProperties,
@@ -73,6 +74,12 @@ import { SidebarNav } from './SidebarNav';
 import { RivalPanel } from './RivalPanel';
 import { SidebarSegmentSupport } from './SidebarSegmentSupport';
 import { AdvisorBriefingModal } from './AdvisorBriefingModal';
+import { EarlyWeekEndWarningModal } from './EarlyWeekEndWarningModal';
+import {
+  getEarlyWeekMissingActivities,
+  isEarlyWeekEndWarningActive,
+  type EarlyWeekMissingActivity,
+} from '../../engine/earlyWeekEndWarning';
 import { TopBar } from './TopBar';
 import { WeeklyAgendaNewsSection } from './overview/WeeklyAgendaNewsSection';
 import { WeeklyCashFlowPanel } from './WeeklyCashFlowPanel';
@@ -99,6 +106,10 @@ export function DashboardScreen({ state, dispatch }: DashboardScreenProps) {
   const [showWeekIntro, setShowWeekIntro] = useState(
     () => state.campaignWeek === 1 && !isTutorialSkipped() && !isTutorialIntroSeen(),
   );
+  const [pendingEarlyWeekEnd, setPendingEarlyWeekEnd] = useState<
+    EarlyWeekMissingActivity[] | null
+  >(null);
+  const lastCampaignWeekRef = useRef(state.campaignWeek);
 
   const showTutorialCostBreakdown =
     !tutorialSkipped && state.campaignWeek === 4;
@@ -112,6 +123,38 @@ export function DashboardScreen({ state, dispatch }: DashboardScreenProps) {
     () => canEndWeekStrict(state, tutorialSkipped),
     [state, tutorialSkipped, tutorialTick],
   );
+
+  const handleEndWeek = useCallback(() => {
+    if (!finishCheck.ok || pendingEarlyWeekEnd) return;
+
+    if (isEarlyWeekEndWarningActive(state)) {
+      const missing = getEarlyWeekMissingActivities(state);
+      if (missing.length > 0) {
+        setPendingEarlyWeekEnd(missing);
+        return;
+      }
+    }
+
+    dispatch({ type: 'END_WEEK' });
+  }, [dispatch, finishCheck.ok, pendingEarlyWeekEnd, state]);
+
+  const confirmEarlyWeekEnd = useCallback(() => {
+    setPendingEarlyWeekEnd(null);
+    dispatch({ type: 'END_WEEK' });
+  }, [dispatch]);
+
+  const cancelEarlyWeekEnd = useCallback(() => {
+    setPendingEarlyWeekEnd(null);
+  }, []);
+
+  useEffect(() => {
+    if (lastCampaignWeekRef.current === state.campaignWeek) return;
+    lastCampaignWeekRef.current = state.campaignWeek;
+    setPendingEarlyWeekEnd(null);
+    setView('overview');
+    setAgendaFocusId(null);
+    setOrganizationFocusRegion(null);
+  }, [state.campaignWeek]);
 
   const handleRadarTutorialViewed = useCallback(() => {
     markRadarTutorialViewed(state);
@@ -211,13 +254,23 @@ export function DashboardScreen({ state, dispatch }: DashboardScreenProps) {
         <TutorialWeekIntroModal partyName={state.party.name} onDismiss={dismissWeekIntro} />
       ) : null}
 
+      {pendingEarlyWeekEnd && pendingEarlyWeekEnd.length > 0 ? (
+        <EarlyWeekEndWarningModal
+          week={state.campaignWeek}
+          missingActivities={pendingEarlyWeekEnd}
+          onConfirm={confirmEarlyWeekEnd}
+          onCancel={cancelEarlyWeekEnd}
+        />
+      ) : null}
+
       <TopBar
         state={state}
         finishCheck={finishCheck}
-        onEndWeek={() => dispatch({ type: 'END_WEEK' })}
+        onEndWeek={handleEndWeek}
       />
 
       {state.activeAdvisorBriefing &&
+      !pendingEarlyWeekEnd &&
       (tutorialSkipped || state.campaignWeek > TUTORIAL_LAST_WEEK) ? (
         <AdvisorBriefingModal
           briefing={state.activeAdvisorBriefing}
