@@ -8,6 +8,7 @@ import { AgendaResponseCard } from './AgendaResponseCard';
 import { AgendaSummary } from './AgendaSummary';
 import { ExpectedOutcomePanel } from './ExpectedOutcomePanel';
 import { SupportOperationsSection } from './SupportOperationsSection';
+import { AgendaFlowActionBar } from './AgendaFlowActionBar';
 import {
   buildPoliticalEffectsForTone,
   mergePoliticalSegmentEffects,
@@ -42,6 +43,8 @@ interface WeeklyAgendaPanelProps {
   focusAgendaId?: string | null;
   onFocusApplied?: () => void;
   onGoToRegional?: () => void;
+  /** Sonraki adım butonu metni — tam sayfa akış çubuğu */
+  nextStepLabel?: string;
 }
 
 export function WeeklyAgendaPanel({
@@ -54,6 +57,7 @@ export function WeeklyAgendaPanel({
   focusAgendaId = null,
   onFocusApplied,
   onGoToRegional,
+  nextStepLabel = 'Sonraki adım: Bölgesel gündemler →',
 }: WeeklyAgendaPanelProps) {
   const storyHint = getUpcomingStoryHint(state);
 
@@ -122,6 +126,8 @@ export function WeeklyAgendaPanel({
   const pressure = getEventPressure(event.type);
   const status = getAgendaStatus(event.type);
 
+  const isPage = layout === 'page';
+
   const decisionSection = (
     <section className="agenda-decision-section">
       <h5 className="agenda-section-title">Bu hafta nasıl yanıt vereceksin?</h5>
@@ -145,11 +151,20 @@ export function WeeklyAgendaPanel({
               selected={isSelected}
               disabled={!canAfford}
               disabledReason={disabledReason}
+              compact={isPage}
               onSelect={() => onSelectResponse(option.id)}
             />
           );
         })}
       </div>
+
+      {isPage ? (
+        <AgendaFlowActionBar
+          hasSelection={Boolean(selectedResponse)}
+          nextStepLabel={nextStepLabel}
+          onContinue={onGoToRegional}
+        />
+      ) : null}
     </section>
   );
 
@@ -167,6 +182,8 @@ export function WeeklyAgendaPanel({
           storyHint={storyHint}
           rivalParties={state.rivalParties}
           playerIdeologyId={state.party.ideologyId}
+          layout="page"
+          selectedResponseTitle={selectedResponse?.title ?? null}
         />
 
         <div className="weekly-agenda-body">
@@ -174,6 +191,7 @@ export function WeeklyAgendaPanel({
           <aside className="weekly-agenda-aside">
             <ExpectedOutcomePanel
               selectedResponse={selectedResponse}
+              showContinueAction={false}
               onGoToRegional={onGoToRegional}
             />
             <SupportOperationsSection operationNames={recommendedOperationNames} />

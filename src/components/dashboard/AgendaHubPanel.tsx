@@ -6,6 +6,7 @@ import { getEffectiveSubAgendaMaxSlots } from '../../engine/subAgendaSlots';
 import type { CampaignAction, GameState, RegionId } from '../../types/game';
 import { AgendaTabs, type AgendaTabId } from './agenda/AgendaTabs';
 import { WeeklyAgendaPanel } from './agenda/WeeklyAgendaPanel';
+import { AgendaWeekFlowStrip } from './agenda/AgendaWeekFlowStrip';
 import './agenda/weeklyAgenda.css';
 import { Panel } from '../ui/Panel';
 import { RadarAgendaPanel } from './RadarAgendaPanel';
@@ -14,8 +15,7 @@ import { SubAgendaPanel } from './SubAgendaPanel';
 import './AgendaHubPanel.css';
 import './agendasPage.css';
 import './WeeklyEventPanel.css';
-import { TUTORIAL_SECTION_IDS } from '../../tutorial/tutorialScroll';
-
+import type { DashboardView } from './DashboardScreen';
 interface AgendaHubPanelProps {
   state: GameState;
   availableActions: CampaignAction[];
@@ -37,6 +37,8 @@ interface AgendaHubPanelProps {
   onFocusApplied?: () => void;
   onGoToRegional?: () => void;
   onGoToSub?: () => void;
+  onGoToCampaign?: () => void;
+  onNavigate?: (view: DashboardView) => void;
 }
 
 export type AgendaPageMode = 'national' | 'regional' | 'sub';
@@ -72,6 +74,8 @@ export function AgendaHubPanel({
   onFocusApplied,
   onGoToRegional,
   onGoToSub,
+  onGoToCampaign,
+  onNavigate,
 }: AgendaHubPanelProps) {
   const subCount = state.subAgendas.length;
   const radarCount = state.radarAgendas.length;
@@ -171,15 +175,75 @@ export function AgendaHubPanel({
   );
 
   if (layout === 'page' && pageMode) {
+    const nationalNextStep =
+      state.regionalAgendas.length > 0
+        ? 'Sonraki adım: Bölgesel gündemler →'
+        : state.subAgendas.length > 0
+          ? 'Sonraki adım: Alt gündemler →'
+          : 'Sonraki adım: Operasyonlar →';
+
+    const regionalNextStep =
+      state.subAgendas.length > 0
+        ? 'Sonraki adım: Alt gündemler →'
+        : 'Sonraki adım: Operasyonlar →';
+
+    const handleRegionalContinue = () => {
+      if (onGoToSub) {
+        onGoToSub();
+        return;
+      }
+      onNavigate?.('campaign-national');
+    };
+
+    const subNextStep = 'Sonraki adım: Operasyonlar →';
+
+    const handleSubContinue = () => {
+      if (onGoToCampaign) {
+        onGoToCampaign();
+        return;
+      }
+      onNavigate?.('campaign-national');
+    };
+
+    const compactPageModes: AgendaPageMode[] = ['national', 'regional', 'sub'];
+
     return (
       <div className={`agenda-hub-page agenda-hub-page--${pageMode}`}>
-        <div className="agenda-hub-page-header agenda-hub-page-header--solo">
+        <div className="agenda-hub-page-header agenda-hub-page-header--solo agenda-hub-page-header--compact">
           <div className="agenda-hub-page-heading">
-            <span className="agenda-hub-page-kicker">Hafta {state.campaignWeek}</span>
-            <h2 className="agenda-hub-page-title">{PAGE_MODE_TITLES[pageMode]}</h2>
-            <p className="agenda-hub-page-subtitle">{PAGE_MODE_HINTS[pageMode]}</p>
+            <span className="agenda-hub-page-kicker">
+              Hafta {state.campaignWeek} · {PAGE_MODE_TITLES[pageMode]}
+            </span>
+            {!compactPageModes.includes(pageMode) ? (
+              <p className="agenda-hub-page-subtitle">{PAGE_MODE_HINTS[pageMode]}</p>
+            ) : null}
           </div>
         </div>
+
+        {pageMode === 'national' ? (
+          <AgendaWeekFlowStrip
+            state={state}
+            activeStepId="response"
+            onNavigate={onNavigate}
+          />
+        ) : null}
+
+        {pageMode === 'regional' ? (
+          <AgendaWeekFlowStrip
+            state={state}
+            activeStepId="regional"
+            onNavigate={onNavigate}
+          />
+        ) : null}
+
+        {pageMode === 'sub' ? (
+          <AgendaWeekFlowStrip
+            state={state}
+            activeStepId="sub-agenda"
+            onNavigate={onNavigate}
+          />
+        ) : null}
+
         <div className="agenda-hub-content agenda-hub-content--page">
           {pageMode === 'national' ? (
             <>
@@ -193,11 +257,15 @@ export function AgendaHubPanel({
                 focusAgendaId={focusAgendaId}
                 onFocusApplied={onFocusApplied}
                 onGoToRegional={onGoToRegional}
+                nextStepLabel={nationalNextStep}
               />
               {radarCount > 0 ? (
-                <div id={TUTORIAL_SECTION_IDS['radar-agenda']}>
+                <details className="agenda-radar-collapsible">
+                  <summary className="agenda-radar-collapsible-summary">
+                    Radar gündemler ({radarCount}) — henüz ulusal değil
+                  </summary>
                   <RadarAgendaPanel state={state} embedded onViewed={onRadarViewed} />
-                </div>
+                </details>
               ) : null}
             </>
           ) : null}
@@ -209,6 +277,8 @@ export function AgendaHubPanel({
               onClearResponse={onClearSubAgendaResponse}
               embedded
               layout={layout}
+              onContinue={handleSubContinue}
+              nextStepLabel={subNextStep}
             />
           ) : null}
 
@@ -221,7 +291,8 @@ export function AgendaHubPanel({
               layout={layout}
               focusAgendaId={focusAgendaId}
               onFocusApplied={onFocusApplied}
-              onGoToSub={onGoToSub}
+              onGoToSub={handleRegionalContinue}
+              nextStepLabel={regionalNextStep}
             />
           ) : null}
         </div>

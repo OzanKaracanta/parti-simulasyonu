@@ -34,20 +34,11 @@ button {
   font: inherit;
 }
 
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+/* Scrollbar gizli — tekerlek / trackpad ile kaydırma devam eder */
+* {
+  scrollbar-width: none;
 }
 
-::-webkit-scrollbar-track {
-  background: var(--ps-bg-inset);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--ps-border);
-  border-radius: var(--ps-radius-sm);
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--ps-border-strong);
+*::-webkit-scrollbar {
+  display: none;
 }

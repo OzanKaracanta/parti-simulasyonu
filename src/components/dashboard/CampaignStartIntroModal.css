@@ -1,4 +1,4 @@
-.tutorial-intro-overlay {
+.campaign-intro-overlay {
   position: fixed;
   inset: 0;
   z-index: 9500;
@@ -10,7 +10,7 @@
   backdrop-filter: blur(4px);
 }
 
-.tutorial-intro-modal {
+.campaign-intro-modal {
   width: min(440px, 100%);
   padding: 1.35rem 1.5rem;
   border-radius: 12px;
@@ -19,27 +19,27 @@
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
 }
 
-.tutorial-intro-kicker {
+.campaign-intro-kicker {
   font-size: 0.68rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--color-agenda, #d4a84b);
+  color: var(--ps-agenda);
 }
 
-.tutorial-intro-modal h2 {
+.campaign-intro-modal h2 {
   margin: 0.35rem 0 0.5rem;
   font-size: 1.25rem;
-  color: var(--text-primary, #e8eaed);
+  color: var(--ps-text);
 }
 
-.tutorial-intro-lead {
+.campaign-intro-lead {
   margin: 0 0 1rem;
   font-size: 0.88rem;
   line-height: 1.5;
-  color: var(--text-secondary, #b4b9bf);
+  color: var(--ps-text-secondary);
 }
 
-.tutorial-intro-steps {
+.campaign-intro-steps {
   list-style: none;
   margin: 0 0 1.25rem;
   padding: 0;
@@ -48,7 +48,7 @@
   gap: 0.65rem;
 }
 
-.tutorial-intro-steps li {
+.campaign-intro-steps li {
   display: flex;
   gap: 0.65rem;
   padding: 0.55rem 0.65rem;
@@ -56,7 +56,7 @@
   background: rgba(0, 0, 0, 0.25);
 }
 
-.tutorial-intro-index {
+.campaign-intro-index {
   flex-shrink: 0;
   width: 1.5rem;
   height: 1.5rem;
@@ -66,25 +66,25 @@
   border-radius: 50%;
   font-size: 0.75rem;
   font-weight: 700;
-  background: rgba(212, 168, 75, 0.2);
-  color: var(--color-agenda, #d4a84b);
+  background: var(--ps-agenda-dim);
+  color: var(--ps-agenda);
 }
 
-.tutorial-intro-steps strong {
+.campaign-intro-steps strong {
   display: block;
   font-size: 0.85rem;
-  color: var(--text-primary, #e8eaed);
+  color: var(--ps-text);
   margin-bottom: 0.15rem;
 }
 
-.tutorial-intro-steps p {
+.campaign-intro-steps p {
   margin: 0;
   font-size: 0.78rem;
   line-height: 1.4;
-  color: var(--text-muted, #8b929a);
+  color: var(--ps-text-dim);
 }
 
-.tutorial-intro-footer {
+.campaign-intro-footer {
   display: flex;
   justify-content: flex-end;
 }

@@ -553,10 +553,20 @@
 
 .setup-footer {
   margin-top: var(--ps-space-xl);
+}
+
+.setup-aside {
+  position: sticky;
+  top: var(--ps-space-lg);
+  align-self: start;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
   gap: var(--ps-space-md);
+  min-width: 0;
+}
+
+.setup-aside__footer {
+  margin: 0;
 }
 
 .setup-error {
@@ -570,7 +580,7 @@
     grid-template-columns: 1fr;
   }
 
-  .setup-preview {
+  .setup-aside {
     position: static;
     order: -1;
   }

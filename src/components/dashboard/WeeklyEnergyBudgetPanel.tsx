@@ -10,6 +10,7 @@ import './WeeklyEnergyBudgetPanel.css';
 
 interface WeeklyEnergyBudgetPanelProps {
   state: GameState;
+  embedded?: boolean;
 }
 
 function netTone(value: number): 'positive' | 'negative' | 'neutral' {
@@ -36,7 +37,10 @@ function FlowLines({ lines, kind }: { lines: EnergyFlowLineItem[]; kind: 'income
   );
 }
 
-export function WeeklyEnergyBudgetPanel({ state }: WeeklyEnergyBudgetPanelProps) {
+export function WeeklyEnergyBudgetPanel({
+  state,
+  embedded = false,
+}: WeeklyEnergyBudgetPanelProps) {
   const preview = useMemo(() => computeWeeklyEnergyPreview(state), [state]);
 
   const detailCount = preview.incomeLines.length + preview.expenseLines.length;
@@ -44,20 +48,16 @@ export function WeeklyEnergyBudgetPanel({ state }: WeeklyEnergyBudgetPanelProps)
   const weekNetTone = netTone(weekNet);
   const closingTone = netTone(preview.netChangeFromWeekStart);
 
-  return (
-    <Panel
-      title="Haftalık Enerji Bütçesi"
-      variant="command"
-      compact
-      className="weekly-energy-panel"
-      headerExtra={
-        <span
-          className={`fm-badge ${closingTone === 'negative' ? 'crisis' : closingTone === 'positive' ? 'opportunity' : 'category'}`}
-        >
-          {formatDelta(preview.netChangeFromWeekStart)} ⚡
-        </span>
-      }
+  const headerBadge = (
+    <span
+      className={`fm-badge ${closingTone === 'negative' ? 'crisis' : closingTone === 'positive' ? 'opportunity' : 'category'}`}
     >
+      {formatDelta(preview.netChangeFromWeekStart)} ⚡
+    </span>
+  );
+
+  const body = (
+    <>
       <div className="energy-hero">
         <div className="energy-hero-primary">
           <span className="energy-hero-label">Şu an</span>
@@ -143,6 +143,30 @@ export function WeeklyEnergyBudgetPanel({ state }: WeeklyEnergyBudgetPanelProps)
       </p>
 
       {preview.warning ? <p className="energy-warning">{preview.warning}</p> : null}
+    </>
+  );
+
+  if (embedded) {
+    return (
+      <div className="weekly-energy-panel weekly-energy-panel--embedded">
+        <div className="topbar-resource-dropdown-header">
+          <h2 className="topbar-resource-dropdown-title">Haftalık Enerji Bütçesi</h2>
+          {headerBadge}
+        </div>
+        <div className="weekly-energy-panel-body">{body}</div>
+      </div>
+    );
+  }
+
+  return (
+    <Panel
+      title="Haftalık Enerji Bütçesi"
+      variant="command"
+      compact
+      className="weekly-energy-panel"
+      headerExtra={headerBadge}
+    >
+      {body}
     </Panel>
   );
 }

@@ -22,6 +22,10 @@ interface AgendaSummaryProps {
   storyHint?: string | null;
   rivalParties: GameState['rivalParties'];
   playerIdeologyId: IdeologyId;
+  /** Tam sayfa Ulusal Gündem — tekrarlayan başlıkları gizler, içeriği sıkıştırır */
+  layout?: 'default' | 'page';
+  /** Seçili ana tepki — üst rozet (Yanıt Kaydedildi) için */
+  selectedResponseTitle?: string | null;
 }
 
 export function AgendaSummary({
@@ -32,6 +36,8 @@ export function AgendaSummary({
   storyHint,
   rivalParties,
   playerIdeologyId,
+  layout = 'default',
+  selectedResponseTitle = null,
 }: AgendaSummaryProps) {
   const topics = getEventTopicLine(event);
   const resolved = enrichResolvedForPlayerContext(
@@ -41,19 +47,57 @@ export function AgendaSummary({
   );
   const targetRival = event.attacksRival ? resolveEventTargetRival(event, rivalParties) : null;
 
-  return (
-    <header className="agenda-summary">
-      <div className="agenda-summary-top">
-        <h3 className="agenda-summary-week">HAFTA {week} GÜNDEMİ</h3>
-        <div className="agenda-summary-badges">
-          <ReactionAxisBadge axis={resolved.reactionAxis} />
-          <span className={`agenda-status-badge status-${status}`}>
-            {AGENDA_STATUS_LABELS[status]}
-          </span>
-        </div>
-      </div>
+  const isPage = layout === 'page';
+  const hasSavedResponse = Boolean(selectedResponseTitle);
+  const topicsLabel = topics || policyTopicLabels[event.policyTopic];
 
-      <h4 className="agenda-summary-title">{event.title}</h4>
+  const segmentImpact = (
+    <AgendaSegmentImpact
+      reactionAxis={resolved.reactionAxis}
+      primarySegments={resolved.primarySegments}
+      tensionSegments={resolved.tensionSegments}
+      primaryPoliticalSegments={resolved.primaryPoliticalSegments}
+      tensionPoliticalSegments={resolved.tensionPoliticalSegments}
+      tensionRationale={resolved.tensionRationale}
+      politicalRationale={resolved.politicalRationale}
+      variant="main"
+    />
+  );
+
+  return (
+    <header className={`agenda-summary${isPage ? ' agenda-summary--page' : ''}`}>
+      {isPage ? (
+        <div className="agenda-summary-headline-row">
+          <h4 className="agenda-summary-title">{event.title}</h4>
+          <div className="agenda-summary-badges">
+            <ReactionAxisBadge axis={resolved.reactionAxis} />
+            {hasSavedResponse ? (
+              <span className="agenda-status-badge status-saved">Yanıt Kaydedildi</span>
+            ) : (
+              <span className={`agenda-status-badge status-${status}`}>
+                {AGENDA_STATUS_LABELS[status]}
+              </span>
+            )}
+          </div>
+        </div>
+      ) : (
+        <>
+          <div className="agenda-summary-top">
+            <h3 className="agenda-summary-week">HAFTA {week} GÜNDEMİ</h3>
+            <div className="agenda-summary-badges">
+              <ReactionAxisBadge axis={resolved.reactionAxis} />
+              {hasSavedResponse ? (
+                <span className="agenda-status-badge status-saved">Yanıt Kaydedildi</span>
+              ) : (
+                <span className={`agenda-status-badge status-${status}`}>
+                  {AGENDA_STATUS_LABELS[status]}
+                </span>
+              )}
+            </div>
+          </div>
+          <h4 className="agenda-summary-title">{event.title}</h4>
+        </>
+      )}
       <p className="agenda-summary-desc">{event.description}</p>
 
       {targetRival ? (
@@ -64,27 +108,34 @@ export function AgendaSummary({
         </p>
       ) : null}
 
-      <AgendaSegmentImpact
-        reactionAxis={resolved.reactionAxis}
-        primarySegments={resolved.primarySegments}
-        tensionSegments={resolved.tensionSegments}
-        primaryPoliticalSegments={resolved.primaryPoliticalSegments}
-        tensionPoliticalSegments={resolved.tensionPoliticalSegments}
-        tensionRationale={resolved.tensionRationale}
-        politicalRationale={resolved.politicalRationale}
-        variant="main"
-      />
+      {isPage ? (
+        <details className="agenda-summary-impact-details">
+          <summary className="agenda-summary-impact-toggle">Kimleri etkiler?</summary>
+          {segmentImpact}
+        </details>
+      ) : (
+        segmentImpact
+      )}
 
       <div className="agenda-summary-meta">
         <span>
           <strong>Baskı:</strong> {getPressureLabel(pressure)}
         </span>
+        <span aria-hidden="true">·</span>
         <span>
-          <strong>Konu:</strong> {topics || policyTopicLabels[event.policyTopic]}
+          <strong>Konu:</strong> {topicsLabel}
         </span>
+        {isPage && storyHint ? (
+          <>
+            <span aria-hidden="true">·</span>
+            <span className="agenda-summary-meta-hint">
+              <strong>Yaklaşan:</strong> {storyHint}
+            </span>
+          </>
+        ) : null}
       </div>
 
-      {storyHint ? (
+      {!isPage && storyHint ? (
         <p className="agenda-summary-hint">
           <span className="agenda-summary-hint-label">Yaklaşan:</span> {storyHint}
         </p>

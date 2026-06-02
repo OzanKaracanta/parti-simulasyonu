@@ -9,11 +9,6 @@ import {
 } from '../data/subAgendaFactory';
 import { createInitialRivalParties } from '../data/rivals';
 import { weeklyEvents } from '../data/weeklyEvents';
-import {
-  getTutorialPrimaryEvent,
-  shouldGuaranteeTutorialRadar,
-} from '../tutorial/tutorialAgenda';
-import { TUTORIAL_LAST_WEEK } from '../tutorial/tutorialSteps';
 import { assignRegionalAgendas, type RegionalAgendaAssignmentInput } from './regionalAgendaEngine';
 import { removeConsumedRegionalSchedules } from './regionalStoryEngine';
 import type {
@@ -98,15 +93,7 @@ export function assignWeekAgenda(
       pickWeeklyEventExcluding(previousEventId ? [previousEventId] : []);
     storyHint = scheduled.reason;
   } else {
-    const tutorialPrimary =
-      campaignWeek <= TUTORIAL_LAST_WEEK
-        ? getTutorialPrimaryEvent(campaignWeek)
-        : null;
-    primaryEvent =
-      tutorialPrimary ?? pickWeeklyEventExcluding(previousEventId ? [previousEventId] : []);
-    if (tutorialPrimary && !storyHint) {
-      storyHint = 'Öğretici tur — tanıdık bir gündem senaryosu';
-    }
+    primaryEvent = pickWeeklyEventExcluding(previousEventId ? [previousEventId] : []);
   }
 
   const subAgendas = pickSubAgendas([primaryEvent.id], rivalParties, playerIdeologyId);
@@ -114,10 +101,7 @@ export function assignWeekAgenda(
     primaryEvent.id,
     ...subAgendas.map((item) => item.sourceEventId),
   ];
-  let radarAgendas = pickRadarAgendas(usedEventIds);
-  if (shouldGuaranteeTutorialRadar(campaignWeek) && radarAgendas.length === 0) {
-    radarAgendas = pickFromPool(weeklyEvents, usedEventIds, 1, createRadarAgendaFromWeeklyEvent);
-  }
+  const radarAgendas = pickRadarAgendas(usedEventIds);
 
   if (radarAgendas.length > 0 && !storyHint) {
     storyHint = `Radar: ${radarAgendas.map((item) => item.title).join(' · ')}`;

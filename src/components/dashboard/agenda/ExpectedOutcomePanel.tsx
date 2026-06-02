@@ -4,11 +4,14 @@ import './weeklyAgenda.css';
 
 interface ExpectedOutcomePanelProps {
   selectedResponse: AgendaResponseDisplay | null;
+  /** Tam sayfa — devam butonu kartların altında; yan panelde gösterme */
+  showContinueAction?: boolean;
   onGoToRegional?: () => void;
 }
 
 export function ExpectedOutcomePanel({
   selectedResponse,
+  showContinueAction = true,
   onGoToRegional,
 }: ExpectedOutcomePanelProps) {
   const hasSelection = Boolean(selectedResponse);
@@ -23,12 +26,12 @@ export function ExpectedOutcomePanel({
 
       {!hasSelection ? (
         <p className="agenda-outcome-empty">
-          Bir ana tepki seçtiğinde beklenen metrik etkileri burada görünecek.
+          Bir tepki kartı seç — seçim anında kaydedilir; beklenen etkiler burada görünür.
         </p>
       ) : (
         <>
           <p className="agenda-outcome-plan">
-            <strong>Seçilen Plan:</strong> {selectedResponse?.title}
+            <strong>Kayıtlı yanıt:</strong> {selectedResponse?.title}
           </p>
 
           <ul className="agenda-outcome-effects">
@@ -45,7 +48,7 @@ export function ExpectedOutcomePanel({
             </p>
           ) : null}
 
-          {onGoToRegional ? (
+          {showContinueAction && onGoToRegional ? (
             <div className="agenda-outcome-continue">
               <button
                 type="button"

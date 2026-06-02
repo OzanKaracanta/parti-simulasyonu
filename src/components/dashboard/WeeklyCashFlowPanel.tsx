@@ -8,6 +8,7 @@ import './WeeklyCashFlowPanel.css';
 
 interface WeeklyCashFlowPanelProps {
   state: GameState;
+  embedded?: boolean;
 }
 
 function formatMoney(value: number): string {
@@ -44,7 +45,7 @@ function FlowLines({ lines, kind }: { lines: CashFlowLineItem[]; kind: 'income' 
   );
 }
 
-export function WeeklyCashFlowPanel({ state }: WeeklyCashFlowPanelProps) {
+export function WeeklyCashFlowPanel({ state, embedded = false }: WeeklyCashFlowPanelProps) {
   const preview = useMemo(() => computeWeeklyCashFlowPreview(state), [state]);
 
   const detailCount = preview.incomeLines.length + preview.expenseLines.length;
@@ -52,18 +53,16 @@ export function WeeklyCashFlowPanel({ state }: WeeklyCashFlowPanelProps) {
   const weekNetTone = netTone(weekNet);
   const closingTone = netTone(preview.netChangeFromWeekStart);
 
-  return (
-    <Panel
-      title="Ulusal Haftalık Bütçe"
-      variant="command"
-      compact
-      className="weekly-budget-panel"
-      headerExtra={
-        <span className={`fm-badge ${closingTone === 'negative' ? 'crisis' : closingTone === 'positive' ? 'opportunity' : 'category'}`}>
-          {formatDelta(preview.netChangeFromWeekStart)} ₺
-        </span>
-      }
+  const headerBadge = (
+    <span
+      className={`fm-badge ${closingTone === 'negative' ? 'crisis' : closingTone === 'positive' ? 'opportunity' : 'category'}`}
     >
+      {formatDelta(preview.netChangeFromWeekStart)} ₺
+    </span>
+  );
+
+  const body = (
+    <>
       <div className="budget-hero">
         <div className="budget-hero-primary">
           <span className="budget-hero-label">Kasa</span>
@@ -134,6 +133,30 @@ export function WeeklyCashFlowPanel({ state }: WeeklyCashFlowPanelProps) {
       )}
 
       {preview.warning ? <p className="budget-warning">{preview.warning}</p> : null}
+    </>
+  );
+
+  if (embedded) {
+    return (
+      <div className="weekly-budget-panel weekly-budget-panel--embedded">
+        <div className="topbar-resource-dropdown-header">
+          <h2 className="topbar-resource-dropdown-title">Ulusal Haftalık Bütçe</h2>
+          {headerBadge}
+        </div>
+        <div className="weekly-budget-panel-body">{body}</div>
+      </div>
+    );
+  }
+
+  return (
+    <Panel
+      title="Ulusal Haftalık Bütçe"
+      variant="command"
+      compact
+      className="weekly-budget-panel"
+      headerExtra={headerBadge}
+    >
+      {body}
     </Panel>
   );
 }

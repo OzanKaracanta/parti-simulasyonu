@@ -4,9 +4,11 @@ import { SUB_AGENDA_MAX_SLOTS } from '../../data/subAgendaConfig';
 import { getEffectiveSubAgendaMaxSlots } from '../../engine/subAgendaSlots';
 import type { GameState } from '../../types/game';
 import { Panel } from '../ui/Panel';
+import { AgendaFlowActionBar } from './agenda/AgendaFlowActionBar';
 import { SubAgendaCard } from './SubAgendaCard';
+import { SubAgendaSummaryAside } from './SubAgendaSummaryAside';
 import './SubAgendaPanel.css';
-import { TUTORIAL_SECTION_IDS } from '../../tutorial/tutorialScroll';
+import './agenda/weeklyAgenda.css';
 
 interface SubAgendaPanelProps {
   state: GameState;
@@ -14,6 +16,8 @@ interface SubAgendaPanelProps {
   onClearResponse: (agendaId?: string) => void;
   embedded?: boolean;
   layout?: 'embedded' | 'page';
+  onContinue?: () => void;
+  nextStepLabel?: string;
 }
 
 export function SubAgendaPanel({
@@ -22,11 +26,14 @@ export function SubAgendaPanel({
   onClearResponse,
   embedded = false,
   layout = 'embedded',
+  onContinue,
+  nextStepLabel = 'Sonraki adım →',
 }: SubAgendaPanelProps) {
   const { subAgendas, selectedSubAgendaSelections, bonusSubAgendaSlots } = state;
   const maxSlots = getEffectiveSubAgendaMaxSlots(state);
   const slotsUsed = selectedSubAgendaSelections.length;
   const slotsFull = slotsUsed >= maxSlots;
+  const isPage = layout === 'page';
 
   if (subAgendas.length === 0) {
     return embedded ? (
@@ -39,11 +46,79 @@ export function SubAgendaPanel({
 
   const introText = `Bu hafta en fazla ${maxSlots} alt gündeme mesaj verebilirsin (temel ${SUB_AGENDA_MAX_SLOTS}${bonusSubAgendaSlots > 0 ? ` + ${bonusSubAgendaSlots} radar bonusu` : ''}). Her mesaj seçildiğinde enerji hemen düşer; tüm gündem tepkileri haftalık enerji tavanıyla sınırlıdır. İki veya daha fazla sert mesaj medyada gürültü yaratır. Boş bırakılan kartlarda rakipler konuşabilir.`;
 
-  const content = (
-    <div
-      id={layout === 'page' ? TUTORIAL_SECTION_IDS['sub-agenda'] : undefined}
-      className={`sub-agenda-panel-body ${layout === 'page' ? 'sub-agenda-panel-body--page' : ''}`}
-    >
+  const cardList = (
+    <div className="sub-agenda-list">
+      {subAgendas.map((agenda) => {
+        const selection = selectionFor(agenda.id);
+        const cardLocked = slotsFull && !Boolean(selection);
+
+        return (
+          <SubAgendaCard
+            key={agenda.id}
+            state={state}
+            agenda={agenda}
+            selection={selection}
+            cardLocked={cardLocked}
+            compact={isPage}
+            onSelectResponse={(responseId) => onSelectResponse(agenda.id, responseId)}
+            onClearResponse={() => onClearResponse(agenda.id)}
+          />
+        );
+      })}
+    </div>
+  );
+
+  const pageContent = (
+    <div className="sub-agenda-page">
+      <div className="sub-agenda-page-main">
+        <section className="sub-agenda-page-intro">
+          <h5 className="agenda-section-title">Bu hafta hangi alt gündemlere mesaj vereceksin?</h5>
+          <p className="sub-agenda-page-intro-text">
+            En fazla <strong>{maxSlots}</strong> alt gündeme mesaj verebilirsin
+            {bonusSubAgendaSlots > 0 ? (
+              <>
+                {' '}
+                (temel {SUB_AGENDA_MAX_SLOTS} + {bonusSubAgendaSlots} bonus)
+              </>
+            ) : null}
+            — seçim anında kaydedilir.
+          </p>
+        </section>
+
+        {cardList}
+
+        <AgendaFlowActionBar
+          hasSelection={slotsUsed > 0}
+          required={false}
+          nextStepLabel={nextStepLabel}
+          onContinue={onContinue}
+          emptyMessage="İsteğe bağlı — alt gündem kartlarından mesaj seçebilir veya doğrudan devam edebilirsin."
+          savedMessage={`${slotsUsed} mesaj kaydedildi`}
+          savedDetail="Başka kartlarla değiştirebilir veya sonraki adıma geçebilirsin."
+        />
+
+        {slotsUsed > 0 ? (
+          <button
+            type="button"
+            className="sub-agenda-clear-btn sub-agenda-clear-btn--inline"
+            onClick={() => onClearResponse()}
+          >
+            Tüm alt gündem seçimlerini temizle
+          </button>
+        ) : null}
+      </div>
+
+      <SubAgendaSummaryAside
+        state={state}
+        slotsUsed={slotsUsed}
+        maxSlots={maxSlots}
+        bonusSlots={bonusSubAgendaSlots}
+      />
+    </div>
+  );
+
+  const embeddedContent = (
+    <div className="sub-agenda-panel-body">
       <div className="sub-agenda-toolbar">
         <h3 className="sub-agenda-toolbar-title">Alt Gündemler</h3>
         <div className="sub-agenda-slot-meter" aria-label={`Mesaj slotu ${slotsUsed} / ${maxSlots}`}>
@@ -57,27 +132,9 @@ export function SubAgendaPanel({
         </div>
       </div>
 
-      {layout !== 'page' ? <p className="sub-agenda-intro">{introText}</p> : null}
+      <p className="sub-agenda-intro">{introText}</p>
 
-      <div className="sub-agenda-list">
-        {subAgendas.map((agenda) => {
-          const selection = selectionFor(agenda.id);
-          const isActiveCard = Boolean(selection);
-          const cardLocked = slotsFull && !isActiveCard;
-
-          return (
-            <SubAgendaCard
-              key={agenda.id}
-              state={state}
-              agenda={agenda}
-              selection={selection}
-              cardLocked={cardLocked}
-              onSelectResponse={(responseId) => onSelectResponse(agenda.id, responseId)}
-              onClearResponse={() => onClearResponse(agenda.id)}
-            />
-          );
-        })}
-      </div>
+      {cardList}
 
       <footer className="sub-agenda-footer">
         {slotsUsed > 0 ? (
@@ -92,6 +149,8 @@ export function SubAgendaPanel({
       </footer>
     </div>
   );
+
+  const content = isPage ? pageContent : embeddedContent;
 
   if (embedded) {
     return content;

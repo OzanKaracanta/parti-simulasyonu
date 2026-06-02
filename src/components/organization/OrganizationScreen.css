@@ -1,31 +1,41 @@
 .org-page-header {
   grid-column: 1 / -1;
-  padding: 14px 18px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
   border-radius: var(--ps-radius-lg);
   border: 1px solid var(--ps-border-strong);
   background: linear-gradient(180deg, var(--ps-bg-panel-top) 0%, var(--ps-bg-panel) 100%);
   box-shadow: var(--ps-shadow-card);
 }
 
+.org-page-heading {
+  flex: 1;
+  min-width: 0;
+}
+
 .org-page-kicker {
+  flex-shrink: 0;
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--ps-info);
+  padding-top: 3px;
 }
 
 .org-page-title-row {
   display: flex;
   align-items: baseline;
   flex-wrap: wrap;
-  gap: 8px 12px;
-  margin-top: 4px;
+  gap: 6px 10px;
 }
 
 .org-page-title {
   margin: 0;
-  font-size: 20px;
+  font-size: 17px;
   font-weight: 800;
   letter-spacing: -0.02em;
   color: var(--ps-text);
@@ -36,9 +46,9 @@
 }
 
 .org-page-subtitle {
-  margin: 6px 0 0;
+  margin: 2px 0 0;
   font-size: 11px;
-  line-height: 1.45;
+  line-height: 1.35;
   color: var(--ps-text-muted);
 }
 

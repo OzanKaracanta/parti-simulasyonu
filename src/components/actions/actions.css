@@ -2,9 +2,9 @@
 
 .action-list-header-extra {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 4px;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
 }
 
 .action-list-panel .fm-panel-body,
@@ -20,12 +20,6 @@
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 10px;
   padding: 12px;
-  max-height: calc(100vh - 340px);
-  overflow-y: auto;
-}
-
-.campaign-layout .operation-cards-grid {
-  max-height: calc(100vh - 200px);
 }
 
 /* Bölgesel kampanyalar — 3 sütunlu kompakt kartlar */
@@ -269,8 +263,6 @@
 
 .action-table-wrap {
   overflow-x: auto;
-  max-height: calc(100vh - 220px);
-  overflow-y: auto;
 }
 
 /* Fixed column layout — headers align with cells */

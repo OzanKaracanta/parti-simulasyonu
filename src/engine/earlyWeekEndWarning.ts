@@ -1,53 +1,52 @@
-/** 6–10. hafta — hafta bitirmeden önce eksik aktivite uyarısı (öğretici turları 1–5 hariç) */
+/** Tur sonu — eksik aktivite tespiti (danışman brifingi) */
 
 import type { GameState } from '../types/game';
 
-export const EARLY_WEEK_END_WARNING_MIN_WEEK = 6;
-export const EARLY_WEEK_END_WARNING_MAX_WEEK = 10;
+export type MissedTurnActivityId =
+  | 'sub_agenda'
+  | 'regional_agenda'
+  | 'field_ops'
+  | 'organization';
 
-export type EarlyWeekMissingActivityId = 'sub_agenda' | 'field_ops' | 'organization';
-
-export interface EarlyWeekMissingActivity {
-  id: EarlyWeekMissingActivityId;
-  label: string;
-}
-
-const MISSING_ACTIVITY_LABELS: Record<EarlyWeekMissingActivityId, string> = {
-  sub_agenda: "Alt Gündemler'e cevap verilmedi.",
-  field_ops: 'Herhangi bir saha operasyonu yürütülmedi.',
-  organization: 'Herhangi bir teşkilat kurulmadı ya da yükseltilmedi.',
+const ADVISOR_ADVICE_BY_ACTIVITY: Record<MissedTurnActivityId, string> = {
+  field_ops:
+    'Önceki turda saha operasyonu seçmediniz — önümüzdeki turda kampanyaya en az bir hareket eklemenizi öneririm.',
+  sub_agenda:
+    'Alt gündemlere yanıt vermediniz — segment mesajınız boş kaldı; önümüzdeki turda en az bir slota mesaj düşünün.',
+  regional_agenda:
+    'Bölgesel gündem sorularına cevap vermediniz — yerel taban için Gündemler → Bölgesel sayfasına bakmanızı öneririm.',
+  organization:
+    'Teşkilatta kurulum veya yükseltme yapmadınız — önümüzdeki turda Teşkilatını yönet adımından bir yatırım planlayın.',
 };
 
-export function isEarlyWeekEndWarningActive(state: GameState): boolean {
-  return (
-    state.status === 'playing' &&
-    state.campaignWeek >= EARLY_WEEK_END_WARNING_MIN_WEEK &&
-    state.campaignWeek <= EARLY_WEEK_END_WARNING_MAX_WEEK
-  );
-}
-
-export function getEarlyWeekMissingActivities(state: GameState): EarlyWeekMissingActivity[] {
-  if (!isEarlyWeekEndWarningActive(state)) return [];
-
-  const missing: EarlyWeekMissingActivity[] = [];
+/** Biten turda yapılmayan isteğe bağlı / önemli aktiviteler */
+export function getMissedTurnActivities(state: GameState): MissedTurnActivityId[] {
+  const missing: MissedTurnActivityId[] = [];
 
   if (state.subAgendas.length > 0 && state.selectedSubAgendaSelections.length === 0) {
-    missing.push({ id: 'sub_agenda', label: MISSING_ACTIVITY_LABELS.sub_agenda });
+    missing.push('sub_agenda');
+  }
+
+  if (
+    state.regionalAgendas.length > 0 &&
+    state.selectedRegionalAgendaSelections.length === 0
+  ) {
+    missing.push('regional_agenda');
   }
 
   if (state.selectedActionIds.length === 0) {
-    missing.push({ id: 'field_ops', label: MISSING_ACTIVITY_LABELS.field_ops });
+    missing.push('field_ops');
   }
 
   if (!state.weekOrganizationChanged) {
-    missing.push({ id: 'organization', label: MISSING_ACTIVITY_LABELS.organization });
+    missing.push('organization');
   }
 
   return missing;
 }
 
-export function shouldShowEarlyWeekEndWarning(state: GameState): boolean {
-  return getEarlyWeekMissingActivities(state).length > 0;
+export function buildAdvisorAdviceNotes(state: GameState): string[] {
+  return getMissedTurnActivities(state).map((id) => ADVISOR_ADVICE_BY_ACTIVITY[id]);
 }
 
 export function markWeekOrganizationChanged(state: GameState): GameState {

@@ -18,6 +18,7 @@ interface SubAgendaCardProps {
   agenda: SubAgendaItem;
   selection: SubAgendaSelection | undefined;
   cardLocked: boolean;
+  compact?: boolean;
   onSelectResponse: (responseId: string) => void;
   onClearResponse: () => void;
 }
@@ -27,14 +28,28 @@ export function SubAgendaCard({
   agenda,
   selection,
   cardLocked,
+  compact = false,
   onSelectResponse,
   onClearResponse,
 }: SubAgendaCardProps) {
   const isActive = Boolean(selection);
 
+  const segmentImpact = (
+    <AgendaSegmentImpact
+      reactionAxis={agenda.reactionAxis}
+      primarySegments={agenda.primarySegments}
+      tensionSegments={agenda.tensionSegments}
+      primaryPoliticalSegments={agenda.primaryPoliticalSegments}
+      tensionPoliticalSegments={agenda.tensionPoliticalSegments}
+      tensionRationale={agenda.tensionRationale}
+      politicalRationale={agenda.politicalRationale}
+      variant="sub"
+    />
+  );
+
   return (
     <article
-      className={`sub-agenda-card type-${agenda.type} ${isActive ? 'is-active' : ''} ${cardLocked ? 'is-locked' : ''}`}
+      className={`sub-agenda-card type-${agenda.type} ${isActive ? 'is-active' : ''} ${cardLocked ? 'is-locked' : ''}${compact ? ' is-compact' : ''}`}
     >
       <header className="sub-agenda-card-top">
         <div className="sub-agenda-card-top-row">
@@ -43,28 +58,30 @@ export function SubAgendaCard({
               {weeklyEventTypeLabels[agenda.type]}
             </span>
             <ReactionAxisBadge axis={agenda.reactionAxis} compact />
-            <span className="sub-agenda-topic-pill">
-              {policyTopicLabels[agenda.policyTopic]}
-            </span>
+            {!compact ? (
+              <span className="sub-agenda-topic-pill">
+                {policyTopicLabels[agenda.policyTopic]}
+              </span>
+            ) : null}
           </div>
-          <span className={`sub-agenda-status ${isActive ? 'answered' : cardLocked ? 'locked' : 'open'}`}>
-            {isActive ? 'Mesaj seçildi' : cardLocked ? 'Slot dolu' : 'Boş'}
+          <span
+            className={`sub-agenda-status ${isActive ? 'answered' : cardLocked ? 'locked' : 'open'}`}
+          >
+            {isActive && compact ? 'Mesaj kaydedildi' : isActive ? 'Mesaj seçildi' : cardLocked ? 'Slot dolu' : 'Boş'}
           </span>
         </div>
 
         <h4 className="sub-agenda-card-title">{agenda.title}</h4>
         <p className="sub-agenda-card-desc">{agenda.description}</p>
 
-        <AgendaSegmentImpact
-          reactionAxis={agenda.reactionAxis}
-          primarySegments={agenda.primarySegments}
-          tensionSegments={agenda.tensionSegments}
-          primaryPoliticalSegments={agenda.primaryPoliticalSegments}
-          tensionPoliticalSegments={agenda.tensionPoliticalSegments}
-          tensionRationale={agenda.tensionRationale}
-          politicalRationale={agenda.politicalRationale}
-          variant="sub"
-        />
+        {compact ? (
+          <details className="sub-agenda-impact-details">
+            <summary className="sub-agenda-impact-toggle">Kimleri etkiler?</summary>
+            {segmentImpact}
+          </details>
+        ) : (
+          segmentImpact
+        )}
       </header>
 
       {cardLocked ? (

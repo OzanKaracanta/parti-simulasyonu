@@ -1,4 +1,5 @@
-.weekly-budget-panel .fm-panel-body {
+.weekly-budget-panel .fm-panel-body,
+.weekly-budget-panel-body {
   display: flex;
   flex-direction: column;
   gap: 10px;

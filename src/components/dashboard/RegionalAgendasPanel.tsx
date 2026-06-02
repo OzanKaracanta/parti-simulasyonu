@@ -9,7 +9,9 @@ import {
 } from '../../engine/regionalAgendaAccess';
 import type { GameState } from '../../types/game';
 import { Panel } from '../ui/Panel';
+import { AgendaFlowActionBar } from './agenda/AgendaFlowActionBar';
 import { RegionalAgendaCard } from './RegionalAgendaCard';
+import { RegionalAgendaSummaryAside } from './RegionalAgendaSummaryAside';
 import './RegionalAgendaPanel.css';
 import './agenda/weeklyAgenda.css';
 
@@ -22,6 +24,7 @@ interface RegionalAgendasPanelProps {
   focusAgendaId?: string | null;
   onFocusApplied?: () => void;
   onGoToSub?: () => void;
+  nextStepLabel?: string;
 }
 
 export function RegionalAgendasPanel({
@@ -33,11 +36,13 @@ export function RegionalAgendasPanel({
   focusAgendaId = null,
   onFocusApplied,
   onGoToSub,
+  nextStepLabel = 'Sonraki adım →',
 }: RegionalAgendasPanelProps) {
   const { regionalAgendas, selectedRegionalAgendaSelections } = state;
   const maxSlots = getRegionalAgendaMaxSlots(state.campaignWeek);
   const slotsUsed = selectedRegionalAgendaSelections.length;
   const slotsFull = slotsUsed >= maxSlots;
+  const isPage = layout === 'page';
 
   useEffect(() => {
     if (!focusAgendaId) return;
@@ -61,10 +66,71 @@ export function RegionalAgendasPanel({
   const selectionFor = (agendaId: string) =>
     selectedRegionalAgendaSelections.find((item) => item.agendaId === agendaId);
 
-  const content = (
-    <div
-      className={`regional-agenda-panel-body ${layout === 'page' ? 'regional-agenda-panel-body--page' : ''}`}
-    >
+  const cardList = (
+    <div className="regional-agenda-list">
+      {regionalAgendas.map((agenda) => {
+        const selection = selectionFor(agenda.id);
+        const isActiveCard = Boolean(selection);
+        const canRespond = canRespondToRegionalAgenda(state, agenda.regionId);
+        const accessReason = getRegionalAgendaAccessReason(state, agenda.regionId);
+        const cardLocked = canRespond && slotsFull && !isActiveCard;
+
+        return (
+          <RegionalAgendaCard
+            key={agenda.id}
+            state={state}
+            agenda={agenda}
+            selection={selection}
+            cardLocked={cardLocked}
+            accessReason={canRespond ? null : accessReason}
+            compact={isPage}
+            onSelectResponse={(responseId) => onSelectResponse(agenda.id, responseId)}
+            onClearResponse={() => onClearResponse(agenda.id)}
+          />
+        );
+      })}
+    </div>
+  );
+
+  const pageContent = (
+    <div className="regional-agenda-page">
+      <div className="regional-agenda-page-main">
+        <section className="regional-agenda-page-intro">
+          <h5 className="agenda-section-title">Bu hafta hangi bölgelere mesaj vereceksin?</h5>
+          <p className="regional-agenda-page-intro-text">
+            En fazla <strong>{maxSlots}</strong> bölgeye mesaj verebilirsin — seçim anında kaydedilir.
+          </p>
+        </section>
+
+        {cardList}
+
+        <AgendaFlowActionBar
+          hasSelection={slotsUsed > 0}
+          required={false}
+          nextStepLabel={nextStepLabel}
+          onContinue={onGoToSub}
+          emptyMessage="İsteğe bağlı — bölge kartlarından mesaj seçebilir veya doğrudan devam edebilirsin."
+          savedMessage={`${slotsUsed} mesaj kaydedildi`}
+          savedDetail="Başka bölgelerle değiştirebilir veya sonraki adıma geçebilirsin."
+        />
+
+        {slotsUsed > 0 ? (
+          <button
+            type="button"
+            className="regional-agenda-clear-btn regional-agenda-clear-btn--inline"
+            onClick={() => onClearResponse()}
+          >
+            Tüm bölgesel seçimleri temizle
+          </button>
+        ) : null}
+      </div>
+
+      <RegionalAgendaSummaryAside state={state} slotsUsed={slotsUsed} maxSlots={maxSlots} />
+    </div>
+  );
+
+  const embeddedContent = (
+    <div className="regional-agenda-panel-body">
       <div className="regional-agenda-toolbar">
         <h3 className="regional-agenda-toolbar-title">Bölgesel Gündemler</h3>
         <div
@@ -78,28 +144,7 @@ export function RegionalAgendasPanel({
         </div>
       </div>
 
-      <div className="regional-agenda-list">
-        {regionalAgendas.map((agenda) => {
-          const selection = selectionFor(agenda.id);
-          const isActiveCard = Boolean(selection);
-          const canRespond = canRespondToRegionalAgenda(state, agenda.regionId);
-          const accessReason = getRegionalAgendaAccessReason(state, agenda.regionId);
-          const cardLocked = canRespond && slotsFull && !isActiveCard;
-
-          return (
-            <RegionalAgendaCard
-              key={agenda.id}
-              state={state}
-              agenda={agenda}
-              selection={selection}
-              cardLocked={cardLocked}
-              accessReason={canRespond ? null : accessReason}
-              onSelectResponse={(responseId) => onSelectResponse(agenda.id, responseId)}
-              onClearResponse={() => onClearResponse(agenda.id)}
-            />
-          );
-        })}
-      </div>
+      {cardList}
 
       <footer className="regional-agenda-footer">
         {onGoToSub ? (
@@ -119,6 +164,8 @@ export function RegionalAgendasPanel({
       </footer>
     </div>
   );
+
+  const content = isPage ? pageContent : embeddedContent;
 
   if (embedded) {
     return content;

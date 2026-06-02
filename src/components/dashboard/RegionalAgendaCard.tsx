@@ -22,6 +22,7 @@ interface RegionalAgendaCardProps {
   selection: SubAgendaSelection | undefined;
   cardLocked: boolean;
   accessReason: string | null;
+  compact?: boolean;
   onSelectResponse: (responseId: string) => void;
   onClearResponse: () => void;
 }
@@ -32,6 +33,7 @@ export function RegionalAgendaCard({
   selection,
   cardLocked,
   accessReason,
+  compact = false,
   onSelectResponse,
   onClearResponse,
 }: RegionalAgendaCardProps) {
@@ -57,10 +59,23 @@ export function RegionalAgendaCard({
         : 'open'
     : 'locked';
 
+  const segmentImpact = (
+    <AgendaSegmentImpact
+      reactionAxis={agenda.reactionAxis}
+      primarySegments={agenda.primarySegments}
+      tensionSegments={agenda.tensionSegments}
+      primaryPoliticalSegments={agenda.primaryPoliticalSegments}
+      tensionPoliticalSegments={agenda.tensionPoliticalSegments}
+      tensionRationale={agenda.tensionRationale}
+      politicalRationale={agenda.politicalRationale}
+      variant="sub"
+    />
+  );
+
   return (
     <article
       id={getAgendaFocusElementId(agenda.id)}
-      className={`regional-agenda-card-module type-${agenda.type} ${isActive ? 'is-active' : ''} ${cardLocked || accessReason ? 'is-locked' : ''}`}
+      className={`regional-agenda-card-module type-${agenda.type} ${isActive ? 'is-active' : ''} ${cardLocked || accessReason ? 'is-locked' : ''}${compact ? ' is-compact' : ''}`}
     >
       <header className="regional-agenda-card-top">
         <div className="regional-agenda-card-top-row">
@@ -70,30 +85,32 @@ export function RegionalAgendaCard({
               {weeklyEventTypeLabels[agenda.type]}
             </span>
             <ReactionAxisBadge axis={agenda.reactionAxis} compact />
-            <span className="regional-agenda-topic-pill">
-              {policyTopicLabels[agenda.policyTopic]}
-            </span>
+            {!compact ? (
+              <span className="regional-agenda-topic-pill">
+                {policyTopicLabels[agenda.policyTopic]}
+              </span>
+            ) : null}
           </div>
-          <span className={`regional-agenda-status ${statusClass}`}>{statusLabel}</span>
+          <span className={`regional-agenda-status ${statusClass}`}>
+            {isActive && compact ? 'Mesaj kaydedildi' : statusLabel}
+          </span>
         </div>
 
         <h4 className="regional-agenda-card-title">{agenda.title}</h4>
         <p className="regional-agenda-card-desc">{agenda.description}</p>
 
-        {agenda.storyHint ? (
+        {!compact && agenda.storyHint ? (
           <p className="regional-agenda-story-hint">{agenda.storyHint}</p>
         ) : null}
 
-        <AgendaSegmentImpact
-          reactionAxis={agenda.reactionAxis}
-          primarySegments={agenda.primarySegments}
-          tensionSegments={agenda.tensionSegments}
-          primaryPoliticalSegments={agenda.primaryPoliticalSegments}
-          tensionPoliticalSegments={agenda.tensionPoliticalSegments}
-          tensionRationale={agenda.tensionRationale}
-          politicalRationale={agenda.politicalRationale}
-          variant="sub"
-        />
+        {compact ? (
+          <details className="regional-agenda-impact-details">
+            <summary className="regional-agenda-impact-toggle">Kimleri etkiler?</summary>
+            {segmentImpact}
+          </details>
+        ) : (
+          segmentImpact
+        )}
       </header>
 
       {isActive && selectedOption ? (

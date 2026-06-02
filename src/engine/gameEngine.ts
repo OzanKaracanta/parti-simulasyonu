@@ -38,7 +38,6 @@ import { getRegionalAgendaMaxSlots } from '../data/regionalAgendaConfig';
 import { canRespondToRegionalAgenda, getRegionalAgendaAccessReason } from './regionalAgendaAccess';
 import { getEffectiveSubAgendaMaxSlots } from './subAgendaSlots';
 import { buildAdvisorBriefing } from './advisorEngine';
-import { TUTORIAL_LAST_WEEK } from '../tutorial/tutorialSteps';
 import { buildWeeklyHistoryItem } from './weeklyReport';
 import {
   buildWeekBacklashContext,
@@ -744,14 +743,16 @@ export function finishWeek(state: GameState): GameState {
     history: [...weekState.history, weeklyReport],
   };
 
-  const advisorBriefing = buildAdvisorBriefing(weeklyReport, nextState, { isFinalWeek });
-  const showAdvisorBriefing =
-    isFinalWeek || nextState.campaignWeek > TUTORIAL_LAST_WEEK;
-
+  const advisorBriefing = buildAdvisorBriefing(
+    weeklyReport,
+    weekState,
+    nextState,
+    { isFinalWeek },
+  );
   if (isFinalWeek) {
     return {
       ...nextState,
-      activeAdvisorBriefing: showAdvisorBriefing ? advisorBriefing : null,
+      activeAdvisorBriefing: advisorBriefing,
       activeWeekBacklash: null,
       finalResult: calculateFinalResult(nextState),
     };
@@ -759,7 +760,7 @@ export function finishWeek(state: GameState): GameState {
 
   return {
     ...nextState,
-    activeAdvisorBriefing: showAdvisorBriefing ? advisorBriefing : null,
+    activeAdvisorBriefing: advisorBriefing,
     activeWeekBacklash: null,
   };
 }

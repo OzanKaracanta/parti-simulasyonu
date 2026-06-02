@@ -497,35 +497,10 @@ export interface WeeklyHistoryItem {
   weekBacklash: WeekBacklashItem | null;
 }
 
-export type AdvisorBriefingBulletKind =
-  | 'support'
-  | 'agenda'
-  | 'segments'
-  | 'resources'
-  | 'rivals'
-  | 'outlook'
-  | 'insight';
-
-export type AdvisorBriefingTone = 'neutral' | 'positive' | 'negative';
-
-export interface AdvisorBriefingTextSegment {
-  text: string;
-  tone?: AdvisorBriefingTone;
-}
-
-export interface AdvisorBriefingBullet {
-  kind: AdvisorBriefingBulletKind;
+export interface AdvisorBriefingSegmentMove {
+  segmentId: SegmentId;
   label: string;
-  text: string;
-  segments: AdvisorBriefingTextSegment[];
-  severity?: 'neutral' | 'positive' | 'warning' | 'critical';
-}
-
-export interface AdvisorBriefingBacklashNote {
-  headline: string;
-  body: string;
-  effectSummary: string;
-  effectSegments: AdvisorBriefingTextSegment[];
+  change: number;
 }
 
 /** Hafta geçişinde zorunlu danışman brifingi — DISMISS_ADVISOR_BRIEFING ile kapanır */
@@ -537,8 +512,12 @@ export interface AdvisorBriefingItem {
   advisorTitle: string;
   headline: string;
   openingLine: string;
-  bullets: AdvisorBriefingBullet[];
-  backlashNote?: AdvisorBriefingBacklashNote;
+  supportBefore: number;
+  supportAfter: number;
+  supportChange: number;
+  topGain: AdvisorBriefingSegmentMove | null;
+  topLoss: AdvisorBriefingSegmentMove | null;
+  adviceNotes: string[];
   closingLine: string;
   isFinalWeek: boolean;
 }

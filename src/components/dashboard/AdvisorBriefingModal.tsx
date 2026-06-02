@@ -1,5 +1,4 @@
-import { splitAdvisorBriefingBullets } from '../../engine/advisorEngine';
-import type { AdvisorBriefingBullet, AdvisorBriefingItem, AdvisorBriefingTextSegment } from '../../types/game';
+import type { AdvisorBriefingItem } from '../../types/game';
 import './AdvisorBriefingModal.css';
 
 interface AdvisorBriefingModalProps {
@@ -7,71 +6,28 @@ interface AdvisorBriefingModalProps {
   onDismiss: () => void;
 }
 
-const BULLET_ICONS: Record<AdvisorBriefingBullet['kind'], string> = {
-  support: '◆',
-  agenda: '◉',
-  segments: '▣',
-  resources: '⚡',
-  rivals: '⚠',
-  outlook: '→',
-  insight: '✦',
-};
-
-function toneClass(tone: AdvisorBriefingTextSegment['tone']): string {
-  switch (tone) {
-    case 'positive':
-      return 'advisor-briefing-tone--positive';
-    case 'negative':
-      return 'advisor-briefing-tone--negative';
-    default:
-      return '';
-  }
+function formatSupportDelta(change: number): string {
+  const rounded = Math.round(change * 10) / 10;
+  if (rounded > 0) return `+${rounded.toFixed(1)}`;
+  if (rounded < 0) return rounded.toFixed(1);
+  return '0';
 }
 
-function renderSegments(segments: AdvisorBriefingTextSegment[]) {
-  return segments.map((segment, index) => (
-    <span className={toneClass(segment.tone)} key={`${index}-${segment.text.slice(0, 12)}`}>
-      {segment.text}
-    </span>
-  ));
+function formatSegmentDelta(change: number): string {
+  const rounded = Math.round(change * 10) / 10;
+  if (rounded > 0) return `+${rounded.toFixed(1)}`;
+  return rounded.toFixed(1);
 }
 
-function severityClass(severity: AdvisorBriefingBullet['severity']): string {
-  switch (severity) {
-    case 'positive':
-      return 'advisor-briefing-bullet--positive';
-    case 'warning':
-      return 'advisor-briefing-bullet--warning';
-    case 'critical':
-      return 'advisor-briefing-bullet--critical';
-    default:
-      return '';
-  }
-}
-
-function AdvisorBulletCard({ bullet, featured = false }: { bullet: AdvisorBriefingBullet; featured?: boolean }) {
-  return (
-    <li
-      className={`advisor-briefing-bullet ${severityClass(bullet.severity)} ${
-        featured ? 'advisor-briefing-bullet--featured' : ''
-      }`}
-    >
-      <div className="advisor-briefing-bullet-head">
-        <span className="advisor-briefing-bullet-icon" aria-hidden>
-          {BULLET_ICONS[bullet.kind]}
-        </span>
-        <span className="advisor-briefing-bullet-label">{bullet.label}</span>
-      </div>
-      <p className="advisor-briefing-bullet-text">{renderSegments(bullet.segments)}</p>
-    </li>
-  );
+function supportChangeTone(change: number): 'positive' | 'negative' | 'neutral' {
+  if (change > 0) return 'positive';
+  if (change < 0) return 'negative';
+  return 'neutral';
 }
 
 export function AdvisorBriefingModal({ briefing, onDismiss }: AdvisorBriefingModalProps) {
   const dismissLabel = briefing.isFinalWeek ? 'Sonuçları gör »' : 'Yeni haftaya devam »';
-  const { overviewBullets, politicalBullets } = splitAdvisorBriefingBullets(briefing.bullets);
-  const supportBullet = politicalBullets.find((item) => item.kind === 'support');
-  const rivalBullets = politicalBullets.filter((item) => item.kind === 'rivals');
+  const changeTone = supportChangeTone(briefing.supportChange);
 
   return (
     <div className="advisor-briefing-overlay" role="presentation">
@@ -98,65 +54,87 @@ export function AdvisorBriefingModal({ briefing, onDismiss }: AdvisorBriefingMod
             </button>
           </div>
 
-          <div className="advisor-briefing-header-main">
-            <div className="advisor-briefing-identity">
-              <span className="advisor-briefing-avatar" aria-hidden>
-                ◈
-              </span>
-              <div>
-                <p className="advisor-briefing-name">{briefing.advisorName}</p>
-                <p className="advisor-briefing-role">{briefing.advisorTitle}</p>
-              </div>
+          <div className="advisor-briefing-identity-row">
+            <span className="advisor-briefing-avatar" aria-hidden>
+              ◈
+            </span>
+            <div>
+              <p className="advisor-briefing-name">{briefing.advisorName}</p>
+              <p className="advisor-briefing-role">{briefing.advisorTitle}</p>
             </div>
-            <h2 id="advisor-briefing-title">{briefing.headline}</h2>
+            <h2 id="advisor-briefing-title" className="advisor-briefing-title">
+              {briefing.headline}
+            </h2>
           </div>
         </header>
 
         <div className="advisor-briefing-body">
           <p className="advisor-briefing-opening">{briefing.openingLine}</p>
 
-          <div className="advisor-briefing-columns">
-            <div className="advisor-briefing-overview-column">
-              {overviewBullets.length > 0 ? (
-                <ul className="advisor-briefing-list advisor-briefing-list--overview">
-                  {overviewBullets.map((bullet) => (
-                    <AdvisorBulletCard bullet={bullet} key={`${bullet.kind}-${bullet.label}`} />
-                  ))}
-                </ul>
-              ) : (
-                <p className="advisor-briefing-empty-note">
-                  Bu turda öne çıkan ek başlık yok; siyasi tablo sağ sütunda.
-                </p>
-              )}
+          <section className="advisor-briefing-support" aria-label="Ulusal destek">
+            <span className="advisor-briefing-stat-label">Ulusal destek</span>
+            <div className="advisor-briefing-support-values">
+              <span className="advisor-briefing-support-before">
+                {briefing.supportBefore.toFixed(1)}%
+              </span>
+              <span className="advisor-briefing-support-arrow" aria-hidden>
+                →
+              </span>
+              <span className={`advisor-briefing-support-after is-${changeTone}`}>
+                {briefing.supportAfter.toFixed(1)}%
+              </span>
+              <span className={`advisor-briefing-support-delta is-${changeTone}`}>
+                ({formatSupportDelta(briefing.supportChange)})
+              </span>
             </div>
+          </section>
 
-            <div className="advisor-briefing-political-column">
-              <ul className="advisor-briefing-list advisor-briefing-list--political">
-                {supportBullet ? <AdvisorBulletCard bullet={supportBullet} featured /> : null}
-                {rivalBullets.map((bullet) => (
-                  <AdvisorBulletCard bullet={bullet} key={`${bullet.kind}-${bullet.label}`} />
+          <div className="advisor-briefing-segments">
+            <section
+              className="advisor-briefing-segment-card advisor-briefing-segment-card--gain"
+              aria-label="En çok kazanç"
+            >
+              <span className="advisor-briefing-stat-label">En çok kazanç</span>
+              {briefing.topGain ? (
+                <>
+                  <span className="advisor-briefing-segment-name">{briefing.topGain.label}</span>
+                  <span className="advisor-briefing-segment-delta positive">
+                    {formatSegmentDelta(briefing.topGain.change)} puan
+                  </span>
+                </>
+              ) : (
+                <span className="advisor-briefing-segment-empty">Bu turda belirgin kazanç yok</span>
+              )}
+            </section>
+
+            <section
+              className="advisor-briefing-segment-card advisor-briefing-segment-card--loss"
+              aria-label="En çok kayıp"
+            >
+              <span className="advisor-briefing-stat-label">En çok kayıp</span>
+              {briefing.topLoss ? (
+                <>
+                  <span className="advisor-briefing-segment-name">{briefing.topLoss.label}</span>
+                  <span className="advisor-briefing-segment-delta negative">
+                    {formatSegmentDelta(briefing.topLoss.change)} puan
+                  </span>
+                </>
+              ) : (
+                <span className="advisor-briefing-segment-empty">Bu turda belirgin kayıp yok</span>
+              )}
+            </section>
+          </div>
+
+          {briefing.adviceNotes.length > 0 ? (
+            <section className="advisor-briefing-advice" aria-label="Danışman notu">
+              <h3 className="advisor-briefing-advice-title">Danışman notu</h3>
+              <ul className="advisor-briefing-advice-list">
+                {briefing.adviceNotes.map((note) => (
+                  <li key={note}>{note}</li>
                 ))}
               </ul>
-
-              {briefing.backlashNote ? (
-                <section className="advisor-briefing-backlash" aria-label="Gölge yankı">
-                  <div className="advisor-briefing-backlash-head">
-                    <span className="advisor-briefing-backlash-icon" aria-hidden>
-                      ☁
-                    </span>
-                    <span className="advisor-briefing-backlash-kicker">Gölge yankı</span>
-                  </div>
-                  <h3 className="advisor-briefing-backlash-headline">
-                    {briefing.backlashNote.headline}
-                  </h3>
-                  <p className="advisor-briefing-backlash-body">{briefing.backlashNote.body}</p>
-                  <p className="advisor-briefing-backlash-effects">
-                    {renderSegments(briefing.backlashNote.effectSegments)}
-                  </p>
-                </section>
-              ) : null}
-            </div>
-          </div>
+            </section>
+          ) : null}
 
           <p className="advisor-briefing-closing">{briefing.closingLine}</p>
         </div>

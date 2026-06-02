@@ -6,10 +6,7 @@ import { RegionalCampaignsPanel } from './RegionalCampaignsPanel';
 import { RegionSelectorBar } from './RegionSelectorBar';
 import type { GameState, RegionId } from '../../types/game';
 import type { GameAction } from '../../store/gameReducer';
-import { CoordinationMeter } from './CoordinationMeter';
 import './CampaignScreen.css';
-import { TUTORIAL_SECTION_IDS } from '../../tutorial/tutorialScroll';
-
 export type CampaignPageMode = 'national' | 'regional';
 
 const PAGE_TITLES: Record<CampaignPageMode, string> = {
@@ -31,7 +28,6 @@ interface CampaignScreenProps {
   onSelectAction: (actionId: string) => void;
   onUnselectAction: (actionId: string) => void;
   dispatch: Dispatch<GameAction>;
-  showTutorialCostBreakdown?: boolean;
 }
 
 export function CampaignScreen({
@@ -43,20 +39,19 @@ export function CampaignScreen({
   onSelectAction,
   onUnselectAction,
   dispatch,
-  showTutorialCostBreakdown = false,
 }: CampaignScreenProps) {
   return (
     <div className={`campaign-page campaign-page--${mode}`}>
       <header className="campaign-page-header">
+        <div className="campaign-page-heading">
+          <h2 className="campaign-page-title">{PAGE_TITLES[mode]}</h2>
+          <p className="campaign-page-subtitle">{PAGE_HINTS[mode]}</p>
+        </div>
         <span className="campaign-page-kicker">Hafta {state.campaignWeek}</span>
-        <h2 className="campaign-page-title">{PAGE_TITLES[mode]}</h2>
-        <p className="campaign-page-subtitle">{PAGE_HINTS[mode]}</p>
-        <CoordinationMeter state={state} className="campaign-page-coordination" />
       </header>
 
       <div className="campaign-layout campaign-layout-single">
         <section
-          id={mode === 'national' ? TUTORIAL_SECTION_IDS['campaign-operations'] : undefined}
           className="campaign-operations-column"
           aria-label={PAGE_TITLES[mode]}
         >
@@ -65,7 +60,6 @@ export function CampaignScreen({
               state={{ ...state, availableActions: nationalActions }}
               onSelect={onSelectAction}
               onUnselect={onUnselectAction}
-              showCostBreakdown={showTutorialCostBreakdown}
             />
           ) : (
             <>

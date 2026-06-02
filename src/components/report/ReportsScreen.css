@@ -22,10 +22,8 @@
   gap: 8px;
   min-width: 0;
   position: sticky;
-  top: 8px;
+  top: 12px;
   align-self: start;
-  max-height: calc(100vh - 120px);
-  overflow-y: auto;
 }
 
 .reports-history {

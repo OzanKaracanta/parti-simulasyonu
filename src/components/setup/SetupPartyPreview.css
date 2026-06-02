@@ -1,7 +1,5 @@
 .setup-preview {
-  position: sticky;
-  top: var(--ps-space-lg);
-  align-self: start;
+  min-width: 0;
 }
 
 .setup-preview__eyebrow {
@@ -85,7 +83,7 @@
   flex-wrap: wrap;
   gap: 6px;
   margin: 0;
-  padding: 0 var(--ps-space-lg) var(--ps-space-lg);
+  padding: 0 var(--ps-space-lg) var(--ps-space-md);
   list-style: none;
 }
 
@@ -100,9 +98,10 @@
 
 .setup-preview__founding {
   margin: 0;
-  padding: 0 var(--ps-space-lg) var(--ps-space-md);
+  padding: var(--ps-space-md) var(--ps-space-lg) var(--ps-space-lg);
+  border-top: 1px solid var(--ps-border-subtle);
   display: grid;
-  gap: var(--ps-space-sm);
+  gap: var(--ps-space-md);
 }
 
 .setup-preview__founding div {
@@ -123,12 +122,7 @@
   margin: 0;
   font-size: var(--ps-font-body);
   color: var(--ps-text-secondary);
-  line-height: 1.4;
+  line-height: 1.45;
+  overflow-wrap: break-word;
 }
 
-.setup-preview__hint {
-  margin: var(--ps-space-md) 0 0;
-  font-size: var(--ps-font-body);
-  color: var(--ps-text-muted);
-  line-height: 1.4;
-}

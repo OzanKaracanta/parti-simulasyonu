@@ -1,5 +1,81 @@
-.week-flow-panel .fm-panel-body {
-  padding: 10px 12px;
+/* Haftalık plan — komuta merkezinde öne çıkan akış kartı */
+
+.week-flow-panel--featured {
+  border: 1px solid color-mix(in srgb, var(--party-color, var(--ps-agenda)) 45%, var(--ps-border-strong));
+  box-shadow:
+    var(--ps-shadow-card),
+    0 0 0 1px color-mix(in srgb, var(--party-color, var(--ps-agenda)) 12%, transparent),
+    0 8px 28px color-mix(in srgb, var(--party-color, var(--ps-info)) 18%, transparent);
+  background:
+    linear-gradient(
+      165deg,
+      color-mix(in srgb, var(--party-color, var(--ps-agenda)) 14%, var(--ps-bg-panel-top)) 0%,
+      var(--ps-bg-panel) 42%
+    );
+  position: relative;
+  overflow: hidden;
+}
+
+.week-flow-panel--featured::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--party-color, var(--ps-agenda)),
+    transparent
+  );
+  opacity: 0.9;
+}
+
+.week-flow-panel--featured .fm-panel-header {
+  padding: 12px 14px 10px;
+  border-bottom: 1px solid color-mix(in srgb, var(--party-color, var(--ps-agenda)) 22%, var(--ps-border));
+  background: color-mix(in srgb, var(--party-color, var(--ps-agenda)) 6%, var(--ps-bg-panel-header));
+}
+
+.week-flow-panel--featured .fm-panel-header h2 {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ps-text);
+}
+
+.week-flow-panel--featured .fm-panel-body {
+  padding: 12px 14px 14px;
+}
+
+.week-flow-progress-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.5rem;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--party-color, var(--ps-agenda));
+  background: color-mix(in srgb, var(--party-color, var(--ps-agenda)) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--party-color, var(--ps-agenda)) 35%, var(--ps-border));
+}
+
+.week-flow-lead {
+  margin: 0 0 10px;
+  padding: 8px 10px;
+  font-size: 11px;
+  line-height: 1.45;
+  font-weight: 600;
+  color: var(--ps-text-secondary);
+  background: var(--ps-bg-inset);
+  border: 1px solid var(--ps-border-subtle);
+  border-radius: var(--ps-radius-sm);
+  border-left: 3px solid var(--party-color, var(--ps-agenda));
 }
 
 .week-flow-steps {
@@ -8,18 +84,22 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--ps-space-sm);
+  gap: 8px;
 }
 
 .week-flow-step {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 10px;
-  padding: 10px 12px;
+  padding: 11px 12px;
   border-radius: var(--ps-radius-md);
   background: var(--ps-bg-inset);
   border: 1px solid var(--ps-border);
-  box-shadow: var(--ps-shadow-card);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  transition:
+    border-color 0.15s,
+    background 0.15s,
+    box-shadow 0.15s;
 }
 
 .week-flow-step.done {
@@ -27,45 +107,69 @@
   background: var(--ps-opportunity-dim);
 }
 
+.week-flow-step.current {
+  border-color: color-mix(in srgb, var(--party-color, var(--ps-agenda)) 55%, var(--ps-border-strong));
+  background: color-mix(in srgb, var(--party-color, var(--ps-agenda)) 10%, var(--ps-bg-inset));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 0 0 1px color-mix(in srgb, var(--party-color, var(--ps-agenda)) 20%, transparent);
+}
+
 .week-flow-step.active {
-  border-color: var(--ps-agenda-border);
-  background: var(--ps-agenda-dim);
+  border-color: var(--ps-opportunity-border);
+  background: color-mix(in srgb, var(--ps-opportunity) 18%, var(--ps-bg-inset));
 }
 
 .week-flow-index {
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 10px;
-  font-weight: 700;
+  font-weight: 800;
   flex-shrink: 0;
   background: var(--ps-bg-panel);
   color: var(--ps-text-muted);
+  border: 1px solid var(--ps-border);
 }
 
 .week-flow-step.done .week-flow-index {
-  background: var(--ps-opportunity-dim);
-  color: var(--ps-opportunity);
+  background: var(--ps-opportunity);
+  border-color: var(--ps-opportunity-border);
+  color: var(--ps-text-inverse);
+}
+
+.week-flow-step.current .week-flow-index {
+  background: color-mix(in srgb, var(--party-color, var(--ps-agenda)) 85%, #000);
+  border-color: color-mix(in srgb, var(--party-color, var(--ps-agenda)) 60%, var(--ps-border));
+  color: var(--ps-text-inverse);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--party-color, var(--ps-agenda)) 45%, transparent);
 }
 
 .week-flow-step.active .week-flow-index {
-  background: var(--ps-agenda-dim);
-  color: var(--ps-agenda);
+  background: var(--ps-opportunity);
+  border-color: var(--ps-opportunity-border);
+  color: var(--ps-text-inverse);
 }
 
 .week-flow-content {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
   min-width: 0;
+  flex: 1;
 }
 
 .week-flow-label {
-  font-size: var(--ps-font-body);
+  font-size: 12px;
   font-weight: 700;
+  color: var(--ps-text);
+  letter-spacing: 0.01em;
+}
+
+.week-flow-step.current .week-flow-label {
   color: var(--ps-text);
 }
 
@@ -77,54 +181,70 @@
 .week-flow-detail {
   font-size: 10px;
   color: var(--ps-text-dim);
-  line-height: 1.35;
+  line-height: 1.4;
 }
 
 .week-flow-step.done .week-flow-detail {
   color: var(--ps-text-muted);
 }
 
+.week-flow-step.current .week-flow-detail {
+  color: var(--ps-text-secondary);
+}
+
 .week-flow-step.active .week-flow-detail {
-  color: var(--ps-agenda);
+  color: var(--ps-opportunity);
+  font-weight: 600;
 }
 
-.week-flow-tutorial-theme {
-  margin: 0 0 10px;
-  font-size: 11px;
-  color: var(--ps-text-muted);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.week-flow-tutorial-badge {
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  padding: 2px 6px;
-  border-radius: 4px;
-  background: var(--ps-agenda-dim);
-  color: var(--ps-agenda);
-}
-
-.week-flow-step.tutorial-required {
-  border-color: var(--ps-agenda-border);
+.week-flow-step--required:not(.done) {
+  border-color: var(--ps-crisis-border);
+  background: color-mix(in srgb, var(--ps-crisis) 6%, var(--ps-bg-inset));
 }
 
 .week-flow-go-btn {
   flex-shrink: 0;
   align-self: center;
-  padding: 4px 8px;
+  padding: 5px 10px;
   font-size: 10px;
-  font-weight: 600;
-  color: var(--ps-agenda);
-  background: var(--ps-agenda-dim);
-  border: 1px solid var(--ps-agenda-border);
-  border-radius: 6px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--party-color, var(--ps-agenda));
+  background: color-mix(in srgb, var(--party-color, var(--ps-agenda)) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--party-color, var(--ps-agenda)) 40%, var(--ps-border));
+  border-radius: var(--ps-radius-sm);
   cursor: pointer;
+  transition:
+    background 0.12s,
+    border-color 0.12s,
+    transform 0.12s;
 }
 
-.week-flow-step {
-  align-items: center;
+.week-flow-go-btn:hover {
+  background: color-mix(in srgb, var(--party-color, var(--ps-agenda)) 24%, transparent);
+  border-color: color-mix(in srgb, var(--party-color, var(--ps-agenda)) 55%, var(--ps-border-strong));
+  transform: translateY(-1px);
+}
+
+.week-flow-go-btn:focus-visible {
+  outline: 2px solid var(--ps-border-focus);
+  outline-offset: 2px;
+}
+
+.week-flow-step.current .week-flow-go-btn {
+  color: var(--ps-text-inverse);
+  background: color-mix(in srgb, var(--party-color, var(--ps-agenda)) 75%, #1a2436);
+  border-color: color-mix(in srgb, var(--party-color, var(--ps-agenda)) 70%, var(--ps-border-strong));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .week-flow-step,
+  .week-flow-go-btn {
+    transition: none;
+  }
+
+  .week-flow-go-btn:hover {
+    transform: none;
+  }
 }

@@ -7,6 +7,8 @@ interface AgendaResponseCardProps {
   disabled?: boolean;
   disabledReason?: string | null;
   onSelect: () => void;
+  /** Tam sayfa — segment etkilerini yan panelde göster, kartı sıkıştır */
+  compact?: boolean;
 }
 
 function EffectLine({ line }: { line: AgendaResponseDisplay['effects'][number] }) {
@@ -30,6 +32,7 @@ export function AgendaResponseCard({
   disabled = false,
   disabledReason = null,
   onSelect,
+  compact = false,
 }: AgendaResponseCardProps) {
   return (
     <button
@@ -38,12 +41,15 @@ export function AgendaResponseCard({
       aria-checked={selected}
       disabled={disabled}
       title={disabledReason ?? undefined}
-      className={`agenda-response-card stance-${option.stance} ${selected ? 'is-selected' : ''} ${disabled ? 'is-disabled' : ''}`}
+      className={`agenda-response-card stance-${option.stance} ${selected ? 'is-selected' : ''} ${disabled ? 'is-disabled' : ''}${compact ? ' is-compact' : ''}`}
       onClick={onSelect}
     >
       <span className="agenda-response-check" aria-hidden>
         {selected ? '✓' : ''}
       </span>
+      {selected ? (
+        <span className="agenda-response-selected-label">Seçili yanıt</span>
+      ) : null}
       <span className="agenda-response-stance">{option.stanceLabel}</span>
       <span className="agenda-response-title">{option.title}</span>
       <p className="agenda-response-desc">{option.description}</p>
@@ -60,7 +66,7 @@ export function AgendaResponseCard({
         </div>
       ) : null}
 
-      {option.effects.length > 0 ? (
+      {option.effects.length > 0 && !compact ? (
         <ul className="agenda-response-effects">
           {option.effects.map((line) => (
             <EffectLine key={`${option.id}-${line.label}`} line={line} />
@@ -68,9 +74,11 @@ export function AgendaResponseCard({
         </ul>
       ) : null}
 
-      <p className="agenda-response-risk">
-        <span>Risk:</span> {option.risk}
-      </p>
+      {!compact ? (
+        <p className="agenda-response-risk">
+          <span>Risk:</span> {option.risk}
+        </p>
+      ) : null}
     </button>
   );
 }

@@ -93,9 +93,25 @@
   min-height: 0;
 }
 
+.agenda-hub-page-header--compact {
+  padding: 12px 20px 0;
+}
+
+.agenda-hub-page-header--compact .agenda-hub-page-heading {
+  padding-bottom: 10px;
+}
+
+.agenda-hub-page-header--compact .agenda-hub-page-kicker {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  color: var(--ps-text);
+}
+
 /* Ana gündem — tam genişlik */
 .agenda-hub-page .weekly-agenda--page .agenda-summary {
-  padding: 24px 28px 20px;
+  padding: 22px 24px 22px;
   border-bottom: 1px solid var(--ps-border-subtle);
   background:
     radial-gradient(ellipse 60% 80% at 100% 0%, rgba(93, 173, 226, 0.06), transparent 50%),
@@ -114,15 +130,39 @@
     rgba(0, 0, 0, 0.12);
 }
 
+.agenda-hub-page .agenda-summary-headline-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.agenda-hub-page .agenda-summary-headline-row .agenda-summary-title {
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+}
+
 .agenda-hub-page .agenda-summary-title {
-  font-size: 24px;
-  max-width: 900px;
+  font-size: 20px;
+  max-width: none;
 }
 
 .agenda-hub-page .agenda-summary-desc {
-  font-size: 14px;
-  max-width: 820px;
-  line-height: 1.65;
+  font-size: 13px;
+  max-width: none;
+  line-height: 1.55;
+  margin-bottom: 10px;
+}
+
+.agenda-hub-page .agenda-summary-meta {
+  margin-top: 4px;
+}
+
+.agenda-hub-page .agenda-summary-impact-details {
+  margin-top: 2px;
+  margin-bottom: 2px;
 }
 
 .agenda-hub-page .weekly-agenda-body {
@@ -152,24 +192,24 @@
 }
 
 .agenda-hub-page .agenda-decision-section {
-  padding: 24px 28px 28px;
+  padding: 20px 24px 24px;
   border-bottom: none;
   background: transparent;
 }
 
 .agenda-hub-page .agenda-section-title {
-  font-size: 12px;
-  margin-bottom: 16px;
+  font-size: 11px;
+  margin-bottom: 12px;
 }
 
 .agenda-hub-page .agenda-response-grid {
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
 }
 
 .agenda-hub-page .agenda-response-card {
-  min-height: 220px;
-  padding: 18px 18px 16px;
+  min-height: 0;
+  padding: 14px 14px 12px;
 }
 
 .agenda-hub-page .agenda-response-title {
@@ -177,7 +217,50 @@
 }
 
 .agenda-hub-page .agenda-response-desc {
-  font-size: 12px;
+  font-size: 11px;
+}
+
+.agenda-radar-collapsible {
+  margin: 0 20px 16px;
+  border: 1px solid var(--ps-border-subtle);
+  border-radius: var(--ps-radius-md);
+  background: rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.agenda-radar-collapsible-summary {
+  padding: 10px 14px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--ps-text-secondary);
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+
+.agenda-radar-collapsible-summary::-webkit-details-marker {
+  display: none;
+}
+
+.agenda-radar-collapsible-summary::before {
+  content: '▸ ';
+  font-size: 10px;
+  color: var(--ps-text-dim);
+}
+
+.agenda-radar-collapsible[open] .agenda-radar-collapsible-summary::before {
+  content: '▾ ';
+}
+
+.agenda-radar-collapsible .radar-agenda-intro,
+.agenda-radar-collapsible .radar-agenda-list {
+  margin-left: 14px;
+  margin-right: 14px;
+}
+
+.agenda-radar-collapsible .radar-agenda-intro {
+  margin-top: 0;
 }
 
 /* Radar — kart grid */

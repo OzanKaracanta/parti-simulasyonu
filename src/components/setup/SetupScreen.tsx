@@ -123,25 +123,28 @@ export function SetupScreen({ onStart, isLaunching = false }: SetupScreenProps) 
             </p>
           ) : null}
 
-          <footer className="setup-footer">
-            {step > 1 ? (
+          {step > 1 ? (
+            <footer className="setup-footer">
               <Button variant="ghost" onClick={handleBack} disabled={isLaunching}>
                 Geri
               </Button>
-            ) : (
-              <span />
-            )}
+            </footer>
+          ) : null}
+        </div>
+
+        <aside className="setup-aside" aria-label="Önizleme ve ilerleme">
+          <SetupPartyPreview form={form} step={step} />
+          <footer className="setup-aside__footer">
             <Button
               variant={step === 3 ? 'success' : 'primary'}
               onClick={handleNext}
               disabled={isLaunching || (step === 1 && !isStep1Valid(form))}
+              block
             >
               {step === 3 ? 'Kampanyaya Başla' : 'İleri'}
             </Button>
           </footer>
-        </div>
-
-        <SetupPartyPreview form={form} step={step} />
+        </aside>
       </div>
     </div>
   );

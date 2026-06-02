@@ -1,9 +1,9 @@
-/** Tur 1 — kampanya başlangıç özeti */
+/** Yeni kampanya — oyun döngüsü özeti (tur 1) */
 
 import { createPortal } from 'react-dom';
-import './TutorialWeekIntroModal.css';
+import './CampaignStartIntroModal.css';
 
-interface TutorialWeekIntroModalProps {
+interface CampaignStartIntroModalProps {
   partyName: string;
   onDismiss: () => void;
 }
@@ -18,27 +18,39 @@ const LOOP_STEPS = [
     text: 'Operasyonlar sahada iş yapar — seçimde para, enerji ve gönüllü düşer; koordinasyon kotası haftalık planı sınırlar.',
   },
   {
+    title: 'Teşkilat',
+    text: 'Binaları kurar, yükseltir veya bakımını yönetirsin — uzun vadeli güç ve seçim yeterliliği burada.',
+  },
+  {
     title: 'Turu bitir',
     text: 'Kararlar uygulanır, kaynaklar güncellenir, yeni tur başlar.',
   },
 ];
 
-export function TutorialWeekIntroModal({ partyName, onDismiss }: TutorialWeekIntroModalProps) {
+export function CampaignStartIntroModal({
+  partyName,
+  onDismiss,
+}: CampaignStartIntroModalProps) {
   return createPortal(
-    <div className="tutorial-intro-overlay" role="dialog" aria-labelledby="tutorial-intro-title">
-      <div className="tutorial-intro-modal">
-        <span className="tutorial-intro-kicker">Öğretici tur · 1/5</span>
-        <h2 id="tutorial-intro-title">{partyName} — İlk tur</h2>
-        <p className="tutorial-intro-lead">
+    <div
+      className="campaign-intro-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="campaign-intro-title"
+    >
+      <div className="campaign-intro-modal">
+        <span className="campaign-intro-kicker">Kampanya özeti</span>
+        <h2 id="campaign-intro-title">{partyName} — Başlangıç</h2>
+        <p className="campaign-intro-lead">
           52 turluk kampanyada her tur aynı döngüyü oynarsın. Mecliste küçük bir gruptan
           başlıyorsun: ulusal desteğin düşük; merkez bölgenizde Genel Merkez ve İl Bürosu, iki
           komşu bölgede İl Bürosu kurulu. Seçime girmek için dört il bürosu ve en az %15 ulusal
           destek gerekir.
         </p>
-        <ol className="tutorial-intro-steps">
+        <ol className="campaign-intro-steps">
           {LOOP_STEPS.map((step, index) => (
             <li key={step.title}>
-              <span className="tutorial-intro-index">{index + 1}</span>
+              <span className="campaign-intro-index">{index + 1}</span>
               <div>
                 <strong>{step.title}</strong>
                 <p>{step.text}</p>
@@ -46,7 +58,7 @@ export function TutorialWeekIntroModal({ partyName, onDismiss }: TutorialWeekInt
             </li>
           ))}
         </ol>
-        <footer className="tutorial-intro-footer">
+        <footer className="campaign-intro-footer">
           <button type="button" className="ps-btn ps-btn--primary" onClick={onDismiss}>
             Anladım, başla
           </button>

@@ -28,15 +28,8 @@ export function SetupPartyPreview({ form, step }: SetupPartyPreviewProps) {
   const founding = getCampaignStartPreviewSummary(form.regionId);
   const neighborIlList = founding.neighborIlOfficeRegionNames.join(', ');
 
-  const stepHint =
-    step === 2 && color && symbol
-      ? `${color.effectSummary} · ${symbol.bonusSummary}`
-      : step === 3 && ideology && leadership
-        ? `${ideology.playStyle} · ${leadership.bonusSummary}`
-        : 'Renk, sembol, ideoloji ve liderlik oyun tarzını ve metrik bonuslarını etkiler.';
-
   return (
-    <aside className="setup-preview" aria-label="Parti önizlemesi">
+    <div className="setup-preview">
       <p className="setup-preview__eyebrow">Önizleme</p>
       <div
         className="setup-preview__card"
@@ -67,23 +60,22 @@ export function SetupPartyPreview({ form, step }: SetupPartyPreviewProps) {
           {step >= 3 && ideology ? <li>{ideology.name}</li> : null}
           {step >= 3 && leadership ? <li>{leadership.name}</li> : null}
         </ul>
+        <dl className="setup-preview__founding">
+          <div>
+            <dt>Kuruluş</dt>
+            <dd>
+              {founding.homeRegionName}: Genel Merkez + İl Bürosu · {neighborIlList}: İl Bürosu
+            </dd>
+          </div>
+          <div>
+            <dt>Ulusal destek</dt>
+            <dd>
+              {founding.playerSupportLabel} · İktidar ({founding.rulingPartyName}) ~%
+              {founding.rulingPartySupport}
+            </dd>
+          </div>
+        </dl>
       </div>
-      <dl className="setup-preview__founding">
-        <div>
-          <dt>Kuruluş</dt>
-          <dd>
-            {founding.homeRegionName}: Genel Merkez + İl Bürosu · {neighborIlList}: İl Bürosu
-          </dd>
-        </div>
-        <div>
-          <dt>Ulusal destek</dt>
-          <dd>
-            {founding.playerSupportLabel} · İktidar ({founding.rulingPartyName}) ~%
-            {founding.rulingPartySupport}
-          </dd>
-        </div>
-      </dl>
-      <p className="setup-preview__hint">{stepHint}</p>
-    </aside>
+    </div>
   );
 }

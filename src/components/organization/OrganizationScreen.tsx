@@ -12,7 +12,6 @@ import { OrganizationToolCard } from './OrganizationToolCard';
 import { Panel } from '../ui/Panel';
 import './organization.css';
 import './OrganizationScreen.css';
-import { TUTORIAL_SECTION_IDS } from '../../tutorial/tutorialScroll';
 
 export type OrganizationPageMode = 'national' | 'regional';
 
@@ -71,12 +70,14 @@ export function OrganizationScreen({
   return (
     <div className={`view-grid org-page org-page--${mode}`}>
       <header className="org-page-header">
-        <span className="org-page-kicker">Hafta {state.campaignWeek}</span>
-        <div className="org-page-title-row">
-          <h2 className="org-page-title">{PAGE_TITLES[mode]}</h2>
-          <span className="org-tool-count org-page-active-count">{activeCount} aktif araç</span>
+        <div className="org-page-heading">
+          <div className="org-page-title-row">
+            <h2 className="org-page-title">{PAGE_TITLES[mode]}</h2>
+            <span className="org-tool-count org-page-active-count">{activeCount} aktif araç</span>
+          </div>
+          <p className="org-page-subtitle">{PAGE_HINTS[mode]}</p>
         </div>
-        <p className="org-page-subtitle">{PAGE_HINTS[mode]}</p>
+        <span className="org-page-kicker">Hafta {state.campaignWeek}</span>
       </header>
 
       <div className="org-page-layout org-page-layout--full">
@@ -116,7 +117,6 @@ export function OrganizationScreen({
           ) : null}
 
           <div
-            id={!isNational ? TUTORIAL_SECTION_IDS['organization-tools'] : undefined}
             className="org-tools-grid org-tools-grid--quad"
           >
             {toolViews.map((view) => (

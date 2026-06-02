@@ -3,6 +3,7 @@
 import type { Dispatch } from 'react';
 import type { CampaignAction, GameState, RegionId } from '../../types/game';
 import type { GameAction } from '../../store/gameReducer';
+import type { DashboardView } from './DashboardScreen';
 import { AgendaHubPanel, type AgendaPageMode } from './AgendaHubPanel';
 import './AgendasScreen.css';
 
@@ -21,6 +22,8 @@ interface AgendasScreenProps {
   onClearSubAgendaResponse: (agendaId?: string) => void;
   onGoToRegional?: () => void;
   onGoToSub?: () => void;
+  onGoToCampaign?: () => void;
+  onNavigate?: (view: DashboardView) => void;
   dispatch: Dispatch<GameAction>;
 }
 
@@ -39,6 +42,8 @@ export function AgendasScreen({
   onClearSubAgendaResponse,
   onGoToRegional,
   onGoToSub,
+  onGoToCampaign,
+  onNavigate,
   dispatch,
 }: AgendasScreenProps) {
   return (
@@ -65,6 +70,8 @@ export function AgendasScreen({
         }
         onGoToRegional={onGoToRegional}
         onGoToSub={onGoToSub}
+        onGoToCampaign={onGoToCampaign}
+        onNavigate={onNavigate}
       />
     </div>
   );

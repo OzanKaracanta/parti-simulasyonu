@@ -34,24 +34,8 @@ import {
   type Dispatch,
   type CSSProperties,
 } from 'react';
-import { TutorialPanel } from '../tutorial/TutorialPanel';
-import { TutorialWeekIntroModal } from '../tutorial/TutorialWeekIntroModal';
-import {
-  canEndWeekStrict,
-  getTutorialProgress,
-  isTutorialActive,
-  markRadarTutorialViewed,
-} from '../../tutorial/tutorialEngine';
-import {
-  isTutorialIntroSeen,
-  isTutorialSkipped,
-  setTutorialIntroSeen,
-} from '../../tutorial/tutorialStorage';
-import { TUTORIAL_LAST_WEEK } from '../../tutorial/tutorialSteps';
-import {
-  scrollToTutorialSection,
-  type TutorialScrollSection,
-} from '../../tutorial/tutorialScroll';
+import { canFinishWeek } from '../../engine/eventEvaluation';
+import { CampaignStartIntroModal } from './CampaignStartIntroModal';
 import { WeekFlowPanel } from './WeekFlowPanel';
 import { colorOptions } from '../../data/setupOptions';
 import { isRegionalAction } from '../../data/regionalActions';
@@ -64,9 +48,7 @@ import { SelectedActionsPanel } from '../actions/SelectedActionsPanel';
 import { CampaignScreen } from './CampaignScreen';
 import { ReportsScreen } from '../report/ReportsScreen';
 import { StatisticsScreen } from '../statistics/StatisticsScreen';
-import { AgendaStatusSummary } from './AgendaStatusSummary';
 import { AgendasScreen } from './AgendasScreen';
-import { CommandCenterPanel } from './CommandCenterPanel';
 import { OrganizationScreen } from '../organization/OrganizationScreen';
 import { RegionMap, RegionPanel } from './RegionPanel';
 import { EventFeed } from './EventFeed';
@@ -74,19 +56,10 @@ import { SidebarNav } from './SidebarNav';
 import { RivalPanel } from './RivalPanel';
 import { SidebarSegmentSupport } from './SidebarSegmentSupport';
 import { AdvisorBriefingModal } from './AdvisorBriefingModal';
-import { EarlyWeekEndWarningModal } from './EarlyWeekEndWarningModal';
-import {
-  getEarlyWeekMissingActivities,
-  isEarlyWeekEndWarningActive,
-  type EarlyWeekMissingActivity,
-} from '../../engine/earlyWeekEndWarning';
 import { TopBar } from './TopBar';
 import { WeeklyAgendaNewsSection } from './overview/WeeklyAgendaNewsSection';
-import { WeeklyCashFlowPanel } from './WeeklyCashFlowPanel';
-import { WeeklyEnergyBudgetPanel } from './WeeklyEnergyBudgetPanel';
 import type { GameAction } from '../../store/gameReducer';
 import type { GameState, RegionId } from '../../types/game';
-import './CommandCenterPanel.css';
 import './dashboard.css';
 
 interface DashboardScreenProps {
@@ -98,89 +71,37 @@ export function DashboardScreen({ state, dispatch }: DashboardScreenProps) {
   const [view, setView] = useState<DashboardView>('overview');
   const [selectedRegionId, setSelectedRegionId] = useState<RegionId>(state.party.homeRegionId);
   const [organizationFocusRegion, setOrganizationFocusRegion] = useState<RegionId | null>(null);
-  const [tutorialSkipped, setTutorialSkipped] = useState(() => isTutorialSkipped());
-  const [tutorialTick, setTutorialTick] = useState(0);
   const [agendaFocusId, setAgendaFocusId] = useState<string | null>(null);
-  const [pendingTutorialScroll, setPendingTutorialScroll] =
-    useState<TutorialScrollSection | null>(null);
-  const [showWeekIntro, setShowWeekIntro] = useState(
-    () => state.campaignWeek === 1 && !isTutorialSkipped() && !isTutorialIntroSeen(),
+  const [showCampaignIntro, setShowCampaignIntro] = useState(
+    () => state.campaignWeek === 1,
   );
-  const [pendingEarlyWeekEnd, setPendingEarlyWeekEnd] = useState<
-    EarlyWeekMissingActivity[] | null
-  >(null);
   const lastCampaignWeekRef = useRef(state.campaignWeek);
 
-  const showTutorialCostBreakdown =
-    !tutorialSkipped && state.campaignWeek === 4;
-
-  const tutorialHighlightView = useMemo(() => {
-    const progress = getTutorialProgress(state, tutorialSkipped);
-    return progress?.nextStep?.targetView ?? null;
-  }, [state, tutorialSkipped, tutorialTick]);
-
-  const finishCheck = useMemo(
-    () => canEndWeekStrict(state, tutorialSkipped),
-    [state, tutorialSkipped, tutorialTick],
-  );
+  const finishCheck = useMemo(() => canFinishWeek(state), [state]);
 
   const handleEndWeek = useCallback(() => {
-    if (!finishCheck.ok || pendingEarlyWeekEnd) return;
-
-    if (isEarlyWeekEndWarningActive(state)) {
-      const missing = getEarlyWeekMissingActivities(state);
-      if (missing.length > 0) {
-        setPendingEarlyWeekEnd(missing);
-        return;
-      }
-    }
-
+    if (!finishCheck.ok) return;
     dispatch({ type: 'END_WEEK' });
-  }, [dispatch, finishCheck.ok, pendingEarlyWeekEnd, state]);
-
-  const confirmEarlyWeekEnd = useCallback(() => {
-    setPendingEarlyWeekEnd(null);
-    dispatch({ type: 'END_WEEK' });
-  }, [dispatch]);
-
-  const cancelEarlyWeekEnd = useCallback(() => {
-    setPendingEarlyWeekEnd(null);
-  }, []);
+  }, [dispatch, finishCheck.ok]);
 
   useEffect(() => {
     if (lastCampaignWeekRef.current === state.campaignWeek) return;
     lastCampaignWeekRef.current = state.campaignWeek;
-    setPendingEarlyWeekEnd(null);
     setView('overview');
     setAgendaFocusId(null);
     setOrganizationFocusRegion(null);
   }, [state.campaignWeek]);
 
-  const handleRadarTutorialViewed = useCallback(() => {
-    markRadarTutorialViewed(state);
-    setTutorialTick((n) => n + 1);
-  }, [state.party.name, state.campaignWeek]);
-
-  const handleTutorialNavigate = useCallback(
-    (target: DashboardView, section?: TutorialScrollSection) => {
+  const handleFlowNavigate = useCallback(
+    (target: DashboardView) => {
       if (target === 'organization-regional') {
         setOrganizationFocusRegion(state.party.homeRegionId);
         setSelectedRegionId(state.party.homeRegionId);
       }
       setView(target);
-      if (section) setPendingTutorialScroll(section);
     },
     [state.party.homeRegionId],
   );
-
-  useEffect(() => {
-    if (!pendingTutorialScroll) return;
-    const timer = window.setTimeout(() => {
-      scrollToTutorialSection(pendingTutorialScroll, state);
-      setPendingTutorialScroll(null);
-    }, 120);
-    return () => window.clearTimeout(timer);
-  }, [view, pendingTutorialScroll, state]);
 
   const selectAction = (actionId: string) => dispatch({ type: 'SELECT_ACTION', actionId });
   const unselectAction = (actionId: string) => dispatch({ type: 'UNSELECT_ACTION', actionId });
@@ -228,38 +149,15 @@ export function DashboardScreen({ state, dispatch }: DashboardScreenProps) {
   const lastHistory = state.history.length > 0 ? state.history[state.history.length - 1] : null;
   const politicalSegmentSupport = ensurePoliticalSegmentSupport(state).politicalSegmentSupport;
 
-  const dismissWeekIntro = () => {
-    setTutorialIntroSeen();
-    setShowWeekIntro(false);
-  };
-
-  const suppressAdvisorBriefingDuringTutorial =
-    !tutorialSkipped && isTutorialActive(state, false);
-
-  useEffect(() => {
-    if (!suppressAdvisorBriefingDuringTutorial || !state.activeAdvisorBriefing) return;
-    dispatch({ type: 'DISMISS_ADVISOR_BRIEFING' });
-  }, [
-    suppressAdvisorBriefingDuringTutorial,
-    state.activeAdvisorBriefing,
-    dispatch,
-  ]);
-
   return (
     <div
       className="dashboard-layout"
       style={{ '--party-color': partyColor } as CSSProperties}
     >
-      {showWeekIntro && !tutorialSkipped ? (
-        <TutorialWeekIntroModal partyName={state.party.name} onDismiss={dismissWeekIntro} />
-      ) : null}
-
-      {pendingEarlyWeekEnd && pendingEarlyWeekEnd.length > 0 ? (
-        <EarlyWeekEndWarningModal
-          week={state.campaignWeek}
-          missingActivities={pendingEarlyWeekEnd}
-          onConfirm={confirmEarlyWeekEnd}
-          onCancel={cancelEarlyWeekEnd}
+      {showCampaignIntro ? (
+        <CampaignStartIntroModal
+          partyName={state.party.name}
+          onDismiss={() => setShowCampaignIntro(false)}
         />
       ) : null}
 
@@ -269,9 +167,7 @@ export function DashboardScreen({ state, dispatch }: DashboardScreenProps) {
         onEndWeek={handleEndWeek}
       />
 
-      {state.activeAdvisorBriefing &&
-      !pendingEarlyWeekEnd &&
-      (tutorialSkipped || state.campaignWeek > TUTORIAL_LAST_WEEK) ? (
+      {state.activeAdvisorBriefing ? (
         <AdvisorBriefingModal
           briefing={state.activeAdvisorBriefing}
           onDismiss={() => dispatch({ type: 'DISMISS_ADVISOR_BRIEFING' })}
@@ -284,18 +180,10 @@ export function DashboardScreen({ state, dispatch }: DashboardScreenProps) {
             active={view}
             onChange={setView}
             pendingAgendaCount={pendingAgendaCount}
-            tutorialHighlightView={tutorialHighlightView}
           />
         </aside>
 
         <main className="dashboard-main">
-          <TutorialPanel
-            state={state}
-            skipped={tutorialSkipped}
-            onSkipChange={setTutorialSkipped}
-            onNavigate={handleTutorialNavigate}
-          />
-
           {view === 'overview' && (
             <div className="overview-command-layout">
               <section className="overview-map-section" aria-label="Türkiye haritası">
@@ -328,6 +216,8 @@ export function DashboardScreen({ state, dispatch }: DashboardScreenProps) {
                     variant="table"
                     segmentSupport={state.segmentSupport}
                     segmentChanges={lastHistory?.segmentChanges}
+                    politicalSegmentSupport={politicalSegmentSupport}
+                    politicalSegmentChanges={lastHistory?.politicalSegmentChanges}
                   />
                   <RivalPanel
                     variant="table"
@@ -340,24 +230,15 @@ export function DashboardScreen({ state, dispatch }: DashboardScreenProps) {
                 </div>
               </section>
 
-              <section className="overview-command-panel" aria-label="Komuta merkezi">
-                <CommandCenterPanel subtitle="Harita, plan ve bütçe özeti">
+              <section className="overview-command-panel" aria-label="Haftalık plan ve operasyonlar">
+                <div className="overview-command-modules">
                   <WeekFlowPanel
                     state={state}
-                    tutorialSkipped={tutorialSkipped}
                     finishCheck={finishCheck}
-                    onNavigate={handleTutorialNavigate}
-                  />
-                  <AgendaStatusSummary
-                    state={state}
-                    onOpenAgendaNational={() => openAgendaNational()}
-                    onOpenAgendaRegional={() => openAgendaRegional()}
-                    onOpenAgendaSub={openAgendaSub}
+                    onNavigate={handleFlowNavigate}
                   />
                   <SelectedActionsPanel state={state} onRemove={unselectAction} />
-                  <WeeklyCashFlowPanel state={state} />
-                  <WeeklyEnergyBudgetPanel state={state} />
-                </CommandCenterPanel>
+                </div>
               </section>
             </div>
           )}
@@ -367,10 +248,12 @@ export function DashboardScreen({ state, dispatch }: DashboardScreenProps) {
               mode="national"
               focusAgendaId={agendaFocusId}
               onFocusApplied={() => setAgendaFocusId(null)}
-              onRadarViewed={handleRadarTutorialViewed}
-              onGoToRegional={
-                state.regionalAgendas.length > 0 ? () => openAgendaRegional() : undefined
-              }
+              onGoToRegional={() => {
+                if (state.regionalAgendas.length > 0) openAgendaRegional();
+                else if (state.subAgendas.length > 0) openAgendaSub();
+                else setView('campaign-national');
+              }}
+              onNavigate={handleFlowNavigate}
               state={state}
               availableActions={state.availableActions}
               selectedResponseId={state.selectedEventResponseId}
@@ -388,7 +271,11 @@ export function DashboardScreen({ state, dispatch }: DashboardScreenProps) {
               mode="regional"
               focusAgendaId={agendaFocusId}
               onFocusApplied={() => setAgendaFocusId(null)}
-              onGoToSub={state.subAgendas.length > 0 ? openAgendaSub : undefined}
+              onGoToSub={() => {
+                if (state.subAgendas.length > 0) openAgendaSub();
+                else setView('campaign-national');
+              }}
+              onNavigate={handleFlowNavigate}
               state={state}
               availableActions={state.availableActions}
               selectedResponseId={state.selectedEventResponseId}
@@ -404,6 +291,8 @@ export function DashboardScreen({ state, dispatch }: DashboardScreenProps) {
           {view === 'agenda-sub' && (
             <AgendasScreen
               mode="sub"
+              onGoToCampaign={() => setView('campaign-national')}
+              onNavigate={handleFlowNavigate}
               state={state}
               availableActions={state.availableActions}
               selectedResponseId={state.selectedEventResponseId}
@@ -426,7 +315,6 @@ export function DashboardScreen({ state, dispatch }: DashboardScreenProps) {
               onSelectAction={selectAction}
               onUnselectAction={unselectAction}
               dispatch={dispatch}
-              showTutorialCostBreakdown={showTutorialCostBreakdown}
             />
           )}
 
@@ -440,7 +328,6 @@ export function DashboardScreen({ state, dispatch }: DashboardScreenProps) {
               onSelectAction={selectAction}
               onUnselectAction={unselectAction}
               dispatch={dispatch}
-              showTutorialCostBreakdown={showTutorialCostBreakdown}
             />
           )}
 
@@ -497,7 +384,7 @@ export function DashboardScreen({ state, dispatch }: DashboardScreenProps) {
           {view === 'statistics' && <StatisticsScreen state={state} />}
 
           {view === 'reports' && (
-            <ReportsScreen state={state} tutorialSkipped={tutorialSkipped} />
+            <ReportsScreen state={state} />
           )}
         </main>
       </div>

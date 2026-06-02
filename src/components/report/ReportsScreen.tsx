@@ -17,10 +17,9 @@ import './ReportsScreen.css';
 
 interface ReportsScreenProps {
   state: GameState;
-  tutorialSkipped?: boolean;
 }
 
-export function ReportsScreen({ state: rawState, tutorialSkipped = false }: ReportsScreenProps) {
+export function ReportsScreen({ state: rawState }: ReportsScreenProps) {
   const state = ensurePoliticalSegmentSupport(rawState);
   const history = state.history;
 
@@ -51,7 +50,7 @@ export function ReportsScreen({ state: rawState, tutorialSkipped = false }: Repo
           <ReportWeekCompare current={activeReport} previous={previousReport} />
         ) : null}
 
-        <WeeklyReport report={activeReport} tutorialSkipped={tutorialSkipped} />
+        <WeeklyReport report={activeReport} />
       </div>
 
       <aside className="reports-sidebar" aria-label="Kampanya durumu">
