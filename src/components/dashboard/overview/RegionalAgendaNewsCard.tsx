@@ -56,7 +56,7 @@ export function RegionalAgendaNewsCard({ model, onOpen }: RegionalAgendaNewsCard
           className="agenda-news-card-cta agenda-news-card-cta--link"
           onClick={onOpen}
         >
-          Bölgesel Gündeme Git
+          {model.ctaLabel}
         </button>
       </div>
     </article>

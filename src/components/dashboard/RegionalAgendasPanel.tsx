@@ -11,6 +11,7 @@ import type { GameState } from '../../types/game';
 import { Panel } from '../ui/Panel';
 import { RegionalAgendaCard } from './RegionalAgendaCard';
 import './RegionalAgendaPanel.css';
+import './agenda/weeklyAgenda.css';
 
 interface RegionalAgendasPanelProps {
   state: GameState;
@@ -20,6 +21,7 @@ interface RegionalAgendasPanelProps {
   layout?: 'embedded' | 'page';
   focusAgendaId?: string | null;
   onFocusApplied?: () => void;
+  onGoToSub?: () => void;
 }
 
 export function RegionalAgendasPanel({
@@ -30,6 +32,7 @@ export function RegionalAgendasPanel({
   layout = 'embedded',
   focusAgendaId = null,
   onFocusApplied,
+  onGoToSub,
 }: RegionalAgendasPanelProps) {
   const { regionalAgendas, selectedRegionalAgendaSelections } = state;
   const maxSlots = getRegionalAgendaMaxSlots(state.campaignWeek);
@@ -99,6 +102,11 @@ export function RegionalAgendasPanel({
       </div>
 
       <footer className="regional-agenda-footer">
+        {onGoToSub ? (
+          <button type="button" className="agenda-flow-continue-btn" onClick={onGoToSub}>
+            Alt Gündemlere Geç
+          </button>
+        ) : null}
         {slotsUsed > 0 ? (
           <button type="button" className="regional-agenda-clear-btn" onClick={() => onClearResponse()}>
             Tüm bölgesel seçimleri temizle

@@ -41,6 +41,7 @@ interface WeeklyAgendaPanelProps {
   layout?: 'embedded' | 'page';
   focusAgendaId?: string | null;
   onFocusApplied?: () => void;
+  onGoToRegional?: () => void;
 }
 
 export function WeeklyAgendaPanel({
@@ -52,6 +53,7 @@ export function WeeklyAgendaPanel({
   layout = 'embedded',
   focusAgendaId = null,
   onFocusApplied,
+  onGoToRegional,
 }: WeeklyAgendaPanelProps) {
   const storyHint = getUpcomingStoryHint(state);
 
@@ -170,7 +172,10 @@ export function WeeklyAgendaPanel({
         <div className="weekly-agenda-body">
           {decisionSection}
           <aside className="weekly-agenda-aside">
-            <ExpectedOutcomePanel selectedResponse={selectedResponse} />
+            <ExpectedOutcomePanel
+              selectedResponse={selectedResponse}
+              onGoToRegional={onGoToRegional}
+            />
             <SupportOperationsSection operationNames={recommendedOperationNames} />
           </aside>
         </div>

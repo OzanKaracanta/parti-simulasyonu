@@ -89,8 +89,7 @@ export function TopBar({ state, onEndWeek, finishCheck: finishCheckProp }: TopBa
       </div>
 
       <div className="topbar-actions">
-        <div className="topbar-resources" aria-label="Haftalık bütçe">
-          <span className="topbar-resources-kicker">Haftalık bütçe</span>
+        <div className="topbar-resources" aria-label="Kaynaklar">
           <div className="topbar-resources-chips">
             {WEEKLY_BUDGET_RESOURCE_KEYS.map((key) => {
               const value = state.resources[key];

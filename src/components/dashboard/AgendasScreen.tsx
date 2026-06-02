@@ -19,6 +19,8 @@ interface AgendasScreenProps {
   onSelectResponse: (responseId: string) => void;
   onSelectSubAgendaResponse: (agendaId: string, responseId: string) => void;
   onClearSubAgendaResponse: (agendaId?: string) => void;
+  onGoToRegional?: () => void;
+  onGoToSub?: () => void;
   dispatch: Dispatch<GameAction>;
 }
 
@@ -35,6 +37,8 @@ export function AgendasScreen({
   onSelectResponse,
   onSelectSubAgendaResponse,
   onClearSubAgendaResponse,
+  onGoToRegional,
+  onGoToSub,
   dispatch,
 }: AgendasScreenProps) {
   return (
@@ -59,6 +63,8 @@ export function AgendasScreen({
         onClearRegionalResponse={(agendaId) =>
           dispatch({ type: 'CLEAR_REGIONAL_AGENDA_RESPONSE', agendaId })
         }
+        onGoToRegional={onGoToRegional}
+        onGoToSub={onGoToSub}
       />
     </div>
   );

@@ -12,6 +12,7 @@ import { OrganizationToolCard } from './OrganizationToolCard';
 import { Panel } from '../ui/Panel';
 import './organization.css';
 import './OrganizationScreen.css';
+import { TUTORIAL_SECTION_IDS } from '../../tutorial/tutorialScroll';
 
 export type OrganizationPageMode = 'national' | 'regional';
 
@@ -114,7 +115,10 @@ export function OrganizationScreen({
             </div>
           ) : null}
 
-          <div className="org-tools-grid org-tools-grid--quad">
+          <div
+            id={!isNational ? TUTORIAL_SECTION_IDS['organization-tools'] : undefined}
+            className="org-tools-grid org-tools-grid--quad"
+          >
             {toolViews.map((view) => (
               <OrganizationToolCard
                 key={view.definition.id}

@@ -14,6 +14,7 @@ import { SubAgendaPanel } from './SubAgendaPanel';
 import './AgendaHubPanel.css';
 import './agendasPage.css';
 import './WeeklyEventPanel.css';
+import { TUTORIAL_SECTION_IDS } from '../../tutorial/tutorialScroll';
 
 interface AgendaHubPanelProps {
   state: GameState;
@@ -34,6 +35,8 @@ interface AgendaHubPanelProps {
   pageMode?: AgendaPageMode;
   focusAgendaId?: string | null;
   onFocusApplied?: () => void;
+  onGoToRegional?: () => void;
+  onGoToSub?: () => void;
 }
 
 export type AgendaPageMode = 'national' | 'regional' | 'sub';
@@ -67,6 +70,8 @@ export function AgendaHubPanel({
   pageMode,
   focusAgendaId = null,
   onFocusApplied,
+  onGoToRegional,
+  onGoToSub,
 }: AgendaHubPanelProps) {
   const subCount = state.subAgendas.length;
   const radarCount = state.radarAgendas.length;
@@ -187,9 +192,12 @@ export function AgendaHubPanel({
                 layout={layout}
                 focusAgendaId={focusAgendaId}
                 onFocusApplied={onFocusApplied}
+                onGoToRegional={onGoToRegional}
               />
               {radarCount > 0 ? (
-                <RadarAgendaPanel state={state} embedded onViewed={onRadarViewed} />
+                <div id={TUTORIAL_SECTION_IDS['radar-agenda']}>
+                  <RadarAgendaPanel state={state} embedded onViewed={onRadarViewed} />
+                </div>
               ) : null}
             </>
           ) : null}
@@ -213,6 +221,7 @@ export function AgendaHubPanel({
               layout={layout}
               focusAgendaId={focusAgendaId}
               onFocusApplied={onFocusApplied}
+              onGoToSub={onGoToSub}
             />
           ) : null}
         </div>

@@ -1,6 +1,7 @@
 /** Tutorial — haftalık öğrenme hedefleri ve adım kimlikleri */
 
 import type { DashboardView } from '../components/dashboard/DashboardScreen';
+import type { TutorialScrollSection } from './tutorialScroll';
 
 export type TutorialStepId =
   | 'main_agenda'
@@ -14,6 +15,7 @@ export interface TutorialStepDef {
   title: string;
   description: string;
   targetView: DashboardView;
+  targetSection: TutorialScrollSection;
   required: boolean;
 }
 
@@ -30,6 +32,7 @@ export interface TutorialStepProgress {
   title: string;
   description: string;
   targetView: DashboardView;
+  targetSection: TutorialScrollSection;
   required: boolean;
   done: boolean;
 }

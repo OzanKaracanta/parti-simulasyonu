@@ -34,7 +34,7 @@ export interface RegionalAgendaNewsCardModel {
   summary: string;
   segmentLabels: string[];
   responseStatus: 'pending' | 'answered' | 'locked';
-  ctaLabel: 'İncele' | 'Bölgesel Gündeme Git';
+  ctaLabel: 'İncele' | 'Gündeme Git';
   accessWarning: string | null;
   miniBadges: AgendaNewsMiniBadge[];
   imageUrl?: string;

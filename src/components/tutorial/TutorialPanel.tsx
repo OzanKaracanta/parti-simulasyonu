@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import type { DashboardView } from '../dashboard/DashboardScreen';
+import type { TutorialScrollSection } from '../../tutorial/tutorialScroll';
 import type { GameState } from '../../types/game';
 import {
   getTutorialProgress,
@@ -15,7 +16,7 @@ interface TutorialPanelProps {
   state: GameState;
   skipped: boolean;
   onSkipChange: (skipped: boolean) => void;
-  onNavigate: (view: DashboardView) => void;
+  onNavigate: (view: DashboardView, section: TutorialScrollSection) => void;
 }
 
 export function TutorialPanel({
@@ -43,12 +44,10 @@ export function TutorialPanel({
     onSkipChange(true);
   };
 
-  const handleGoToStep = (view: DashboardView) => {
-    onNavigate(view);
+  const handleGoToStep = (view: DashboardView, section: TutorialScrollSection) => {
+    onNavigate(view, section);
     refresh();
   };
-
-  const doneCount = progress.steps.filter((s) => s.done).length;
 
   return (
     <section className="tutorial-panel" aria-label="Öğretici tur">
@@ -83,7 +82,7 @@ export function TutorialPanel({
               <button
                 type="button"
                 className="tutorial-go-btn"
-                onClick={() => handleGoToStep(step.targetView)}
+                onClick={() => handleGoToStep(step.targetView, step.targetSection)}
               >
                 Git →
               </button>
@@ -91,22 +90,6 @@ export function TutorialPanel({
           </li>
         ))}
       </ol>
-
-      <footer className="tutorial-panel-footer">
-        <span className="tutorial-progress-text">
-          {doneCount}/{progress.steps.length} adım
-          {progress.allRequiredDone ? ' · Turu bitirebilirsin' : ''}
-        </span>
-        {progress.nextStep ? (
-          <button
-            type="button"
-            className="ps-btn ps-btn--primary tutorial-primary-cta"
-            onClick={() => handleGoToStep(progress.nextStep!.targetView)}
-          >
-            Sıradaki: {progress.nextStep.title}
-          </button>
-        ) : null}
-      </footer>
     </section>
   );
 }

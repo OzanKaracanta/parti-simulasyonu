@@ -343,7 +343,15 @@
 
 /* Footer */
 .regional-agenda-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
   padding: 0 24px 20px;
+}
+
+.regional-agenda-footer .agenda-flow-continue-btn {
+  max-width: 360px;
 }
 
 .regional-agenda-clear-btn {

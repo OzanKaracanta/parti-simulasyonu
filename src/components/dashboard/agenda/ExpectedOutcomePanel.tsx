@@ -4,9 +4,13 @@ import './weeklyAgenda.css';
 
 interface ExpectedOutcomePanelProps {
   selectedResponse: AgendaResponseDisplay | null;
+  onGoToRegional?: () => void;
 }
 
-export function ExpectedOutcomePanel({ selectedResponse }: ExpectedOutcomePanelProps) {
+export function ExpectedOutcomePanel({
+  selectedResponse,
+  onGoToRegional,
+}: ExpectedOutcomePanelProps) {
   const hasSelection = Boolean(selectedResponse);
 
   const effectLines: AgendaEffectLine[] = hasSelection
@@ -39,6 +43,18 @@ export function ExpectedOutcomePanel({ selectedResponse }: ExpectedOutcomePanelP
             <p className="agenda-outcome-risk">
               <strong>Risk:</strong> {selectedResponse.risk}
             </p>
+          ) : null}
+
+          {onGoToRegional ? (
+            <div className="agenda-outcome-continue">
+              <button
+                type="button"
+                className="agenda-flow-continue-btn"
+                onClick={onGoToRegional}
+              >
+                Bölgesel Gündemlere Geç
+              </button>
+            </div>
           ) : null}
         </>
       )}

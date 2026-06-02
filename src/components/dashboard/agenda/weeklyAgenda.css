@@ -175,6 +175,7 @@
 }
 
 .agenda-response-card {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -199,12 +200,15 @@
 
 .agenda-response-card::before {
   content: '';
-  display: block;
-  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
   height: 2px;
-  margin: -2px 0 4px;
-  border-radius: 2px 2px 0 0;
+  border-radius: var(--ps-radius-md) var(--ps-radius-md) 0 0;
   opacity: 0.7;
+  z-index: 0;
+  pointer-events: none;
 }
 
 .agenda-response-card.stance-decisive::before {
@@ -244,12 +248,37 @@
   opacity: 1;
 }
 
+.agenda-response-check {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 1;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 800;
+  color: transparent;
+  border: 1px solid var(--ps-border-strong);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.agenda-response-card.is-selected .agenda-response-check {
+  color: var(--ps-text-inverse);
+  border-color: var(--ps-opportunity);
+  background: var(--ps-opportunity);
+}
+
 .agenda-response-stance {
   font-size: 10px;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.07em;
   color: var(--ps-text-dim);
+  padding-right: 24px;
 }
 
 .agenda-response-card.stance-decisive .agenda-response-stance {
@@ -432,6 +461,37 @@
 
 .agenda-outcome-risk strong {
   color: var(--ps-crisis-light);
+}
+
+.agenda-outcome-continue {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--ps-border-subtle);
+}
+
+.agenda-flow-continue-btn {
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: inherit;
+  letter-spacing: 0.02em;
+  color: #f0faf4;
+  background: var(--ps-btn-success-bg);
+  border: 1px solid var(--ps-btn-success-border);
+  border-radius: var(--ps-radius-md);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.28);
+  cursor: pointer;
+  transition:
+    filter 0.16s ease,
+    transform 0.12s ease,
+    box-shadow 0.16s ease;
+}
+
+.agenda-flow-continue-btn:hover {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.32);
 }
 
 @media (max-width: 900px) {

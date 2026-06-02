@@ -47,6 +47,10 @@ import {
   setTutorialIntroSeen,
 } from '../../tutorial/tutorialStorage';
 import { TUTORIAL_LAST_WEEK } from '../../tutorial/tutorialSteps';
+import {
+  scrollToTutorialSection,
+  type TutorialScrollSection,
+} from '../../tutorial/tutorialScroll';
 import { WeekFlowPanel } from './WeekFlowPanel';
 import { colorOptions } from '../../data/setupOptions';
 import { isRegionalAction } from '../../data/regionalActions';
@@ -90,6 +94,8 @@ export function DashboardScreen({ state, dispatch }: DashboardScreenProps) {
   const [tutorialSkipped, setTutorialSkipped] = useState(() => isTutorialSkipped());
   const [tutorialTick, setTutorialTick] = useState(0);
   const [agendaFocusId, setAgendaFocusId] = useState<string | null>(null);
+  const [pendingTutorialScroll, setPendingTutorialScroll] =
+    useState<TutorialScrollSection | null>(null);
   const [showWeekIntro, setShowWeekIntro] = useState(
     () => state.campaignWeek === 1 && !isTutorialSkipped() && !isTutorialIntroSeen(),
   );
@@ -113,15 +119,25 @@ export function DashboardScreen({ state, dispatch }: DashboardScreenProps) {
   }, [state.party.name, state.campaignWeek]);
 
   const handleTutorialNavigate = useCallback(
-    (target: DashboardView) => {
+    (target: DashboardView, section?: TutorialScrollSection) => {
       if (target === 'organization-regional') {
         setOrganizationFocusRegion(state.party.homeRegionId);
         setSelectedRegionId(state.party.homeRegionId);
       }
       setView(target);
+      if (section) setPendingTutorialScroll(section);
     },
     [state.party.homeRegionId],
   );
+
+  useEffect(() => {
+    if (!pendingTutorialScroll) return;
+    const timer = window.setTimeout(() => {
+      scrollToTutorialSection(pendingTutorialScroll, state);
+      setPendingTutorialScroll(null);
+    }, 120);
+    return () => window.clearTimeout(timer);
+  }, [view, pendingTutorialScroll, state]);
 
   const selectAction = (actionId: string) => dispatch({ type: 'SELECT_ACTION', actionId });
   const unselectAction = (actionId: string) => dispatch({ type: 'UNSELECT_ACTION', actionId });
@@ -299,6 +315,9 @@ export function DashboardScreen({ state, dispatch }: DashboardScreenProps) {
               focusAgendaId={agendaFocusId}
               onFocusApplied={() => setAgendaFocusId(null)}
               onRadarViewed={handleRadarTutorialViewed}
+              onGoToRegional={
+                state.regionalAgendas.length > 0 ? () => openAgendaRegional() : undefined
+              }
               state={state}
               availableActions={state.availableActions}
               selectedResponseId={state.selectedEventResponseId}
@@ -316,6 +335,7 @@ export function DashboardScreen({ state, dispatch }: DashboardScreenProps) {
               mode="regional"
               focusAgendaId={agendaFocusId}
               onFocusApplied={() => setAgendaFocusId(null)}
+              onGoToSub={state.subAgendas.length > 0 ? openAgendaSub : undefined}
               state={state}
               availableActions={state.availableActions}
               selectedResponseId={state.selectedEventResponseId}

@@ -41,6 +41,9 @@ export function AgendaResponseCard({
       className={`agenda-response-card stance-${option.stance} ${selected ? 'is-selected' : ''} ${disabled ? 'is-disabled' : ''}`}
       onClick={onSelect}
     >
+      <span className="agenda-response-check" aria-hidden>
+        {selected ? '✓' : ''}
+      </span>
       <span className="agenda-response-stance">{option.stanceLabel}</span>
       <span className="agenda-response-title">{option.title}</span>
       <p className="agenda-response-desc">{option.description}</p>

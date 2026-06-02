@@ -175,7 +175,7 @@ function buildRegionalCard(
     summary: truncateSummary(agenda.description, 110),
     segmentLabels: segmentLabelsFromIds(segmentIds),
     responseStatus,
-    ctaLabel: answered ? 'Bölgesel Gündeme Git' : 'İncele',
+    ctaLabel: answered ? 'Gündeme Git' : 'İncele',
     accessWarning: accessReason
       ? 'Yanıt için bölgede gönüllü ağı gerekli.'
       : null,

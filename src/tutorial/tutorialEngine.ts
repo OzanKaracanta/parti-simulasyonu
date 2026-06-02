@@ -72,6 +72,7 @@ export function getTutorialProgress(
     title: step.title,
     description: step.description,
     targetView: step.targetView,
+    targetSection: step.targetSection,
     required: step.required,
     done: isTutorialStepComplete(step.id, state),
   }));

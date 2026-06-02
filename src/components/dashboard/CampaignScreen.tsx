@@ -8,6 +8,7 @@ import type { GameState, RegionId } from '../../types/game';
 import type { GameAction } from '../../store/gameReducer';
 import { CoordinationMeter } from './CoordinationMeter';
 import './CampaignScreen.css';
+import { TUTORIAL_SECTION_IDS } from '../../tutorial/tutorialScroll';
 
 export type CampaignPageMode = 'national' | 'regional';
 
@@ -54,7 +55,11 @@ export function CampaignScreen({
       </header>
 
       <div className="campaign-layout campaign-layout-single">
-        <section className="campaign-operations-column" aria-label={PAGE_TITLES[mode]}>
+        <section
+          id={mode === 'national' ? TUTORIAL_SECTION_IDS['campaign-operations'] : undefined}
+          className="campaign-operations-column"
+          aria-label={PAGE_TITLES[mode]}
+        >
           {mode === 'national' ? (
             <ActionList
               state={{ ...state, availableActions: nationalActions }}
